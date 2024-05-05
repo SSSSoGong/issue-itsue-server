@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @DiscriminatorValue("U")
-public class User {
+public class User extends Account {
 
     @OneToMany(mappedBy = "user")
     private List<Role> roles = new ArrayList<>();

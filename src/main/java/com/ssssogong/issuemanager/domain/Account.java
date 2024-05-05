@@ -16,6 +16,7 @@ public abstract class Account {
     @Column(name = "ACCOUNT_ID")
     private Long id;
 
+    private String acc_Id;
     private String password;
     private boolean isAdmin;
     private String groupCode;
