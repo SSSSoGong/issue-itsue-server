@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @DiscriminatorValue("U")
+@PrimaryKeyJoinColumn(name = "USER_ID")
 public class User extends Account {
 
     @OneToMany(mappedBy = "user")
