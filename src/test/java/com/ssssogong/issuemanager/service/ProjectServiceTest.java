@@ -21,7 +21,6 @@ public class ProjectServiceTest {
     ProjectService projectService;
     @Autowired
     AccountService accountService;
-
     @Autowired
     RoleService roleService;
 
@@ -46,10 +45,6 @@ public class ProjectServiceTest {
         member.setName("Hyun");
         accountService.loginAccount(member);
 
-        Role role = new Role();
-        role.setMember(member);
-        role.setProject(project);
-        role.setRole("Tester");
-        roleService.saveRole(role);
+        roleService.saveRole("Tester", member, project);
     }
 }

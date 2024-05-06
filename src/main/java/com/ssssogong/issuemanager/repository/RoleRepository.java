@@ -25,4 +25,5 @@ public class RoleRepository {
         return em.createQuery("select r from Role r", Role.class)
                 .getResultList();
     }
+
 }
