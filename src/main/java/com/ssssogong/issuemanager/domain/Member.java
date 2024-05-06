@@ -11,9 +11,9 @@ import java.util.List;
 @Getter
 @Setter
 @DiscriminatorValue("U")
-@PrimaryKeyJoinColumn(name = "USER_ID")
-public class User extends Account {
+@PrimaryKeyJoinColumn(name = "MEMBER_ID")
+public class Member extends Account {
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "member")
     private List<Role> roles = new ArrayList<>();
 }

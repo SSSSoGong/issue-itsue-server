@@ -31,4 +31,11 @@ public class Project {
     @OneToMany(mappedBy = "project")
     private List<Role> roles = new ArrayList<>();
 
+
+    public void setAdmin(Admin admin) {
+        if(this.admin != null)
+            this.admin.getProjects().remove(this);
+        this.admin = admin;
+        admin.getProjects().add(this);
+    }
 }

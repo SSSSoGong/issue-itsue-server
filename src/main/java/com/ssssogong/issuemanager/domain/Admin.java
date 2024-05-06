@@ -16,4 +16,5 @@ public class Admin extends Account {
 
     @OneToMany(mappedBy = "admin")
     private List<Project> projects = new ArrayList<>();
+
 }

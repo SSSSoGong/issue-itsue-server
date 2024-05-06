@@ -1,7 +1,8 @@
 package com.ssssogong.issuemanager.service;
 
+import com.ssssogong.issuemanager.domain.Member;
 import com.ssssogong.issuemanager.domain.Project;
-import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.domain.Role;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,12 @@ import static org.junit.Assert.assertEquals;
 public class ProjectServiceTest {
 
     @Autowired
-    ProjectRepository projectRepository;
-    @Autowired
     ProjectService projectService;
+    @Autowired
+    AccountService accountService;
+
+    @Autowired
+    RoleService roleService;
 
     @Test
     public void 프로젝트_추가() throws Exception {
@@ -28,6 +32,24 @@ public class ProjectServiceTest {
         project.setSubject("OOAD");
 
         projectService.saveProject(project);
-        assertEquals(project, projectRepository.findProject(project.getId()));
+        assertEquals(project, projectService.findOne(project.getId()));
+    }
+
+    @Test
+    public void 프로젝트_인원추가() throws Exception {
+        Project project = new Project();
+        project.setProjectName("SE");
+        project.setSubject("OOAD");
+        projectService.saveProject(project);
+
+        Member member = new Member();
+        member.setName("Hyun");
+        accountService.loginAccount(member);
+
+        Role role = new Role();
+        role.setMember(member);
+        role.setProject(project);
+        role.setRole("Tester");
+        roleService.saveRole(role);
     }
 }
