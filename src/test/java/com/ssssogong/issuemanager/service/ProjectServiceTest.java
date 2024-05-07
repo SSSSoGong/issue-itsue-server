@@ -2,7 +2,6 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Member;
 import com.ssssogong.issuemanager.domain.Project;
-import com.ssssogong.issuemanager.domain.Role;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ public class ProjectServiceTest {
     @Autowired
     AccountService accountService;
     @Autowired
-    RoleService roleService;
+    MPService MPService;
 
     @Test
     public void 프로젝트_추가() throws Exception {
@@ -45,6 +44,6 @@ public class ProjectServiceTest {
         member.setName("Hyun");
         accountService.loginAccount(member);
 
-        roleService.saveRole("Tester", member, project);
+        MPService.saveRole("Tester", member, project);
     }
 }

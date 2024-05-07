@@ -15,5 +15,5 @@ import java.util.List;
 public class Member extends Account {
 
     @OneToMany(mappedBy = "member")
-    private List<Role> roles = new ArrayList<>();
+    private List<Member_Project> memberProjects = new ArrayList<>();
 }

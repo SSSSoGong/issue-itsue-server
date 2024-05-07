@@ -29,11 +29,15 @@ public class Project {
     private Admin admin;
 
     @OneToMany(mappedBy = "project")
-    private List<Role> roles = new ArrayList<>();
+    private List<Member_Project> memberProjects = new ArrayList<>();
+
+    @OneToMany
+    @JoinColumn(name = "PROJECT_ID")
+    private List<Issue> issues = new ArrayList<>();
 
 
     public void setAdmin(Admin admin) {
-        if(this.admin != null)
+        if (this.admin != null)
             this.admin.getProjects().remove(this);
         this.admin = admin;
         admin.getProjects().add(this);
