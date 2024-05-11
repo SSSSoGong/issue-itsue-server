@@ -1,8 +1,10 @@
 package com.ssssogong.issuemanager.domain;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.ssssogong.issuemanager.domain.account.Admin;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,36 +12,22 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
-public class Project {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder
+public class Project extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "PROJECT_ID")
+    @Column(name = "project_id")
     private Long id;
 
-    private String projectName;
+    private String name;
     private String subject;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ADMIN_ID")
+    @JoinColumn(name = "admin_id")
     private Admin admin;
 
     @OneToMany(mappedBy = "project")
-    private List<Member_Project> memberProjects = new ArrayList<>();
-
-    @OneToMany
-    @JoinColumn(name = "PROJECT_ID")
     private List<Issue> issues = new ArrayList<>();
-
-
-    public void setAdmin(Admin admin) {
-        if (this.admin != null)
-            this.admin.getProjects().remove(this);
-        this.admin = admin;
-        admin.getProjects().add(this);
-    }
 }

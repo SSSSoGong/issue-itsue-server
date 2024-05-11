@@ -1,41 +1,48 @@
 package com.ssssogong.issuemanager.domain;
 
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
-public class Comment extends BaseEntity {
+public class IssueModification extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "comment_id")
+    @Column(name = "im_id")
     private Long id;
 
-    private String content;
-    private List<String> imageUrls = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "'from'")
+    private State from;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "'to'")
+    private State to;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
     private Issue issue;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User writer;
-    
+    private User modifier;
 
     public void setIssue(Issue issue) {
         if (this.issue != null) {
-            this.issue.getComments().remove(this);
+            this.issue.getIssueModifications().remove(this);
         }
         this.issue = issue;
-        issue.getComments().add(this);
+        issue.getIssueModifications().add(this);
     }
+
 }
