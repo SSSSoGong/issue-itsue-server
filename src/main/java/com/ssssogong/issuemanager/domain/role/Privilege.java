@@ -1,4 +1,4 @@
-package com.ssssogong.issuemanager.domain;
+package com.ssssogong.issuemanager.domain.role;
 
 public enum Privilege {
     ISSUE_REPORTABLE,

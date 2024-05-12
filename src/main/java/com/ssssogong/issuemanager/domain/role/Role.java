@@ -1,4 +1,4 @@
-package com.ssssogong.issuemanager.domain;
+package com.ssssogong.issuemanager.domain.role;
 
 import com.ssssogong.issuemanager.util.StringCollectionConverter;
 import jakarta.persistence.*;
@@ -20,8 +20,9 @@ public abstract class Role implements GrantedAuthority {
     @Getter
     private Long id;
 
-    @Convert(converter = StringCollectionConverter.class) // Collection이지만 String 으로 변환하여 하나의 컬럼에 저장
-    @Enumerated(EnumType.STRING) // enum 이름 그대로 저장
+    /**Role에 주어진 권한 목록*/
+    @Convert(converter = StringCollectionConverter.class) // Collection => String 으로 변환하여 하나의 컬럼에 저장
+    @Enumerated(EnumType.STRING)
     @Column
     @Getter
     protected Collection<Privilege> allowedPrivileges;
