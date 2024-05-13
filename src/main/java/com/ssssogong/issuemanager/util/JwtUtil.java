@@ -1,5 +1,7 @@
 package com.ssssogong.issuemanager.util;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +26,7 @@ public class JwtUtil {
         this.expirationMinutes = expirationMinutes;
     }
 
-    public String createToken(final long accountId, final boolean isAdmin) {
+    public String createToken(final String accountId, final boolean isAdmin) {
         Date now = new Date();
         return Jwts.builder()
                 .claim(ACCOUNT_ID, accountId)
@@ -35,5 +37,19 @@ public class JwtUtil {
                 .compact();
     }
 
-    //todo: 토큰에서 유저 정보 extract
+    public AccessUser extractUserData(final String token) {
+        try {
+            final Claims payload = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            final String accountId = payload.get(ACCOUNT_ID, String.class);
+            final Boolean isAdmin = payload.get(IS_ADMIN, Boolean.class);
+            return new AccessUser(accountId, isAdmin);
+        } catch (ExpiredJwtException e) {
+            throw new IllegalArgumentException("만료된 토큰입니다");
+        }
+        //todo: 예외처리
+    }
 }

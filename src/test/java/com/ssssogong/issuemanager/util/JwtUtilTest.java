@@ -21,7 +21,7 @@ class JwtUtilTest {
 
     @Test
     void JWT_토큰_생성() {
-        final long accountId = 1L;
+        final String accountId = "happy";
         final String token = JWT_UTIL.createToken(accountId, false);
 
         assertThat(token).isNotBlank();
@@ -29,7 +29,7 @@ class JwtUtilTest {
 
     @Test
     void 시크릿_키로_JWT_토큰_검증() {
-        final long accountId = 1L;
+        final String accountId = "happy";
         final String token = JWT_UTIL.createToken(accountId, false);
 
         assertDoesNotThrow(
@@ -43,7 +43,7 @@ class JwtUtilTest {
 
     @Test
     void 시크릿_키로_JWT_토큰에서_계정_아이디_추출() {
-        final long accountId = 1L;
+        final String accountId = "happy";
         final String token = JWT_UTIL.createToken(accountId, false);
 
         final Claims payload = Jwts.parser()
@@ -51,10 +51,20 @@ class JwtUtilTest {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        final Long extractedAccountId = payload.get(ACCOUNT_ID, Long.class);
+        final String extractedAccountId = payload.get(ACCOUNT_ID, String.class);
         final Boolean extractedIsAdmin = payload.get(IS_ADMIN, Boolean.class);
 
         assertThat(extractedAccountId).isEqualTo(accountId);
         assertThat(extractedIsAdmin).isFalse();
+    }
+
+    @Test
+    void JWT_토큰에서_유저_정보_추출() {
+        final String accountId = "happy";
+        final String token = JWT_UTIL.createToken(accountId, false);
+
+        final AccessUser accessUser = JWT_UTIL.extractUserData(token);
+        assertThat(accessUser.getAccountId()).isEqualTo(accountId);
+        assertThat(accessUser.isAdmin()).isFalse();
     }
 }
