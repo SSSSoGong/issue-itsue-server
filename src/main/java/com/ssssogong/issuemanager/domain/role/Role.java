@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthoritiesContainer;
 
 import java.util.Collection;
 
@@ -14,7 +14,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public abstract class Role implements GrantedAuthority {
+public abstract class Role implements GrantedAuthoritiesContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
