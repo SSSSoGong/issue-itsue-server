@@ -63,8 +63,8 @@ class JwtUtilTest {
         final String accountId = "happy";
         final String token = JWT_UTIL.createToken(accountId, false);
 
-        final AccessUser accessUser = JWT_UTIL.extractUserData(token);
-        assertThat(accessUser.getAccountId()).isEqualTo(accountId);
-        assertThat(accessUser.isAdmin()).isFalse();
+        final AccessAccount accessAccount = JWT_UTIL.extractAccountData(token);
+        assertThat(accessAccount.getAccountId()).isEqualTo(accountId);
+        assertThat(accessAccount.isAdmin()).isFalse();
     }
 }

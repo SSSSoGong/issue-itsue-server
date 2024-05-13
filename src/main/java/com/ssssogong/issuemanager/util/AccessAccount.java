@@ -3,12 +3,12 @@ package com.ssssogong.issuemanager.util;
 import lombok.Getter;
 
 @Getter
-public class AccessUser {
+public class AccessAccount {
 
     private final String accountId;
     private final boolean isAdmin;
 
-    public AccessUser(final String accountId, final boolean isAdmin) {
+    public AccessAccount(final String accountId, final boolean isAdmin) {
         this.accountId = accountId;
         this.isAdmin = isAdmin;
     }

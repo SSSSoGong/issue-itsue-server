@@ -37,7 +37,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public AccessUser extractUserData(final String token) {
+    public AccessAccount extractAccountData(final String token) {
         try {
             final Claims payload = Jwts.parser()
                     .verifyWith(secretKey)
@@ -46,7 +46,7 @@ public class JwtUtil {
                     .getPayload();
             final String accountId = payload.get(ACCOUNT_ID, String.class);
             final Boolean isAdmin = payload.get(IS_ADMIN, Boolean.class);
-            return new AccessUser(accountId, isAdmin);
+            return new AccessAccount(accountId, isAdmin);
         } catch (ExpiredJwtException e) {
             throw new IllegalArgumentException("만료된 토큰입니다");
         }
