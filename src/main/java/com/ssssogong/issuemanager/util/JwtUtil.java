@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
     private static final String ACCOUNT_ID = "accountId";
+    private static final String IS_ADMIN = "isAdmin";
     private static final int MINUTES_TO_MILLISECONDS = 60 * 1000;
 
     private final SecretKey secretKey;
@@ -23,10 +24,11 @@ public class JwtUtil {
         this.expirationMinutes = expirationMinutes;
     }
 
-    public String createToken(final long accountId) { //todo: 어떤 정보를 담을까? admin 여부?
+    public String createToken(final long accountId, final boolean isAdmin) {
         Date now = new Date();
         return Jwts.builder()
                 .claim(ACCOUNT_ID, accountId)
+                .claim(IS_ADMIN, isAdmin)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationMinutes * MINUTES_TO_MILLISECONDS))
                 .signWith(secretKey)
