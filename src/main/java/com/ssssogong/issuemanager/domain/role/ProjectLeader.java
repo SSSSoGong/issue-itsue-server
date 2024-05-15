@@ -1,6 +1,5 @@
 package com.ssssogong.issuemanager.domain.role;
 
-
 import jakarta.persistence.Entity;
 import java.util.List;
 
@@ -12,4 +11,5 @@ public class ProjectLeader extends Role {
                 Privilege.ISSUE_CLOSABLE
         );
     }
+
 }
