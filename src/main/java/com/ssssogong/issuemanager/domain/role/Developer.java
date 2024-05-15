@@ -10,4 +10,5 @@ public class Developer extends Role{
                 Privilege.ISSUE_FIXABLE,
         });
     }
+
 }
