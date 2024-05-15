@@ -6,8 +6,8 @@ import java.util.List;
 @Entity
 public class Developer extends Role{
     {
-        this.allowedPrivileges = List.of( new Privilege[]{
-                Privilege.ISSUE_FIXABLE,
-        });
+        this.allowedPrivileges = List.of(
+                Privilege.ISSUE_FIXABLE
+        );
     }
 }

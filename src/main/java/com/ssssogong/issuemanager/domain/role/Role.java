@@ -18,11 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Role implements GrantedAuthoritiesContainer {
-    public Role(Collection<Privilege> privileges){
-        allowedPrivileges = privileges;
-    }
-
+public abstract class Role implements GrantedAuthoritiesContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
