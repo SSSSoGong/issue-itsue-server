@@ -4,7 +4,6 @@ import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

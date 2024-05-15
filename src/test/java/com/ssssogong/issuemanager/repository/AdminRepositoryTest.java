@@ -1,36 +1,31 @@
 package com.ssssogong.issuemanager.repository;
 
 import com.ssssogong.issuemanager.domain.account.Admin;
-import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+//import static org.junit.Assert.*;
 
 @DataJpaTest
-@RunWith(SpringRunner.class)
-//@ExtendWith(SpringExtension.class)
+@ExtendWith(SpringExtension.class)
+@Sql(value = "/truncate.sql")
 public class AdminRepositoryTest {
-
-    @Autowired
-    AdminRepository adminRepository;
 
     private static Admin admin1;
     private static Admin admin2;
+    @Autowired
+    AdminRepository adminRepository;
 
-    @Before
-//    @BeforeEach
+    @BeforeEach
     public void setUp() {
         admin1 = Admin.builder()
                 .username("Jin")
@@ -43,6 +38,7 @@ public class AdminRepositoryTest {
                 .accountId("2")
                 .password("2")
                 .build();
+
     }
 
     @DisplayName("계정 추가")
@@ -50,12 +46,14 @@ public class AdminRepositoryTest {
     public void 계정_추가() {
         // given
         adminRepository.save(admin1);
+        System.out.println(admin1.getId());
 
         // when
         Admin findAdmin = adminRepository.findById(1L).orElseThrow(RuntimeException::new);
 
         // then
         assertThat(admin1.getUsername()).isEqualTo(findAdmin.getUsername());
+
     }
 
     @DisplayName("계정 찾기")
@@ -86,5 +84,6 @@ public class AdminRepositoryTest {
         // then
         assertThat(size).isNotEqualTo(adminRepository.count());
     }
+
 
 }

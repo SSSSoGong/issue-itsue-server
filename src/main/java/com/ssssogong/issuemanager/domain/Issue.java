@@ -2,10 +2,13 @@ package com.ssssogong.issuemanager.domain;
 
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.Category;
-import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
+import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -51,9 +54,11 @@ public class Issue extends BaseEntity {
     private Project project;
 
     @OneToMany(mappedBy = "issue")
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "issue")
+    @Builder.Default
     private List<IssueModification> issueModifications = new ArrayList<>();
 
     public void setProject(Project project) {

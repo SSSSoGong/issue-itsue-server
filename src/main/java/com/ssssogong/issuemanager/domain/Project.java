@@ -1,12 +1,13 @@
 package com.ssssogong.issuemanager.domain;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,5 +30,6 @@ public class Project extends BaseEntity {
     private Admin admin;
 
     @OneToMany(mappedBy = "project")
+    @Builder.Default
     private List<Issue> issues = new ArrayList<>();
 }

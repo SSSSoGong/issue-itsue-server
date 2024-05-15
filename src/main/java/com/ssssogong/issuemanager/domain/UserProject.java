@@ -3,7 +3,10 @@ package com.ssssogong.issuemanager.domain;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 

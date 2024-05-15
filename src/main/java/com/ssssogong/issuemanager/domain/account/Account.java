@@ -2,7 +2,9 @@ package com.ssssogong.issuemanager.domain.account;
 
 import com.ssssogong.issuemanager.domain.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
@@ -12,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 public abstract class Account extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "account_id", unique = true)
