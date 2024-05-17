@@ -95,6 +95,10 @@ public class ProjectService {
                 )).toList();
     }
 
+    public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
+        userProjectRepository.deleteAllByProjectIdAndAccountIdIn(projectId, accountIds);
+    }
+
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         return userProjects.stream()

@@ -64,7 +64,11 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    //todo: 프로젝트에서 유저(들) 삭제
+    @DeleteMapping("/projects/{id}/users")
+    public ResponseEntity<Void> deleteUsers(@PathVariable("id") Long id, @RequestBody List<String> accountIds) {
+        projectService.deleteUsersFromProject(id, accountIds);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/users/{accountId}/projects")
     public ResponseEntity<List<UserProjectSummaryResponse>> findProjectsByAccountId(
