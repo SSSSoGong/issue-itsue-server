@@ -51,22 +51,23 @@ public class ProjectController {
     }
 
     @PostMapping("/projects/{id}/users")
-    public ResponseEntity<Void> addUsers(@PathVariable("id") Long id, @RequestBody List<ProjectUserAdditionRequest> request) {
+    public ResponseEntity<Void> addUsers(@PathVariable("id") Long id,
+                                         @RequestBody List<ProjectUserAdditionRequest> request) {
         projectService.addUsersToProject(id, request);
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping("/projects/{id}/users")
     public ResponseEntity<List<ProjectUserResponse>> findUsers(@PathVariable("id") Long id) {
-        final List<ProjectUserResponse> response =  projectService.findUsers(id);
+        final List<ProjectUserResponse> response = projectService.findUsers(id);
         return ResponseEntity.ok(response);
     }
 
     //todo: 프로젝트에서 유저(들) 삭제
 
     @GetMapping("/users/{accountId}/projects")
-    public ResponseEntity<List<UserProjectSummaryResponse>> findProjectsByAccountId(@PathVariable("accountId") String accountId) {
+    public ResponseEntity<List<UserProjectSummaryResponse>> findProjectsByAccountId(
+            @PathVariable("accountId") String accountId) {
         final List<UserProjectSummaryResponse> response = projectService.findProjectsByAccountId(accountId);
         return ResponseEntity.ok(response);
     }
@@ -74,4 +75,10 @@ public class ProjectController {
     //todo: 프로젝트-회원간 정보검색
 
     //todo: 프로젝트 접근시간 갱신
+    @PostMapping("/users/{accountId}/projects/{projectId}/access")
+    public ResponseEntity<Void> renewAccessTime(@PathVariable("accountId") String accountId,
+                                                @PathVariable("projectId") String projectId) {
+        projectService.renewAccessTime(accountId, projectId);
+        return ResponseEntity.ok().build();
+    }
 }

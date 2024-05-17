@@ -62,13 +62,13 @@ public class ProjectService {
 
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
         final Project project = projectRepository.findById(projectId).orElseThrow();
+        //todo: 유저 중복 참여X
         final List<Role> roles = roleRepository.findAll();
         //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
         List<UserProject> userProjects = new ArrayList<>();
         for (ProjectUserAdditionRequest userData : request) {
             final User user = userRepository.findByAccountId(userData.getAccountId()).orElseThrow();
             final UserProject userProject = UserProject.builder()
-                    .accessTime(LocalDateTime.now())
                     .user(user)
                     .project(project)
                     .role(findRole(roles, userData))
@@ -104,5 +104,10 @@ public class ProjectService {
                         each.getProject().getCreatedAt().toString(),
                         each.isFavorite()
                 )).toList();
+    }
+
+    public void renewAccessTime(final String accountId, final String projectId) {
+        UserProject userProject = userProjectRepository.findByAccountIdAndProjectId(accountId, projectId).orElseThrow();
+        userProject.updateAccessTime();
     }
 }
