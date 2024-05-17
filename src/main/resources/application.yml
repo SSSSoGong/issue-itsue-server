@@ -20,3 +20,7 @@ auth:
   jwt:
     secret-key: tmp-key-hahahahahahahahaahahahahahahaha
     expiration-minutes: 30
+
+app:
+  upload:
+    dir: /path/to/upload/dir

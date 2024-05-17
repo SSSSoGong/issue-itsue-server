@@ -43,4 +43,9 @@ public class Comment extends BaseEntity {
         this.issue = issue;
         issue.getComments().add(this);
     }
+
+    public void update(String content, List<String> imageUrls) {
+        this.content = content;
+        this.imageUrls = imageUrls;
+    }
 }
