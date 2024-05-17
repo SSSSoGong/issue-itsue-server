@@ -9,6 +9,7 @@ import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
+import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
@@ -79,5 +80,15 @@ public class ProjectService {
                 .filter(each -> each.isRole(userData.getRole()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("역할을 찾지 못함"));
+    }
+
+    public List<ProjectUserResponse> findUsers(final Long id) {
+        List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id);
+        return userProjects.stream()
+                .map(each -> new ProjectUserResponse(
+                        each.getUser().getAccountId(),
+                        each.getUser().getUsername(),
+                        each.getRole().getRoleName()
+                )).toList();
     }
 }

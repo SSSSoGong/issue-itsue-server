@@ -5,6 +5,7 @@ import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
+import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,12 @@ public class ProjectController {
     public ResponseEntity<Void> addUsers(@PathVariable("id") Long id, @RequestBody List<ProjectUserAdditionRequest> request) {
         projectService.addUsersToProject(id, request);
         return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("projects/{id}/users")
+    public ResponseEntity<List<ProjectUserResponse>> findUsers(@PathVariable("id") Long id) {
+        final List<ProjectUserResponse> response =  projectService.findUsers(id);
+        return ResponseEntity.ok(response);
     }
 }

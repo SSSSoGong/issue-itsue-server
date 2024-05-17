@@ -52,4 +52,8 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     public boolean isRole(String roleName) {
         return this.getClass().getSimpleName().equalsIgnoreCase(roleName);
     }
+
+    public String getRoleName() {
+        return this.getClass().getSimpleName();
+    }
 }
