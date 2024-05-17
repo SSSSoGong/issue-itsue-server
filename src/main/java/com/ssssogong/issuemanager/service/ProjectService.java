@@ -37,4 +37,11 @@ public class ProjectService {
         project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
         return new ProjectIdResponse(id);
     }
+
+    public ProjectIdResponse deleteById(final Long id) {
+        final Project project = projectRepository.findById(id).orElseThrow();
+        //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
+        projectRepository.deleteById(id);
+        return new ProjectIdResponse(id);
+    }
 }

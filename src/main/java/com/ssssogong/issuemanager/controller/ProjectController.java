@@ -37,4 +37,10 @@ public class ProjectController {
         final ProjectIdResponse response = projectService.updateById(id, projectUpdateRequest);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/projects/{id}")
+    public ResponseEntity<ProjectIdResponse> deleteById(@PathVariable Long id) {
+        final ProjectIdResponse response = projectService.deleteById(id);
+        return ResponseEntity.ok(response);
+    }
 }
