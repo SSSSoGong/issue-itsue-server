@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.util.Strings;
 
 @Entity
 @Getter
@@ -32,4 +33,13 @@ public class Project extends BaseEntity {
     @OneToMany(mappedBy = "project")
     @Builder.Default
     private List<Issue> issues = new ArrayList<>();
+
+    public void update(final String name, final String subject) {
+        if(Strings.isNotEmpty(name)) {
+            this.name = name;
+        }
+        if(Strings.isNotEmpty(subject)){
+            this.name = subject;
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
+import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,5 +30,11 @@ public class ProjectService {
     public ProjectDetailsResponse findById(final Long id) {
         final Project project = projectRepository.findById(id).orElseThrow();
         return ProjectDetailsResponse.from(project);
+    }
+
+    public ProjectIdResponse updateById(final Long id, final ProjectUpdateRequest projectUpdateRequest) {
+        final Project project = projectRepository.findById(id).orElseThrow();
+        project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
+        return new ProjectIdResponse(id);
     }
 }

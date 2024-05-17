@@ -3,6 +3,7 @@ package com.ssssogong.issuemanager.controller;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
+import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,12 @@ public class ProjectController {
     @GetMapping("/projects/{id}")
     public ResponseEntity<ProjectDetailsResponse> findById(@PathVariable Long id) {
         final ProjectDetailsResponse response = projectService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/projects/{id}")
+    public ResponseEntity<ProjectIdResponse> updateById(@PathVariable Long id, @RequestBody ProjectUpdateRequest projectUpdateRequest) {
+        final ProjectIdResponse response = projectService.updateById(id, projectUpdateRequest);
         return ResponseEntity.ok(response);
     }
 }
