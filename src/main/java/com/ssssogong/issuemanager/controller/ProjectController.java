@@ -4,13 +4,16 @@ import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
+import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.service.ProjectService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,20 +30,27 @@ public class ProjectController {
     }
 
     @GetMapping("/projects/{id}")
-    public ResponseEntity<ProjectDetailsResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<ProjectDetailsResponse> findById(@PathVariable("id") Long id) {
         final ProjectDetailsResponse response = projectService.findById(id);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/projects/{id}")
-    public ResponseEntity<ProjectIdResponse> updateById(@PathVariable Long id, @RequestBody ProjectUpdateRequest projectUpdateRequest) {
+    @PutMapping("/projects/{id}")
+    public ResponseEntity<ProjectIdResponse> updateById(@PathVariable("id") Long id,
+                                                        @RequestBody ProjectUpdateRequest projectUpdateRequest) {
         final ProjectIdResponse response = projectService.updateById(id, projectUpdateRequest);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/projects/{id}")
-    public ResponseEntity<ProjectIdResponse> deleteById(@PathVariable Long id) {
+    @DeleteMapping("/projects/{id}")
+    public ResponseEntity<ProjectIdResponse> deleteById(@PathVariable("id") Long id) {
         final ProjectIdResponse response = projectService.deleteById(id);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/projects/{id}/users")
+    public ResponseEntity<Void> addUsers(@PathVariable("id") Long id, @RequestBody List<ProjectUserAdditionRequest> request) {
+        projectService.addUsersToProject(id, request);
+        return ResponseEntity.ok().build();
     }
 }

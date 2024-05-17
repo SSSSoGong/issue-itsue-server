@@ -1,11 +1,20 @@
 package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.UserProject;
+import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
+import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.RoleRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
+import com.ssssogong.issuemanager.repository.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final UserProjectRepository userProjectRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     public ProjectIdResponse create(final ProjectCreationRequest projectCreationRequest) {
         //todo: admin 권한 체크
@@ -43,5 +55,29 @@ public class ProjectService {
         //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
         projectRepository.deleteById(id);
         return new ProjectIdResponse(id);
+    }
+
+    public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
+        final Project project = projectRepository.findById(projectId).orElseThrow();
+        final List<Role> roles = roleRepository.findAll();
+        //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
+        List<UserProject> userProjects = new ArrayList<>();
+        for (ProjectUserAdditionRequest userData : request) {
+            final User user = userRepository.findByAccountId(userData.getAccountId()).orElseThrow();
+            final UserProject userProject = UserProject.builder()
+                    .user(user)
+                    .project(project)
+                    .role(findRole(roles, userData))
+                    .build();
+            userProjects.add(userProject);
+        }
+        userProjectRepository.saveAll(userProjects);
+    }
+
+    private Role findRole(final List<Role> roles, final ProjectUserAdditionRequest userData) {
+        return roles.stream()
+                .filter(each -> each.isRole(userData.getRole()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("역할을 찾지 못함"));
     }
 }
