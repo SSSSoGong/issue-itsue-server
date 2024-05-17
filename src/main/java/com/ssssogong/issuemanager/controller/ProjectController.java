@@ -6,6 +6,7 @@ import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
+import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -56,9 +57,21 @@ public class ProjectController {
     }
 
 
-    @GetMapping("projects/{id}/users")
+    @GetMapping("/projects/{id}/users")
     public ResponseEntity<List<ProjectUserResponse>> findUsers(@PathVariable("id") Long id) {
         final List<ProjectUserResponse> response =  projectService.findUsers(id);
         return ResponseEntity.ok(response);
     }
+
+    //todo: 프로젝트에서 유저(들) 삭제
+
+    @GetMapping("/users/{accountId}/projects")
+    public ResponseEntity<List<UserProjectSummaryResponse>> findProjectsByAccountId(@PathVariable("accountId") String accountId) {
+        final List<UserProjectSummaryResponse> response = projectService.findProjectsByAccountId(accountId);
+        return ResponseEntity.ok(response);
+    }
+
+    //todo: 프로젝트-회원간 정보검색
+
+    //todo: 프로젝트 접근시간 갱신
 }

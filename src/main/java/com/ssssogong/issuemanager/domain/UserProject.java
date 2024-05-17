@@ -21,7 +21,7 @@ public class UserProject {
     private Long id;
 
     @Column(name = "is_favorite")
-    private Boolean isFavorite;
+    private boolean isFavorite;
 
     @Column(name = "access_time")
     private LocalDateTime accessTime;
@@ -39,8 +39,7 @@ public class UserProject {
     private Role role;
 
     @Builder
-    public UserProject(Boolean isFavorite, LocalDateTime accessTime, User user, Project project, Role role) {
-        this.isFavorite = isFavorite;
+    public UserProject(LocalDateTime accessTime, User user, Project project, Role role) {
         this.accessTime = accessTime;
         this.user = user;
         this.project = project;

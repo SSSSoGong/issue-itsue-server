@@ -10,10 +10,12 @@ import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
+import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +68,7 @@ public class ProjectService {
         for (ProjectUserAdditionRequest userData : request) {
             final User user = userRepository.findByAccountId(userData.getAccountId()).orElseThrow();
             final UserProject userProject = UserProject.builder()
+                    .accessTime(LocalDateTime.now())
                     .user(user)
                     .project(project)
                     .role(findRole(roles, userData))
@@ -89,6 +92,17 @@ public class ProjectService {
                         each.getUser().getAccountId(),
                         each.getUser().getUsername(),
                         each.getRole().getRoleName()
+                )).toList();
+    }
+
+    public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
+        final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
+        return userProjects.stream()
+                .map(each -> new UserProjectSummaryResponse(
+                        each.getProject().getId(),
+                        each.getProject().getName(),
+                        each.getProject().getCreatedAt().toString(),
+                        each.isFavorite()
                 )).toList();
     }
 }
