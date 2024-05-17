@@ -6,6 +6,7 @@ import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
+import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.service.ProjectService;
 import java.util.List;
@@ -72,10 +73,19 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    //todo: 프로젝트-회원간 정보검색
+    @GetMapping("/users/{accountId}/projects/{projectId}")
+    public ResponseEntity<UserProjectAssociationResponse> findAssociationBetweenProjectAndUser(
+            @PathVariable("accountId") String accountId,
+            @PathVariable("projectId") String projectId
+    ) {
+        final UserProjectAssociationResponse response = projectService.findAssociationBetweenProjectAndUser(
+                accountId,
+                projectId
+        );
+        return ResponseEntity.ok(response);
+    }
 
-    //todo: 프로젝트 접근시간 갱신
-    @PostMapping("/users/{accountId}/projects/{projectId}/access")
+    @PutMapping("/users/{accountId}/projects/{projectId}/access")
     public ResponseEntity<Void> renewAccessTime(@PathVariable("accountId") String accountId,
                                                 @PathVariable("projectId") String projectId) {
         projectService.renewAccessTime(accountId, projectId);

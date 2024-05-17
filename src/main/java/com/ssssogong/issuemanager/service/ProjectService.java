@@ -10,12 +10,12 @@ import com.ssssogong.issuemanager.dto.ProjectIdResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
+import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -104,6 +104,17 @@ public class ProjectService {
                         each.getProject().getCreatedAt().toString(),
                         each.isFavorite()
                 )).toList();
+    }
+
+    public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
+                                                                               final String projectId) {
+        final UserProject userProject = userProjectRepository.findByAccountIdAndProjectId(accountId, projectId)
+                .orElseThrow();
+        return new UserProjectAssociationResponse(
+                userProject.getRole().getRoleName(),
+                userProject.getProject().getCreatedAt().toString(),
+                userProject.getAccessTime().toString()
+        );
     }
 
     public void renewAccessTime(final String accountId, final String projectId) {
