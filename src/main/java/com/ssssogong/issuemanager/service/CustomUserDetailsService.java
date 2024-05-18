@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
-/**UserDetailsService 구현 <br>
- * (UserDetailsService : Spring Security에서 현재 사용자 정보 로드할 때 사용됨)*/
+/**UserDetailsService 인터페이스 구현 <br>
+ * (UserDetailsService : Spring Security 내부에서 현재 사용자 정보 로드할 때 사용하는 인터페이스)*/
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
     public final UserRepository userRepository;
