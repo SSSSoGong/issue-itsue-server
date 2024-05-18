@@ -61,11 +61,30 @@ public class Issue extends BaseEntity {
     @Builder.Default
     private List<IssueModification> issueModifications = new ArrayList<>();
 
+    @Builder.Default
+    private List<String> imageUrls = new ArrayList<>();
+
     public void setProject(Project project) {
         if (this.project != null) {
             this.project.getIssues().remove(this);
         }
         this.project = project;
         project.getIssues().add(this);
+    }
+
+    public void update(String title, String description, String priority) {
+        if (!title.isBlank())
+            this.title = title;
+        if (!description.isBlank())
+            this.description = description;
+        if (!priority.isBlank())
+            this.priority = Priority.valueOf(priority);
+    }
+
+    public void stateUpdate(String state, User assignee) {
+        if (!state.isBlank())
+            this.state = State.valueOf(state);
+        if (assignee != null)
+            this.assignee = assignee;
     }
 }
