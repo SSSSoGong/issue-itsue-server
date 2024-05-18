@@ -96,11 +96,13 @@ public class ProjectService {
     }
 
     public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
+        //todo: admin 체크
         userProjectRepository.deleteAllByProjectIdAndAccountIdIn(projectId, accountIds);
     }
 
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
+        //TODO : 최근에 접속한 프로젝트 순으로 정렬합니다.
         return userProjects.stream()
                 .map(each -> new UserProjectSummaryResponse(
                         each.getProject().getId(),
