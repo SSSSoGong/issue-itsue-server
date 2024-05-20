@@ -24,12 +24,6 @@ import java.util.stream.Collectors;
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private long tokenExpiredMs = 60*60*1000L;
-
-    public void setTokenExpiredMs(long tokenExpiredMs){
-        if(tokenExpiredMs < 0 ) return;
-        this.tokenExpiredMs = tokenExpiredMs;
-    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -73,7 +67,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String id = authentication.getName();
         List<GrantedAuthority> authorities = new ArrayList<>(authentication.getAuthorities());
-        String role = authentication.getAuthorities().iterator().next().getAuthority();
 
         System.out.println("LoginFilter: Hello, " + id + " with role ["); // test
         for(GrantedAuthority auth: authorities){
