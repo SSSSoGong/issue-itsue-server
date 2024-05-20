@@ -1,9 +1,10 @@
 package com.ssssogong.issuemanager.dto;
 
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @Data
-public class UserDTO {
-    // TODO : UserDTO, RegisterRequestDTO, UserResponseDTO 한 상속관계로 묶기
-
+public class UserDTO extends UserResponseDTO{
+    private Long id;
 }

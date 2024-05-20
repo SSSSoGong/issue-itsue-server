@@ -2,11 +2,10 @@ package com.ssssogong.issuemanager.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
-@Builder
 @Data
-public class RegisterRequestDTO {
-    private String accountId;
+@SuperBuilder
+public class FullUserDTO extends UserDTO{
     private String password;
-    private String username;
 }

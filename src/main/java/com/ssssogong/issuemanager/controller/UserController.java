@@ -22,9 +22,9 @@ public class UserController {
 
     /**User 목록 검색 (쿼리스트링 필터 가능)*/
     @GetMapping
-    public ResponseEntity<Object> findUsers(@RequestParam(value = "name", required = false) String username){
+    public ResponseEntity<List<UserResponseDTO>> findUsers(@RequestParam(value = "name", required = false) String username){
         // 사용자명이 username과 매치하는 유저 목록을 찾는다.
-        List<UserDTO> users;
+        List<UserResponseDTO> users;
         // 쿼리 스트링이 빈 경우 모든 User 반환
         if(username.isBlank() || username == null) users = new ArrayList<>(userService.findUsers());
         // 그 외엔 필터링한 User 반환
@@ -35,18 +35,21 @@ public class UserController {
     /**login filter 거쳐서 로그인 됨 (여기는 도달할 필요 없음)*/
     @PostMapping("/login")
     public ResponseEntity<Object> login(){
-        return ResponseEntity.ok().body("good");
+        return ResponseEntity.ok().body("good job");
     }
 
     /**Body에 입력한 정보로 회원가입*/
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO registerRequest){
-        // 회원 id가 존재하는 경우 기각
-        if(userService.findUserByAccoundId(registerRequest.getAccountId()) != null){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 ID입니다.");
-        }
         // DB에 저장한다
-        UserDTO userDTO = userService.register(registerRequest);
+        UserResponseDTO userDTO;
+        try {
+            userDTO = userService.register(registerRequest);
+        }
+        catch(Exception e) {
+            // 이미 존재하는 id인 경우 기각
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
         // 회원가입된 정보와 함께 return
         return ResponseEntity.ok(userDTO);
     }
@@ -56,8 +59,12 @@ public class UserController {
     public ResponseEntity<Object> unregister(){
         // 인증 정보에서 accountID를 받아 DB에서 삭제한다.
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDTO user = userService.unregister(auth.getName());
-
+        try {
+            UserResponseDTO user = userService.unregister(auth.getName());
+        }
+        catch(Exception e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
         return ResponseEntity.ok(user);
     }
 
