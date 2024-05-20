@@ -18,14 +18,11 @@ import java.util.List;
 public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long id;
 
     private String content;
-
-    @Builder.Default
-    private List<String> imageUrls = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
@@ -34,6 +31,10 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User writer;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<CommentImage> commentImages = new ArrayList<>();
 
 
     public void setIssue(Issue issue) {
@@ -44,8 +45,7 @@ public class Comment extends BaseEntity {
         issue.getComments().add(this);
     }
 
-    public void update(String content, List<String> imageUrls) {
+    public void update(String content) {
         this.content = content;
-        this.imageUrls = imageUrls;
     }
 }

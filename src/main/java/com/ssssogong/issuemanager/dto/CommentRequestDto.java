@@ -3,6 +3,7 @@ package com.ssssogong.issuemanager.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
@@ -11,14 +12,13 @@ import java.util.List;
 
 
 
-//@AllArgsConstructor // modelattribute 바인딩 시 필요
 @NoArgsConstructor
 @Getter
+@Setter
 public class CommentRequestDto {
 
-    private Long id;
     private String content;
-    private List<MultipartFile> imageFiles;
+    private List<String> imageUrls;
 
     private String createdAt;
     private String updatedAt;

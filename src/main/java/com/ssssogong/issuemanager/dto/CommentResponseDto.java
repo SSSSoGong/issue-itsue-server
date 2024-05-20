@@ -1,11 +1,13 @@
 package com.ssssogong.issuemanager.dto;
 
 import com.ssssogong.issuemanager.domain.Comment;
+import com.ssssogong.issuemanager.domain.CommentImage;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -23,9 +25,13 @@ public class CommentResponseDto {
         this.content = comment.getContent();
         this.writerId = comment.getWriter().getAccountId();
         this.writerName = comment.getWriter().getUsername();
-        this.imageUrls = comment.getImageUrls();
         this.createdAt = comment.getCreatedAt();
         this.updatedAt = comment.getUpdatedAt();
-    }
 
+        this.imageUrls = comment.getCommentImages().stream()
+                .map(CommentImage::getImageUrls)
+                .collect(Collectors.toList());
+    }
 }
+
+
