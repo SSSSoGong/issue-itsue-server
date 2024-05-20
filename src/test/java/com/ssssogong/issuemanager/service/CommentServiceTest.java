@@ -8,6 +8,7 @@ import com.ssssogong.issuemanager.dto.CommentResponseDto;
 import com.ssssogong.issuemanager.repository.CommentRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import com.ssssogong.issuemanager.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,10 +16,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.FileInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +33,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+
 
 class CommentServiceTest {
     // TODO : 테스트 사진 파일 삭제
@@ -43,11 +51,23 @@ class CommentServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    // 시큐리티 관련 설정
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
+
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         //Mock 객체 초기화 & field 할당
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        //시큐리티 관련 설정
     }
 
     @Test
@@ -67,6 +87,9 @@ class CommentServiceTest {
         when(userRepository.findByAccountId(writerAccountId)).thenReturn(Optional.of(writer));
         // Comment Service 에서 사용할 기본 issue, user 설정
 
+        when(authentication.getName()).thenReturn(writerAccountId);
+        // 시큐리티에서 가져올 이름 설정
+
 
         Constructor<CommentRequestDto> constructor = CommentRequestDto.class.getDeclaredConstructor();
         constructor.setAccessible(true);
@@ -80,9 +103,6 @@ class CommentServiceTest {
         imageFilesField.setAccessible(true);
         imageFilesField.set(commentRequestDto, List.of(mockFile));
 
-        Field writerAccountIdField = CommentRequestDto.class.getDeclaredField("writerAccountId");
-        writerAccountIdField.setAccessible(true);
-        writerAccountIdField.set(commentRequestDto, writerAccountId);
         /*
         처음에 CommentRequestDto에서 테스트 때문에 setter 열어뒀다가, 안될거 같아서 없애고 Reflection 이용해서 주입
         사실 이것 저것 찾아보다가 @NoArgsConstructor도 access level private으로 하는게 좋다고 하는걸 봤는데,
@@ -123,7 +143,6 @@ class CommentServiceTest {
     @Test
     void updateComment() throws Exception {
         Long commentId = 1L;
-
 
         String content = "농...";
         MockMultipartFile mockFile = new MockMultipartFile("image", "bear.jpg", "jpg", new FileInputStream("bear.jpg"));
@@ -188,9 +207,6 @@ class CommentServiceTest {
         constructor.setAccessible(true);
         CommentRequestDto commentRequestDto = constructor.newInstance();
 
-        Field writerAccountIdField = CommentRequestDto.class.getDeclaredField("writerAccountId");
-        writerAccountIdField.setAccessible(true);
-        writerAccountIdField.set(commentRequestDto, writerAccountId);
 
         assertThrows(IllegalArgumentException.class, () -> {
             commentService.createComment(issueId, commentRequestDto);
