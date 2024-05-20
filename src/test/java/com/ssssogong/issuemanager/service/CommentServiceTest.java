@@ -97,7 +97,7 @@ class CommentServiceTest {
         commentRequestDto.setContent(content);
         commentImageRequestDto.setImageFiles(List.of(mockFile1, mockFile2));
 
-        Long commentId = commentService.createComment(issueId, commentRequestDto);
+        Long commentId = commentService.createComment(issueId, commentRequestDto, commentImageRequestDto);
 
 
         ArgumentCaptor<Comment> commentCaptor = ArgumentCaptor.forClass(Comment.class); // Comment type의 객체 가져오기

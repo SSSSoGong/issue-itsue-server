@@ -45,7 +45,8 @@ public class Comment extends BaseEntity {
         issue.getComments().add(this);
     }
 
-    public void update(String content) {
+    public void update(String content, List<CommentImage> commentImages) {
         this.content = content;
+        this.commentImages = commentImages;
     }
 }
