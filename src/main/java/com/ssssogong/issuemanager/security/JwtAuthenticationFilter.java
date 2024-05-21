@@ -2,8 +2,10 @@ package com.ssssogong.issuemanager.security;
 
 import com.ssssogong.issuemanager.domain.account.CustomUserDetails;
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import com.ssssogong.issuemanager.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
+    private final UserProjectRepository userProjectRepository;
 
     /**인증 필터 구현*/
     @Override
@@ -32,20 +35,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 토큰이 빈 경우 다음으로 넘어간다
         if(authorization == null || !authorization.startsWith("Bearer ")){
             // TODO: Anonymous Authentication 넣어줄까?
+            System.out.println("JwtAuthenticationFilter: token null; skipping authorization");
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = authorization.split(" ")[1];
-        // 토큰 만료 시 인증 없이 넘어감
-        if(jwtUtil.isExpired(token)){
-            System.out.println("JWTAuthFilter : token expired");
+
+        // username 획득
+        String userId = "";
+        try {
+            userId = jwtUtil.extractAccountData(token).getAccountId();
+        }
+        catch(Exception e){
+            // 토큰 만료, 파싱 에러 등의 경우 인증 없이 넘어감
+            System.out.println("JWTAuthFilter : error parsing token " + e.getMessage());
             filterChain.doFilter(request, response);
             return;
         }
-
-        // username 획득
-        String userId = jwtUtil.extractAccountData(token).getAccountId();
 
         // User 생성
         Optional<User> user = userRepository.findByAccountId(userId);
@@ -57,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // UserDetails에 회원 정보 담음
-        CustomUserDetails userDetails = new CustomUserDetails(user.get());
+        CustomUserDetails userDetails = new CustomUserDetails(user.get(), userProjectRepository);
 
         // 인증 토큰 생성
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -65,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 null,
                 userDetails.getAuthorities()
         );
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+        SecurityContextHolder.getContext().setAuthentication(authToken);        
         // 내용 출력 (디버그용)
         System.out.println("JWTAuthFilter : Hello, " + SecurityContextHolder.getContext().getAuthentication().getName());
         System.out.print("JWTAuthFilter : Your role is ");

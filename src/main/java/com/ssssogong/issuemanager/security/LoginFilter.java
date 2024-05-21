@@ -28,6 +28,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // 로그인 요청 가로채서 검증 진행
+        System.out.println("LoginFilter : attempting authentication");
 
         // 요청에서 id, password 추출
         String id, password;
@@ -37,7 +38,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 BufferedReader br = request.getReader();
                 String jsonString = br.lines().collect(Collectors.joining(System.lineSeparator()));
                 Map<String, String> jsonRequest = new ObjectMapper().readValue(jsonString, Map.class);
-                id = jsonRequest.get("id");
+                id = jsonRequest.get("accountId");
                 password = jsonRequest.get("password");
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -45,15 +46,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
         else {
             // form으로 요청한 경우 -> 파라미터에서 꺼낸다
-            id = request.getParameter("id");
+            id = request.getParameter("accountId");
             password = request.getParameter("password");
         }
+        System.out.println("LoginFilter: id : '" + id + "' password : '" + password + "'"); // test
 
-        System.out.println("LoginFilter: Attempting Authentication - id : '" + id + "' password : '" + password + "'"); // test
+        // 예외 처리 - id나 password가 null인 경우 기각
+        if(id == null || password == null) {
+            throw new AuthenticationException("invalid authentication") {};
+        }
+
 
         // 스프링 시큐리티에서 username과 password를 검증하기 위해서 token에 담아야 함
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(id, password, null);
-
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(id, password, null );
         // token 검증을 위해 AuthenticationManager에 전달
         return authenticationManager.authenticate(authToken);
     }
@@ -68,11 +73,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String id = authentication.getName();
         List<GrantedAuthority> authorities = new ArrayList<>(authentication.getAuthorities());
 
-        System.out.println("LoginFilter: Hello, " + id + " with role ["); // test
+        System.out.println("LoginFilter: Hello, " + id + " with role [ "); // test
         for(GrantedAuthority auth: authorities){
             System.out.print(auth.getAuthority() + " ");
         }
-        System.out.println();
+        System.out.println("]");
 
         String token = jwtUtil.createToken(id, false); // TODO : JWT에 어떤 정보 넣을지
 
@@ -92,7 +97,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed){
         // 로그인 실패
-        System.out.println("Attempt failed.");
+        System.out.println("LoginFilter: Login attempt failed.");
         response.setStatus(401);
     }
 }
