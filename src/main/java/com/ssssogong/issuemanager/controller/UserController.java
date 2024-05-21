@@ -26,15 +26,15 @@ public class UserController {
         // 사용자명이 username과 매치하는 유저 목록을 찾는다.
         List<UserResponseDTO> users;
         // 쿼리 스트링이 빈 경우 모든 User 반환
-        if(username.isBlank() || username == null) users = new ArrayList<>(userService.findUsers());
+        if(username == null || username.isBlank()) users = new ArrayList<>(userService.findUsers());
         // 그 외엔 필터링한 User 반환
-        users = new ArrayList<>(userService.findUsers(username)); // TODO : query 필드가 여러가지 생기면 어떻게 필터링하지
+        else users = new ArrayList<>(userService.findUsers(username)); // TODO : query 필드가 여러가지 생기면 어떻게 필터링하지
         return ResponseEntity.ok(users);
     }
 
     /**login filter 거쳐서 로그인 됨 (여기는 도달할 필요 없음)*/
     @PostMapping("/login")
-    public ResponseEntity<Object> login(){
+    public ResponseEntity<Object> login(@RequestBody RegisterRequestDTO requestDTO){
         return ResponseEntity.ok().body("good job");
     }
 
@@ -44,7 +44,7 @@ public class UserController {
         // DB에 저장한다
         UserResponseDTO userDTO;
         try {
-            userDTO = userService.register(registerRequest);
+            userDTO = userService.save(registerRequest);
         }
         catch(Exception e) {
             // 이미 존재하는 id인 경우 기각
@@ -58,9 +58,10 @@ public class UserController {
     @DeleteMapping("/unregister")
     public ResponseEntity<Object> unregister(){
         // 인증 정보에서 accountID를 받아 DB에서 삭제한다.
+        UserResponseDTO user;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         try {
-            UserResponseDTO user = userService.unregister(auth.getName());
+            user = userService.unregister(auth.getName());
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
@@ -80,10 +81,10 @@ public class UserController {
 
     /**해당 id 회원 정보 수정*/
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDTO updateRequest){
+    public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDTO updateRequest, @PathVariable String accountId){
         // 사용자명, password에 값 있는 경우 변경
         UserDTO user;
-        if(updateRequest.getUsername() != null && updateRequest.getUsername().trim() != ""){
+        if(updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank()){
             user = userService.updateUser(); // TODO : update를 필드 별로 어떻게 나누지
         }
 
