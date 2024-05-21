@@ -23,8 +23,4 @@ public abstract class Account extends BaseEntity {
 
     private String password;
     private String username;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id")
-    private Role role;
 }
