@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CommentImageRepository extends JpaRepository<CommentImage, Long> {
     List<CommentImage> findByCommentId(Long commentId);
+
+    List<CommentImage> deleteByCommentId(Long commentId);
 }

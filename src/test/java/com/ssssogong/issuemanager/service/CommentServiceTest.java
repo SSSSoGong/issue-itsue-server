@@ -10,6 +10,7 @@ import com.ssssogong.issuemanager.repository.CommentRepository;
 import com.ssssogong.issuemanager.repository.CommentImageRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -166,7 +167,7 @@ class CommentServiceTest {
 
         Long updatedCommentId = commentService.updateComment(commentId, commentRequestDto.getContent(), commentImageRequestDto.getImageFiles());
 
-        verify(comment).update(eq(content), anyList());
+        verify(comment).update(eq(content));
         assertThat(updatedCommentId).isEqualTo(comment.getId());
 
     }
@@ -210,4 +211,5 @@ class CommentServiceTest {
 //            commentService.createComment(issueId, commentRequestDto);
 //        });
 //    }
+
 }

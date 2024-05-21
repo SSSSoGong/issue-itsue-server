@@ -19,22 +19,18 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // TODO : 어노테이션 잘 들어가는지 확인
     @PostMapping("/issues/{iid}/comments")
     public ResponseEntity<Long> createComment(@PathVariable("iid") Long issueId,
                                               @RequestPart("content") CommentRequestDto commentRequestDto,
                                               @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         Long commentId = commentService.createComment(issueId, commentRequestDto, commentImageRequestDto);
-        if (commentId != null)
-            return new ResponseEntity<>(commentId, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(commentId, HttpStatus.OK);
+
     }
 
-    @GetMapping("/issues/{iid}/comments-all/{cid}")
-    public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("iid") Long issueId,
-                                                                   @PathVariable("cid") Long commentId) {
+    @GetMapping("/issues/{iid}/comments-all")
+    public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("iid") Long issueId) {
         return new ResponseEntity<>(commentService.findAllComment(issueId), HttpStatus.OK);
     }
 

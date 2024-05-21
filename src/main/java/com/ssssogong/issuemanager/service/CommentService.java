@@ -14,7 +14,6 @@ import com.ssssogong.issuemanager.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,9 +35,9 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentImageRepository commentImageRepository;
 
-    private String uploadDir;
     private String writerAccountId;
 
+    //TODO : 이미지 수정/삭제 시, 일단 디비만 반영함 => 로컬 파일 반영 할까?
     @Transactional
     public Long createComment(Long issueId, CommentRequestDto commentRequestDto, CommentImageRequestDto commentImageRequestDto) throws IOException {
 
@@ -50,13 +48,10 @@ public class CommentService {
         User writer = userRepository.findByAccountId("Jin")
                 .orElseThrow(IllegalArgumentException::new);
 
-        List<CommentImage> commentImages = new ArrayList<>();
-
         Comment comment = Comment.builder()
                 .content(commentRequestDto.getContent())
                 .issue(issue)
                 .writer(writer)
-                .commentImages(commentImages)
                 .build();
 
         commentRepository.save(comment);
@@ -97,20 +92,15 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
 
-        List<CommentImage> commentImages = new ArrayList<>();
+
+        commentImageRepository.deleteByCommentId(id);
 
         if (images != null && !images.isEmpty()) {
-            commentImages = saveImages(comment, images);
+            saveImages(comment, images); // 연관관계 편의 메소드 이용 => 기존 관계 끊기고 자동으로 연결
         }
 
-        /*
-         TODO : 로직 확인
-         TODO : update 시 서버에 다 축적 + 연결만 바꿔줄건지 or 서버에서 삭제 + replace로 갈건지
-         */
 
-
-        comment.getCommentImages().clear();
-        comment.update(content, commentImages);
+        comment.update(content);
 
         commentRepository.save(comment);
 
@@ -125,7 +115,7 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    private List<CommentImage> saveImages(Comment comment, List<MultipartFile> imageFiles) throws IOException {
+    private void saveImages(Comment comment, List<MultipartFile> imageFiles) throws IOException {
 
         List<CommentImage> commentImages = new ArrayList<>();
 
@@ -147,10 +137,9 @@ public class CommentService {
                     .imageUrls(filePath.toString())
                     .build();
 
-            commentImage.setComment(comment);
+            commentImage.setComment(comment); // 연관관계 주입
             commentImageRepository.save(commentImage);
         }
-        return commentImages;
     }
 
 
