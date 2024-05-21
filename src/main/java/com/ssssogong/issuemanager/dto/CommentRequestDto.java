@@ -14,6 +14,5 @@ import java.util.List;
 public class CommentRequestDto {
 
     private String content;
-    private String writerAccountId;
 
 }

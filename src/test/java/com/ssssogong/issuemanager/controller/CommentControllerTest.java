@@ -108,7 +108,7 @@ class CommentControllerTest {
 
         ArgumentCaptor<Long> commentIdCaptor = ArgumentCaptor.forClass(Long.class);
         ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<ArrayList> imagesCaptor = ArgumentCaptor.forClass(ArrayList.class);
+        ArgumentCaptor<List> imagesCaptor = ArgumentCaptor.forClass(List.class);
 
         verify(commentService, Mockito.times(1))
                 .updateComment(commentIdCaptor.capture(), contentCaptor.capture(), imagesCaptor.capture());

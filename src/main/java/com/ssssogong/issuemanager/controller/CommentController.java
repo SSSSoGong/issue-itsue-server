@@ -22,8 +22,8 @@ public class CommentController {
     // TODO : 어노테이션 잘 들어가는지 확인
     @PostMapping("/issues/{iid}/comments")
     public ResponseEntity<Long> createComment(@PathVariable("iid") Long issueId,
-                                              CommentRequestDto commentRequestDto,
-                                              @ModelAttribute CommentImageRequestDto commentImageRequestDto) throws IOException {
+                                              @RequestPart("content") CommentRequestDto commentRequestDto,
+                                              @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         Long commentId = commentService.createComment(issueId, commentRequestDto, commentImageRequestDto);
         if (commentId != null)
@@ -32,14 +32,10 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //TODO : Service에서 FindAllCommnet method 추가하기
-    @GetMapping("/issues/{iid}/commentsAll/{cid}")
+    @GetMapping("/issues/{iid}/comments-all/{cid}")
     public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("iid") Long issueId,
-                                                                   @PathVariable("cid") Long commentId,
-                                                                   CommentRequestDto commentRequestDto,
-                                                                   @ModelAttribute CommentImageRequestDto commentImageRequestDto) {
-        //CommentResponseDto commentResponseDto = new CommentResponseDto();
-        return new ResponseEntity<>(List.of(commentService.getComment(issueId)), HttpStatus.OK);
+                                                                   @PathVariable("cid") Long commentId) {
+        return new ResponseEntity<>(commentService.findAllComment(issueId), HttpStatus.OK);
     }
 
     @GetMapping("/issues/{iid}/comments/{cid}")
@@ -51,10 +47,10 @@ public class CommentController {
     @PutMapping("/issues/{iid}/comments/{cid}")
     public ResponseEntity<Long> updateComment(@PathVariable("iid") Long issueId,
                                               @PathVariable("cid") Long commentId,
-                                              @RequestPart String content,
-                                              @RequestPart List<MultipartFile> images) throws IOException {
+                                              @RequestPart("content") CommentRequestDto commentRequestDto,
+                                              @ModelAttribute List<MultipartFile> imageFiles) throws IOException {
 
-        commentService.updateComment(commentId, content, images);
+        commentService.updateComment(commentId, commentRequestDto.getContent(), imageFiles);
 
         return new ResponseEntity<>(commentId, HttpStatus.OK);
     }

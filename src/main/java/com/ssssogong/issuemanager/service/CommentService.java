@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,14 +46,17 @@ public class CommentService {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User writer = userRepository.findByAccountId(writerAccountId)
+        //writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User writer = userRepository.findByAccountId("Jin")
                 .orElseThrow(IllegalArgumentException::new);
+
+        List<CommentImage> commentImages = new ArrayList<>();
 
         Comment comment = Comment.builder()
                 .content(commentRequestDto.getContent())
                 .issue(issue)
                 .writer(writer)
+                .commentImages(commentImages)
                 .build();
 
         commentRepository.save(comment);
@@ -63,6 +67,21 @@ public class CommentService {
 
 
         return new CommentResponseDto(comment).getId();
+    }
+
+    @Transactional
+    public List<CommentResponseDto> findAllComment(Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
+
+        for (Comment comment : issue.getComments()) {
+            CommentResponseDto commentResponseDto = new CommentResponseDto(comment);
+            commentResponseDtoList.add(commentResponseDto);
+        }
+
+        return commentResponseDtoList;
     }
 
     @Transactional
@@ -125,12 +144,11 @@ public class CommentService {
             file.transferTo(filePath.toFile()); // 파일 경로 => 파일 변환 후 해당 경로에 파일 저장
 
             CommentImage commentImage = CommentImage.builder()
-                    .comment(comment)
                     .imageUrls(filePath.toString())
                     .build();
 
+            commentImage.setComment(comment);
             commentImageRepository.save(commentImage);
-            commentImages.add(commentImage);
         }
         return commentImages;
     }

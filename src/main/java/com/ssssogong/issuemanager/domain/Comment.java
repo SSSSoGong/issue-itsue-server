@@ -18,7 +18,7 @@ import java.util.List;
 public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "comment_id")
     private Long id;
 
@@ -44,6 +44,7 @@ public class Comment extends BaseEntity {
         this.issue = issue;
         issue.getComments().add(this);
     }
+
 
     public void update(String content, List<CommentImage> commentImages) {
         this.content = content;

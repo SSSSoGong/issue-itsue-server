@@ -29,4 +29,12 @@ public class CommentImage {
         this.imageUrls = imageUrls;
         this.comment = comment;
     }
+
+    public void setComment(Comment comment) {
+        if (this.comment != null) {
+            this.comment.getCommentImages().remove(this);
+        }
+        this.comment = comment;
+        comment.getCommentImages().add(this);
+    }
 }
