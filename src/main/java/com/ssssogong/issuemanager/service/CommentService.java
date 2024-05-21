@@ -41,11 +41,11 @@ public class CommentService {
 
     @Transactional
     public Long createComment(Long issueId, CommentRequestDto commentRequestDto, CommentImageRequestDto commentImageRequestDto) throws IOException {
+
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(IllegalArgumentException::new);
 
         writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
-
         User writer = userRepository.findByAccountId(writerAccountId)
                 .orElseThrow(IllegalArgumentException::new);
 
@@ -84,8 +84,16 @@ public class CommentService {
             commentImages = saveImages(comment, images);
         }
 
+        /*
+         TODO : 로직 확인
+         TODO : update 시 서버에 다 축적 + 연결만 바꿔줄건지 or 서버에서 삭제 + replace로 갈건지
+         */
+
+
         comment.getCommentImages().clear();
         comment.update(content, commentImages);
+
+        commentRepository.save(comment);
 
         return new CommentResponseDto(comment).getId();
 

@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
-    // TODO : 테스트 사진 파일 삭제
+    // TODO : 테스트 사진 파일 삭제 자동화
 
     @InjectMocks
     private CommentService commentService;
@@ -128,19 +128,21 @@ class CommentServiceTest {
         assertThat(responseDto.getWriterId()).isEqualTo(writer.getAccountId());
     }
 
-//    @Test
-//    void updateComment() throws Exception {
-//        Long commentId = 1L;
-//
-//        String content = "농...";
-//        MockMultipartFile mockFile = new MockMultipartFile("image", "bear.jpg", "jpg", new FileInputStream("bear.jpg"));
-//
-//        User writer = mock(User.class);
-//        when(writer.getAccountId()).thenReturn("Jin");
-//
-//        Comment comment = mock(Comment.class);
-//        when(comment.getWriter()).thenReturn(writer);
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+    @Test
+    void updateComment() throws Exception {
+        // TODO : 이미지 제대로 업데이트 되는지 확인
+
+        Long commentId = 1L;
+
+        String content = "농...";
+        MockMultipartFile mockFile = new MockMultipartFile("image", "bear.jpg", "jpg", new FileInputStream("bear.jpg"));
+
+        User writer = mock(User.class);
+        when(writer.getAccountId()).thenReturn("Jin");
+
+        Comment comment = mock(Comment.class);
+        when(comment.getWriter()).thenReturn(writer);
+        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 //
 //        Constructor<CommentRequestDto> constructor = CommentRequestDto.class.getDeclaredConstructor();
 //        constructor.setAccessible(true);
@@ -153,14 +155,22 @@ class CommentServiceTest {
 //        Field imageFilesField = CommentRequestDto.class.getDeclaredField("imageFiles");
 //        imageFilesField.setAccessible(true);
 //        imageFilesField.set(commentRequestDto, Collections.singletonList(mockFile));
-//
-//
-//        Long updatedCommentId = commentService.updateComment(commentId, commentRequestDto);
-//
-//        verify(comment).update(eq(content), anyList());
-//        assertThat(updatedCommentId).isEqualTo(comment.getId());
-//    }
-//
+
+        CommentRequestDto commentRequestDto = new CommentRequestDto();
+        CommentImageRequestDto commentImageRequestDto = new CommentImageRequestDto();
+
+        commentRequestDto.setContent(content);
+        commentImageRequestDto.setImageFiles(List.of(mockFile));
+
+
+
+        Long updatedCommentId = commentService.updateComment(commentId, commentRequestDto.getContent(), commentImageRequestDto.getImageFiles());
+
+        verify(comment).update(eq(content), anyList());
+        assertThat(updatedCommentId).isEqualTo(comment.getId());
+
+    }
+
 //    @Test
 //    void deleteComment() {
 //        Long commentId = 1L;

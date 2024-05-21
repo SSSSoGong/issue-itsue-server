@@ -14,15 +14,15 @@ import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/api")
 @RestController
 public class CommentController {
 
     private final CommentService commentService;
 
+    // TODO : 어노테이션 잘 들어가는지 확인
     @PostMapping("/issues/{iid}/comments")
     public ResponseEntity<Long> createComment(@PathVariable("iid") Long issueId,
-                                              @RequestBody CommentRequestDto commentRequestDto,
+                                              CommentRequestDto commentRequestDto,
                                               @ModelAttribute CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         Long commentId = commentService.createComment(issueId, commentRequestDto, commentImageRequestDto);
@@ -32,10 +32,13 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/issues/{iid}/comments")
+    //TODO : Service에서 FindAllCommnet method 추가하기
+    @GetMapping("/issues/{iid}/commentsAll/{cid}")
     public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("iid") Long issueId,
-                                                                   @RequestBody CommentRequestDto commentRequestDto,
+                                                                   @PathVariable("cid") Long commentId,
+                                                                   CommentRequestDto commentRequestDto,
                                                                    @ModelAttribute CommentImageRequestDto commentImageRequestDto) {
+        //CommentResponseDto commentResponseDto = new CommentResponseDto();
         return new ResponseEntity<>(List.of(commentService.getComment(issueId)), HttpStatus.OK);
     }
 
