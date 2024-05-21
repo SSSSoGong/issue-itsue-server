@@ -5,10 +5,7 @@ import com.ssssogong.issuemanager.domain.enumeration.Category;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -16,12 +13,13 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class Issue extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_id")
     private Long id;
 
@@ -61,8 +59,9 @@ public class Issue extends BaseEntity {
     @Builder.Default
     private List<IssueModification> issueModifications = new ArrayList<>();
 
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     @Builder.Default
-    private List<String> imageUrls = new ArrayList<>();
+    private List<IssueImage> issueImages = new ArrayList<>();
 
     public void setProject(Project project) {
         if (this.project != null) {
@@ -70,21 +69,5 @@ public class Issue extends BaseEntity {
         }
         this.project = project;
         project.getIssues().add(this);
-    }
-
-    public void update(String title, String description, String priority) {
-        if (!title.isBlank())
-            this.title = title;
-        if (!description.isBlank())
-            this.description = description;
-        if (!priority.isBlank())
-            this.priority = Priority.valueOf(priority);
-    }
-
-    public void stateUpdate(String state, User assignee) {
-        if (!state.isBlank())
-            this.state = State.valueOf(state);
-        if (assignee != null)
-            this.assignee = assignee;
     }
 }

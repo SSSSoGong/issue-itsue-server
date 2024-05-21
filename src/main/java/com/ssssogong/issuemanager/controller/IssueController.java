@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,17 +19,21 @@ public class IssueController {
 
     // 이슈 생성
     @PostMapping("/issues")
-    public ResponseEntity<Long> create(@RequestParam MultipartFile file, @RequestParam IssueSaveRequestDto requestDto) {
-        // tester 확인 ... 아니면 403
-        // SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+    public ResponseEntity<Long> create(@ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
+        try {
+            Long issueId = issueService.save(issueImageRequestDto, issueSaveRequestDto);
+            return new ResponseEntity<>(issueId, HttpStatus.OK);
+        } catch (NotFoundException | IOException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     // 이슈 확인
     @GetMapping("/issues/{id}")
-    public ResponseEntity<IssueDTO> check(@PathVariable("id") Long id) {
+    public ResponseEntity<IssueResponseDto> show(@PathVariable("id") Long id) {
         try {
-            IssueDTO issueDTO = issueService.check(id);
-            return new ResponseEntity<>(issueDTO, HttpStatus.OK);
+            IssueResponseDto issueResponseDTO = issueService.show(id);
+            return new ResponseEntity<>(issueResponseDTO, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
         }
@@ -37,13 +41,11 @@ public class IssueController {
 
     // 이슈 수정
     @PutMapping("/issues/{id}")
-    public ResponseEntity<Long> update(@PathVariable("id") Long id, @RequestBody IssueUpdateRequestDto requestDto) {
-        // tester 확인... 아니면 403
-        // SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+    public ResponseEntity<Long> update(@PathVariable("id") Long id, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto requestDto) {
         try {
-            Long updateIssueId = issueService.update(id, requestDto);
+            Long updateIssueId = issueService.update(id, issueImageRequestDto, requestDto);
             return new ResponseEntity<>(updateIssueId, HttpStatus.OK);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
         }
     }
@@ -51,8 +53,6 @@ public class IssueController {
     // 이슈 삭제
     @DeleteMapping("/issues/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        // admin 확인 ... 아니면 403
-        // SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         try {
             issueService.delete(id);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -63,9 +63,7 @@ public class IssueController {
 
     // 이슈 상태 변경
     @PostMapping("/issues/{id}/state")
-    public ResponseEntity<Void> stateUpdate(@PathVariable("id") Long id, @RequestBody IssueStateUpdateRequestDto requestDto) {
-        // 상태 변경에 적합한 권한을 가지고 있는지 ... 아니면 403
-        // SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+    public ResponseEntity<Void> stateUpdate(@PathVariable("id") Long id, @RequestPart(value = "requestDto") IssueStateUpdateRequestDto requestDto) {
         try {
             issueService.stateUpdate(id, requestDto);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -77,14 +75,14 @@ public class IssueController {
 
     // 프로젝트에 속한 이슈 목록 검색
     @GetMapping("/projects/{pid}/issues")
-    public ResponseEntity<List<IssueProjectDto>> search(
+    public ResponseEntity<List<IssueProjectResponseDto>> search(
             @PathVariable("pid") Long projectId,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) Integer issueCount) {
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "issueCount", required = false) Integer issueCount) {
 
         try {
-            List<IssueProjectDto> issues = issueService.findIssuesInProject(projectId, title, state, issueCount);
+            List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, state, issueCount);
             return new ResponseEntity<>(issues, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404

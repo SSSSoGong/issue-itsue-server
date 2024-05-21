@@ -6,13 +6,16 @@ import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-public class IssueDTO {
+@NoArgsConstructor
+public class IssueResponseDto {
 
     private String title;
     private String description;
@@ -21,15 +24,17 @@ public class IssueDTO {
     private String category;
     private String reporter;
     private String reportedDate;
+    private List<String> imageUrls;
 
     @Builder
-    public IssueDTO(String title, String description, Priority priority, State state, Category category, User reporter, LocalDateTime reportedDate) {
+    public IssueResponseDto(String title, String description, String priority, String state, String category, String reporter, String reportedDate, List<String> imageUrls) {
         this.title = title;
         this.description = description;
-        this.priority = priority.toString();
-        this.state = state.toString();
-        this.category = category.toString();
-        this.reporter = reporter.getAccountId();
-        this.reportedDate = reportedDate.toString();
+        this.priority = priority;
+        this.state = state;
+        this.category = category;
+        this.reporter = reporter;
+        this.reportedDate = reportedDate;
+        this.imageUrls = imageUrls;
     }
 }

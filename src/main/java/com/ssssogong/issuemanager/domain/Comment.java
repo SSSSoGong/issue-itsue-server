@@ -3,13 +3,9 @@ package com.ssssogong.issuemanager.domain;
 import com.ssssogong.issuemanager.domain.account.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -18,14 +14,11 @@ import java.util.List;
 public class Comment extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private Long id;
 
     private String content;
-
-    @Builder.Default
-    private List<String> imageUrls = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")

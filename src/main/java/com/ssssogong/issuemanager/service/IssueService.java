@@ -1,19 +1,28 @@
 package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Issue;
+import com.ssssogong.issuemanager.domain.IssueImage;
+import com.ssssogong.issuemanager.domain.IssueModification;
 import com.ssssogong.issuemanager.domain.Project;
-import com.ssssogong.issuemanager.domain.enumeration.Category;
-import com.ssssogong.issuemanager.domain.enumeration.Priority;
+import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
-import com.ssssogong.issuemanager.repository.IssueRepository;
-import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.mapper.IssueMapper;
+import com.ssssogong.issuemanager.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -21,40 +30,42 @@ import java.util.List;
 public class IssueService {
 
     private final IssueRepository issueRepository;
+    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+    private final IssueImageRepository issueImageRepository;
+    private final IssueModificationRepository issueModificationRepository;
 
     // 이슈 생성
     @Transactional
-    public Long save(IssueSaveRequestDto requestDto) {
-        // 토큰에서 User 정보 꺼내기
-        // projectService에서 project 가져오기
-        Issue issue = Issue.builder()
-                .title(requestDto.getTitle())
-                .description(requestDto.getDescription())
-                .priority(Priority.valueOf(requestDto.getPriority()))
-                .state(State.NEW)
-                .category(Category.valueOf(requestDto.getCategory()))
-                .reporter("토큰에서 추출한 User 정보")
-                .project("projectService에서 project 가져오기")
-                .imageUrls()
-                .build();
+    public Long save(IssueImageRequestDto issueImageRequestDto, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
+
+//        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User reporter = userRepository.findByAccountId("tlsgusdn4818@gmail.com").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
+        Project project = projectRepository.findById(issueSaveRequestDto.getProjectId()).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
+
+        Issue issue = IssueMapper.convertToIssueSaveRequestDto(reporter, project, issueSaveRequestDto);
+        issueRepository.save(issue);
+        saveImages(issue, issueImageRequestDto.getImageFiles());
 
         return issue.getId();
     }
 
     //  이슈 확인
     @Transactional(readOnly = true)
-    public IssueDTO check(Long issueId) {
-        return issueRepository.findById(issueId)
-                .map(this::convertToDTO)
+    public IssueResponseDto show(Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
+        return IssueMapper.convertToIssueResponseDto(issue);
     }
 
     //  이슈 수정
     @Transactional
-    public Long update(Long issueId, IssueUpdateRequestDto requestDto) {
+    public Long update(Long issueId, IssueImageRequestDto issueImageRequestDto, IssueUpdateRequestDto requestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        issue.update(requestDto.getTitle(), requestDto.getDescription(), requestDto.getPriority());
+        issueImageRepository.deleteByIssueId(issue.getId());
+        IssueMapper.updateFromIssueUpdateRequestDto(issue, requestDto);
+        issueRepository.save(issue);
+        saveImages(issue, issueImageRequestDto.getImageFiles());
         return issue.getId();
     }
 
@@ -70,46 +81,64 @@ public class IssueService {
     @Transactional
     public void stateUpdate(Long issueId, IssueStateUpdateRequestDto requestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-//      userService에서 requestDto.getAssginee()를 이용해 assignee(accountId)를 가진 User를 return받아서 stateUpdate의 parameter로 전달
-//      만약에 assignee가 존재하지 않으면 null 전달
-//      issue.stateUpdate(requestDto.getState(), User assignee);
+        State from = issue.getState();
+        IssueMapper.updateFromIssueStateUpdateRequestDto(issue, requestDto);
+        State to = issue.getState();
+        if (!requestDto.getAssignee().isBlank()) {
+            User assignee = userRepository.findByUsername(requestDto.getAssignee()).orElseThrow(() -> new NotFoundException("해당 user가 없습니다"));
+            issue.setAssignee(assignee);
+        }
+        issueRepository.save(issue);
+        saveIssueModifications(issue, from, to);
     }
 
     // 프로젝트에 속한 이슈 검색
     @Transactional(readOnly = true)
-    public List<IssueProjectDto> findIssuesInProject(Long projectId, String title, String state, Integer issueCount) {
+    public List<IssueProjectResponseDto> findIssuesInProject(Long projectId, String title, String state, Integer issueCount) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
-        List<IssueProjectDto> issues = issueRepository.findIssuesByProjectId(projectId, title, state);
-        if (issueCount != null && issueCount < issues.size()) {
-            return issues.subList(0, issueCount);
+        List<Issue> issues = issueRepository.findByProjectId(project.getId());
+        List<Issue> filteredIssues = issues.stream()
+                .filter(issue -> title == null || issue.getTitle().contains(title))
+                .filter(issue -> state == null || issue.getState().toString().equals(state))
+                .limit(issueCount != null ? issueCount : issues.size()) // issueCount가 지정되지 않았을 경우 모든 이슈 반환
+                .toList();
+
+        return filteredIssues.stream()
+                .map(IssueMapper::convertToIssueProjectResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private void saveImages(Issue issue, List<MultipartFile> imageFiles) throws IOException {
+
+        Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
+        Path saveImagesPath = currentPath.resolve("saveimages"); // 현재 경로에 save_images 경로 추가
+
+        if (!Files.exists(saveImagesPath)) { // 해당 폴더 없으면
+            Files.createDirectories(saveImagesPath); // 생성
         }
-        return issues;
+
+        for (MultipartFile file : imageFiles) {
+            String fileName = UUID.randomUUID() + "" + file.getOriginalFilename(); // 파일 이름 : 고유식별번호 + 원래 이름
+
+            Path filePath = saveImagesPath.resolve(fileName); // 파일 경로 : 해당 폴더 + 파일 이름
+
+            file.transferTo(filePath.toFile()); // 파일 경로 => 파일 변환 후 해당 경로에 파일 저장
+
+            IssueImage issueImage = IssueImage.builder()
+                    .imageUrl(filePath.toString())
+                    .build();
+            issueImage.setIssue(issue);
+            issueImageRepository.save(issueImage);
+        }
     }
 
-    public IssueDTO convertToDTO(Issue issue) {
-        return IssueDTO.builder()
-                .title(issue.getTitle())
-                .description(issue.getDescription())
-                .priority(issue.getPriority())
-                .state(issue.getState())
-                .category(issue.getCategory())
-                .reporter(issue.getReporter())
-                .reportedDate(issue.getCreatedAt())
+    private void saveIssueModifications(Issue issue, State from, State to) {
+        IssueModification issueModification = IssueModification.builder()
+                .from(from)
+                .to(to)
+                .modifier(null)
                 .build();
+        issueModification.setIssue(issue);
+        issueModificationRepository.save(issueModification);
     }
-
-//    public Issue convertToEntity(IssueDTO issueDTO) {
-//        User reporter = userRepository.findByUsername(issueDTO.getReporter()).orElseThrow(() ->
-//                new RuntimeException("User not found"));
-//
-//        return Issue.builder()
-//                .title(issueDTO.getTitle())
-//                .description(issueDTO.getDescription())
-//                .priority(issueDTO.getPriority())
-//                .state(issueDTO.getState())
-//                .category(issueDTO.getCategory())
-//                .reporter(reporter)
-//                .createdAt(issueDTO.getReportedDate())
-//                .build();
-//    }
 }

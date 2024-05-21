@@ -1,11 +1,11 @@
 package com.ssssogong.issuemanager.repository;
-
+import com.ssssogong.issuemanager.domain.IssueImage;
 import com.ssssogong.issuemanager.domain.account.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByAccountId(String accountId);
-    Optional<User> findByUsername(String username);
+public interface IssueImageRepository extends JpaRepository<IssueImage, Long> {
+
+    Optional<IssueImage> deleteByIssueId(Long issueId);
 }
