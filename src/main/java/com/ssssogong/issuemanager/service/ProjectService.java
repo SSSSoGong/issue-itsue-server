@@ -37,7 +37,8 @@ public class ProjectService {
     private final AdminRepository adminRepository;
 
     public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
-        final Admin admin = adminRepository.findByAccountId(adminAccountId).orElseThrow();
+        final Admin admin = adminRepository.findByAccountId(adminAccountId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
         final Project project = Project.builder()
                 .admin(admin)
                 .name(projectCreationRequest.getName())
@@ -48,12 +49,17 @@ public class ProjectService {
     }
 
     public ProjectDetailsResponse findById(final Long id) {
-        final Project project = projectRepository.findById(id).orElseThrow();
+        final Project project = findProjectById(id);
         return ProjectMapper.toProjectDetailsResponse(project);
     }
 
+    private Project findProjectById(final Long id) {
+        return projectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
+    }
+
     public ProjectIdResponse updateById(final Long id, final ProjectUpdateRequest projectUpdateRequest) {
-        final Project project = projectRepository.findById(id).orElseThrow();
+        final Project project = findProjectById(id);
         project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
@@ -65,12 +71,13 @@ public class ProjectService {
     }
 
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
-        final Project project = projectRepository.findById(projectId).orElseThrow();
+        final Project project = findProjectById(projectId);
         //todo: 유저 중복 참여X
         final List<Role> roles = roleRepository.findAll();
         List<UserProject> userProjects = new ArrayList<>();
         for (ProjectUserAdditionRequest userData : request) {
-            final User user = userRepository.findByAccountId(userData.getAccountId()).orElseThrow();
+            final User user = userRepository.findByAccountId(userData.getAccountId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없음"));
             final UserProject userProject = UserProject.builder()
                     .user(user)
                     .project(project)
@@ -117,8 +124,7 @@ public class ProjectService {
 
     public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
                                                                                final String projectId) {
-        final UserProject userProject = userProjectRepository.findByAccountIdAndProjectId(accountId, projectId)
-                .orElseThrow();
+        final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         return new UserProjectAssociationResponse(
                 userProject.getRole().getRoleName(),
                 userProject.getProject().getCreatedAt().toString(),
@@ -126,8 +132,13 @@ public class ProjectService {
         );
     }
 
+    private UserProject findUserProjectByAccountIdAndProjectId(final String accountId, final String projectId) {
+        return userProjectRepository.findByAccountIdAndProjectId(accountId, projectId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
+    }
+
     public void renewAccessTime(final String accountId, final String projectId) {
-        UserProject userProject = userProjectRepository.findByAccountIdAndProjectId(accountId, projectId).orElseThrow();
+        UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         userProject.updateAccessTime();
     }
 }
