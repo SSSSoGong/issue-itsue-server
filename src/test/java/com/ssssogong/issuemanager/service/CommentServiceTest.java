@@ -24,6 +24,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.FileInputStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,6 +94,7 @@ public class CommentService {
                 .orElseThrow(IllegalArgumentException::new);
 
 
+        deleteLocalImageFiles(comment);
         commentImageRepository.deleteByCommentId(id);
 
         if (images != null && !images.isEmpty()) {
@@ -112,7 +114,9 @@ public class CommentService {
     public void deleteComment(Long id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(IllegalArgumentException::new);
+        deleteLocalImageFiles(comment);
         commentRepository.delete(comment);
+
     }
 
     private void saveImages(Comment comment, List<MultipartFile> imageFiles) throws IOException {
@@ -134,11 +138,22 @@ public class CommentService {
             file.transferTo(filePath.toFile()); // 파일 경로 => 파일 변환 후 해당 경로에 파일 저장
 
             CommentImage commentImage = CommentImage.builder()
-                    .imageUrls(filePath.toString())
+                    .imageUrl(filePath.toString())
                     .build();
 
             commentImage.setComment(comment); // 연관관계 주입
             commentImageRepository.save(commentImage);
+        }
+    }
+
+    private void deleteLocalImageFiles(Comment comment) {
+         List<CommentImage> commentImages = commentImageRepository.findByCommentId(comment.getId());
+
+        for (CommentImage commentImage : commentImages) {
+            String imageUrl = commentImage.getImageUrl();
+            System.out.println(imageUrl);
+            File deleteFile = new File(imageUrl);
+            deleteFile.delete();
         }
     }
 

@@ -31,7 +31,7 @@ public class CommentResponseDto {
         this.updatedAt = comment.getUpdatedAt();
 
         this.imageUrls = comment.getCommentImages().stream()
-                .map(CommentImage::getImageUrls)
+                .map(CommentImage::getImageUrl)
                 .collect(Collectors.toList());
     }
 }

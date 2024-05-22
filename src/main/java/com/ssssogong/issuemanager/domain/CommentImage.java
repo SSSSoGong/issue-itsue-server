@@ -16,7 +16,7 @@ public class CommentImage {
     @Column(name = "image_id")
     private Long id;
 
-    private String imageUrls;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "comment_id")
@@ -24,9 +24,9 @@ public class CommentImage {
 
 
     @Builder
-    public CommentImage(Long id, String imageUrls, Comment comment) {
+    public CommentImage(Long id, String imageUrl, Comment comment) {
         this.id = id;
-        this.imageUrls = imageUrls;
+        this.imageUrl = imageUrl;
         this.comment = comment;
     }
 
