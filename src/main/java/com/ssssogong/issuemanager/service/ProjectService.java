@@ -14,6 +14,7 @@ import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
+import com.ssssogong.issuemanager.mapper.UserProjectMapper;
 import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
@@ -97,12 +98,7 @@ public class ProjectService {
 
     public List<ProjectUserResponse> findUsers(final Long id) {
         List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id);
-        return userProjects.stream()
-                .map(each -> new ProjectUserResponse(
-                        each.getUser().getAccountId(),
-                        each.getUser().getUsername(),
-                        each.getRole().getRoleName()
-                )).toList();
+        return UserProjectMapper.toProjectUserResponse(userProjects);
     }
 
     public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
@@ -112,24 +108,14 @@ public class ProjectService {
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         //TODO : 최근에 접속한 프로젝트 순으로 정렬합니다.
-        //todo: 즐겨찾기?
-        return userProjects.stream()
-                .map(each -> new UserProjectSummaryResponse(
-                        each.getProject().getId(),
-                        each.getProject().getName(),
-                        each.getProject().getCreatedAt().toString(),
-                        each.isFavorite()
-                )).toList();
+        //todo: 즐겨찾기를 위로??
+        return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
     }
 
     public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
                                                                                final String projectId) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
-        return new UserProjectAssociationResponse(
-                userProject.getRole().getRoleName(),
-                userProject.getProject().getCreatedAt().toString(),
-                userProject.getAccessTime().toString()
-        );
+        return UserProjectMapper.toUserProjectAssociationResponse(userProject);
     }
 
     private UserProject findUserProjectByAccountIdAndProjectId(final String accountId, final String projectId) {
