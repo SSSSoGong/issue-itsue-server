@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssssogong.issuemanager.domain.Comment;
+import com.ssssogong.issuemanager.dto.CommentIdResponseDto;
 import com.ssssogong.issuemanager.dto.CommentRequestDto;
 import com.ssssogong.issuemanager.dto.CommentResponseDto;
 import com.ssssogong.issuemanager.security.SecurityConfig;
@@ -56,12 +57,15 @@ class CommentControllerTest {
         CommentRequestDto commentRequestDto = new CommentRequestDto();
         commentRequestDto.setContent("This is a comment");
 
+
+
         MockMultipartFile contentFile = new MockMultipartFile("commentRequestDto", "", "application/json",
                 new ObjectMapper().writeValueAsBytes(commentRequestDto));
         MockMultipartFile imageFile = new MockMultipartFile("commentImageRequestDto", "image.jpg", "image/jpeg", "image data".getBytes());
 
-        Mockito.when(commentService.createComment(Mockito.eq(issueId), Mockito.any(), Mockito.any())).thenReturn(commentId);
+        //Mockito.when().thenReturn(commentId);
 
+        commentService.createComment(Mockito.eq(issueId), Mockito.any(), Mockito.any());
         mockMvc.perform(multipart("/issues/{iid}/comments", issueId)
                         .file(contentFile)
                         .file(imageFile))
