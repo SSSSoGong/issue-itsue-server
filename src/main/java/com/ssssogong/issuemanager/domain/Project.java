@@ -39,7 +39,7 @@ public class Project extends BaseEntity {
             this.name = name;
         }
         if(Strings.isNotEmpty(subject)){
-            this.name = subject;
+            this.subject = subject;
         }
     }
 }
