@@ -70,7 +70,7 @@ public class UserController {
     }
 
     /**해당 id 회원 검색*/
-    @GetMapping("/{id}")
+    @GetMapping("/{accountId}")
     public ResponseEntity<Object> getUser(@PathVariable String accountId){
         UserDTO user = userService.findUserByAccoundId(accountId);
         if(user == null){
@@ -80,7 +80,7 @@ public class UserController {
     }
 
     /**해당 id 회원 정보 수정*/
-    @PutMapping("/{id}")
+    @PutMapping("/{accountId}")
     public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDTO updateRequest, @PathVariable String accountId){
         // 사용자명, password에 값 있는 경우 변경
         UserDTO user;

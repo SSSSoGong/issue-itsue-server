@@ -19,6 +19,7 @@ import java.util.Optional;
 public class CustomUserDetailsService implements UserDetailsService {
     public final UserRepository userRepository;
     public final UserProjectRepository userProjectRepository;
+    public final UserService userService;
 
     /**username(=사용자 id)에 해당하는 UserDetails 객체를 반환하는 메소드 <br>
      * (UserDetails : 사용자 인증 정보를 담음)*/
@@ -32,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
         User user = optionalUser.get();
         // CutsomUserDetails에 담아서 반환한다
-        CustomUserDetails userDetails = new CustomUserDetails(user, userProjectRepository);
+        CustomUserDetails userDetails = new CustomUserDetails(user, userProjectRepository, userService);
         return userDetails;
     }
 }
