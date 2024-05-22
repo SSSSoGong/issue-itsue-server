@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-@Setter
 public class CommentIdResponseDto {
     private Long commentId;
 

@@ -24,10 +24,10 @@ public class CommentController {
 
     @PostMapping("/issues/{iid}/comments")
     public ResponseEntity<CommentIdResponseDto> createComment(@PathVariable("iid") Long issueId,
-                                                              @RequestPart("content") CommentRequestDto commentRequestDto,
+                                                              @RequestPart(value = "content", required = false) CommentRequestDto commentRequestDto,
                                                               @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
-        CommentIdResponseDto commentIdResponseDto = commentService.createComment(issueId, commentRequestDto, commentImageRequestDto);
+        CommentIdResponseDto commentIdResponseDto = commentService.createComment(issueId, commentRequestDto);
         imageService.saveImages(commentIdResponseDto.getCommentId(), commentImageRequestDto.getImageFiles());
 
         return new ResponseEntity<>(commentIdResponseDto, HttpStatus.OK);
@@ -51,7 +51,7 @@ public class CommentController {
                                                               @RequestPart("content") CommentRequestDto commentRequestDto,
                                                               @ModelAttribute List<MultipartFile> imageFiles) throws IOException {
 
-        imageService.deleteImageFiles(commentId);
+        imageService.deleteImages(commentId);
         imageService.saveImages(commentId, imageFiles);
 
         return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent(), imageFiles), HttpStatus.OK);
@@ -61,7 +61,7 @@ public class CommentController {
     public void deleteComment(@PathVariable("iid") Long issueId,
                               @PathVariable("cid") Long commentId) {
 
-        imageService.deleteImageFiles(commentId);
+        imageService.deleteImages(commentId);
         commentService.deleteComment(commentId);
     }
 

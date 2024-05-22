@@ -65,7 +65,7 @@ class CommentControllerTest {
 
         //Mockito.when().thenReturn(commentId);
 
-        commentService.createComment(Mockito.eq(issueId), Mockito.any(), Mockito.any());
+        commentService.createComment(Mockito.eq(issueId), Mockito.any());
         mockMvc.perform(multipart("/issues/{iid}/comments", issueId)
                         .file(contentFile)
                         .file(imageFile))
