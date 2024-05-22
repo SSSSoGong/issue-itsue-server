@@ -8,29 +8,40 @@ import com.ssssogong.issuemanager.repository.RoleRepository;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.reflections.Reflections;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class RoleInitializer {
 
+    private static final String ROLE_BASE_PACKAGE = "com.ssssogong.issuemanager.domain.role";
     private final RoleRepository roleRepository;
 
     @PostConstruct
     public void updateRoles() {
         final List<Role> roles = roleRepository.findAll();
         final List<Role> saves = new ArrayList<>();
-        //todo: 새로운 Role이 추가되어도 알잘딱하게 추가해주기
-        if(isRoleNotExist(roles, "Tester")) {
-            saves.add(new Tester());
+
+        // Reflection을 사용하여 role 패키지 내의 모든 role 하위 클래스들을 찾는다
+        Reflections reflections = new Reflections(ROLE_BASE_PACKAGE);
+        Set<Class<? extends Role>> roleClasses = reflections.getSubTypesOf(Role.class);
+
+        for (Class<? extends Role> roleClass : roleClasses) {
+            String roleName = roleClass.getSimpleName();
+            //DB에 없는 role은 반영한다
+            if (isRoleNotExist(roles, roleName)) {
+                try {
+                    Role roleInstance = roleClass.getDeclaredConstructor().newInstance();
+                    saves.add(roleInstance);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                }
+            }
         }
-        if(isRoleNotExist(roles, "Developer")) {
-            saves.add(new Developer());
-        }
-        if(isRoleNotExist(roles, "ProjectLeader")) {
-            saves.add(new ProjectLeader());
-        }
+
         roleRepository.saveAll(saves);
     }
 

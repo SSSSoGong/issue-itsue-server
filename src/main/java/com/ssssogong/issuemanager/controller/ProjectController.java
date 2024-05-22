@@ -97,4 +97,6 @@ public class ProjectController {
         projectService.renewAccessTime(accountId, projectId);
         return ResponseEntity.ok().build();
     }
+
+    //todo: 즐겨찾기 추가/삭제 api
 }
