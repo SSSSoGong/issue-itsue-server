@@ -7,7 +7,6 @@ import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.mapper.IssueMapper;
-import com.ssssogong.issuemanager.repository.IssueImageRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -27,13 +26,11 @@ public class IssueService {
     private final IssueRepository issueRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
-    private final IssueImageRepository issueImageRepository;
     private final IssueModificationService issueModificationService;
-    private final IssueImageService issueImageService;
 
     // 이슈 생성
     @Transactional
-    public IssueIdResponseDto save(Long projectId, IssueImageRequestDto issueImageRequestDto, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
+    public IssueIdResponseDto save(Long projectId, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
 
         // TODO 이슈 생성 시 Security에서 User를 가져와서 reporter 필드에 넣어야 함
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -42,8 +39,6 @@ public class IssueService {
 
         Issue issue = IssueMapper.convertToIssueSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
         issueRepository.save(issue);    // issue 저장
-        issueImageService.save(issue, issueImageRequestDto.getImageFiles());    // 이미지 저장
-
         return IssueMapper.convertToIssueIdResponseDto(issue);
     }
 
@@ -57,13 +52,10 @@ public class IssueService {
 
     //  이슈 수정
     @Transactional
-    public IssueIdResponseDto update(Long issueId, IssueImageRequestDto issueImageRequestDto, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+    public IssueIdResponseDto update(Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        issueImageService.deleteInLocal(issue); // Local에서 이미지 삭제
-        issueImageRepository.deleteByIssueId(issue.getId()); // DB에서 이미지 삭제
         IssueMapper.updateFromIssueUpdateRequestDto(issue, issueUpdateRequestDto);  // dto -> entity : update 처리
         issueRepository.save(issue);    // DB에 issue 저장(수정)
-        issueImageService.save(issue, issueImageRequestDto.getImageFiles());    // DB에 이미지 저장(수정)
         return IssueMapper.convertToIssueIdResponseDto(issue);  // entity -> dto
     }
 
@@ -73,7 +65,6 @@ public class IssueService {
         if (!issueRepository.existsById(issueId))
             throw new NotFoundException("해당 issue가 없습니다.");
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        issueImageService.deleteInLocal(issue); // Local에서 이미지 삭제
         issueRepository.deleteById(issueId);    // cascade 때문에 DB에서 연관된 issueModification, issueImage 자동 삭제
     }
 

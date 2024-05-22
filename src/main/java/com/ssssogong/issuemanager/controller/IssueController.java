@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.controller;
 
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
+import com.ssssogong.issuemanager.service.IssueImageService;
 import com.ssssogong.issuemanager.service.IssueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,15 @@ import java.util.List;
 public class IssueController {
 
     private final IssueService issueService;
+    private final IssueImageService issueImageService;
 
     // 이슈 생성
     @PostMapping("/projects/{projectId}/issues")
     public ResponseEntity<IssueIdResponseDto> create(@PathVariable("projectId") Long projectId, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto,
                                        @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
         try {
-            IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueImageRequestDto, issueSaveRequestDto);
+            IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueSaveRequestDto);
+            issueImageService.save(issueIdResponseDto.getIssueId(), issueImageRequestDto.getImageFiles());
             return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
         } catch (NotFoundException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -45,7 +48,9 @@ public class IssueController {
     public ResponseEntity<IssueIdResponseDto> update(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
                                        @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) {
         try {
-            IssueIdResponseDto issueIdResponseDto = issueService.update(issueId, issueImageRequestDto, issueUpdateRequestDto);
+            issueImageService.delete(issueId);
+            IssueIdResponseDto issueIdResponseDto = issueService.update(issueId, issueUpdateRequestDto);
+            issueImageService.save(issueId, issueImageRequestDto.getImageFiles());
             return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
         } catch (NotFoundException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
