@@ -35,8 +35,8 @@ public class ProjectService {
     private final RoleRepository roleRepository;
     private final AdminRepository adminRepository;
 
-    public ProjectIdResponse create(final String adminId, final ProjectCreationRequest projectCreationRequest) {
-        final Admin admin = adminRepository.findByAccountId(adminId).orElseThrow();
+    public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
+        final Admin admin = adminRepository.findByAccountId(adminAccountId).orElseThrow();
         final Project project = Project.builder()
                 .admin(admin)
                 .name(projectCreationRequest.getName())
