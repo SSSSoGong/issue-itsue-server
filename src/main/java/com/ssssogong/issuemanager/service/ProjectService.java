@@ -76,8 +76,10 @@ public class ProjectService {
 
     @Transactional
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
+        checkDuplicatedAddition(projectId, request);
+
+        //todo: 보기좋게 리팩터링해보기
         final Project project = findProjectById(projectId);
-        //todo: 유저 중복 참여X
         final List<Role> roles = roleRepository.findAll();
         List<UserProject> userProjects = new ArrayList<>();
         for (ProjectUserAdditionRequest userData : request) {
@@ -91,6 +93,15 @@ public class ProjectService {
             userProjects.add(userProject);
         }
         userProjectRepository.saveAll(userProjects);
+    }
+
+    private void checkDuplicatedAddition(final Long projectId, final List<ProjectUserAdditionRequest> request) {
+        final List<String> accountIds = request.stream()
+                .map(ProjectUserAdditionRequest::getAccountId)
+                .toList();
+        if(userProjectRepository.existsByProjectIdAndAccountIdIn(projectId, accountIds)) {
+            throw new IllegalArgumentException("이미 프로젝트에 참여중인 유저가 포함되어 있음");
+        }
     }
 
     private Role findRole(final List<Role> roles, final ProjectUserAdditionRequest userData) {

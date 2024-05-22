@@ -20,6 +20,9 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 
     @Query("DELETE FROM UserProject up WHERE up.project.id = :projectId AND up.user.accountId IN :accountIds")
     @Modifying
-    void deleteAllByProjectIdAndAccountIdIn(@Param("projectId")Long projectId, @Param("accountIds") List<String> accountIds);
+    void deleteAllByProjectIdAndAccountIdIn(@Param("projectId") Long projectId, @Param("accountIds") List<String> accountIds);
+
+    @Query("SELECT CASE WHEN COUNT(up) > 0 THEN TRUE ELSE FALSE END FROM UserProject up WHERE up.project.id = :projectId AND up.user.accountId IN :accountIds")
+    boolean existsByProjectIdAndAccountIdIn(@Param("projectId") Long projectId, @Param("accountIds") List<String> accountIds);
 }
 
