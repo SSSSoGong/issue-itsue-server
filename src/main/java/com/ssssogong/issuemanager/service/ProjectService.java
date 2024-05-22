@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class ProjectService {
 
@@ -37,6 +36,7 @@ public class ProjectService {
     private final RoleRepository roleRepository;
     private final AdminRepository adminRepository;
 
+    @Transactional
     public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
         final Admin admin = adminRepository.findByAccountId(adminAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
@@ -49,6 +49,7 @@ public class ProjectService {
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
+    @Transactional(readOnly = true)
     public ProjectDetailsResponse findById(final Long id) {
         final Project project = findProjectById(id);
         return ProjectMapper.toProjectDetailsResponse(project);
@@ -59,18 +60,21 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
     }
 
+    @Transactional
     public ProjectIdResponse updateById(final Long id, final ProjectUpdateRequest projectUpdateRequest) {
         final Project project = findProjectById(id);
         project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
+    @Transactional
     public ProjectIdResponse deleteById(final Long id) {
         //todo: 연관된 userProject.. issue... comment.. issuemodification 등등 삭제해야 함
         projectRepository.deleteById(id);
         return ProjectMapper.toProjectIdResponse(id);
     }
 
+    @Transactional
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
         final Project project = findProjectById(projectId);
         //todo: 유저 중복 참여X
@@ -96,15 +100,18 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("역할을 찾지 못함"));
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectUserResponse> findUsers(final Long id) {
         List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id);
         return UserProjectMapper.toProjectUserResponse(userProjects);
     }
 
+    @Transactional
     public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
         userProjectRepository.deleteAllByProjectIdAndAccountIdIn(projectId, accountIds);
     }
 
+    @Transactional(readOnly = true)
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         //TODO : 최근에 접속한 프로젝트 순으로 정렬합니다.
@@ -112,6 +119,7 @@ public class ProjectService {
         return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
     }
 
+    @Transactional(readOnly = true)
     public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
                                                                                final String projectId) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
@@ -123,6 +131,7 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
     }
 
+    @Transactional
     public void renewAccessTime(final String accountId, final String projectId) {
         UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         userProject.updateAccessTime();
