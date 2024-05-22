@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Getter
-public class ImageService {
+public class CommentImageService {
 
     private final CommentImageRepository commentImageRepository;
     private final CommentRepository commentRepository;

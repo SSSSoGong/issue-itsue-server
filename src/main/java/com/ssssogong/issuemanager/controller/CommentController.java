@@ -5,7 +5,7 @@ import com.ssssogong.issuemanager.dto.CommentImageRequestDto;
 import com.ssssogong.issuemanager.dto.CommentRequestDto;
 import com.ssssogong.issuemanager.dto.CommentResponseDto;
 import com.ssssogong.issuemanager.service.CommentService;
-import com.ssssogong.issuemanager.service.ImageService;
+import com.ssssogong.issuemanager.service.CommentImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
-    private final ImageService imageService;
+    private final CommentImageService commentImageService;
 
     @PostMapping("/issues/{iid}/comments")
     public ResponseEntity<CommentIdResponseDto> createComment(@PathVariable("iid") Long issueId,
@@ -28,7 +28,7 @@ public class CommentController {
                                                               @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         CommentIdResponseDto commentIdResponseDto = commentService.createComment(issueId, commentRequestDto);
-        imageService.saveImages(commentIdResponseDto.getCommentId(), commentImageRequestDto.getImageFiles());
+        commentImageService.saveImages(commentIdResponseDto.getCommentId(), commentImageRequestDto.getImageFiles());
 
         return new ResponseEntity<>(commentIdResponseDto, HttpStatus.OK);
 
@@ -51,8 +51,8 @@ public class CommentController {
                                                               @RequestPart("content") CommentRequestDto commentRequestDto,
                                                               @ModelAttribute List<MultipartFile> imageFiles) throws IOException {
 
-        imageService.deleteImages(commentId);
-        imageService.saveImages(commentId, imageFiles);
+        commentImageService.deleteImages(commentId);
+        commentImageService.saveImages(commentId, imageFiles);
 
         return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent(), imageFiles), HttpStatus.OK);
     }
@@ -61,7 +61,7 @@ public class CommentController {
     public void deleteComment(@PathVariable("iid") Long issueId,
                               @PathVariable("cid") Long commentId) {
 
-        imageService.deleteImages(commentId);
+        commentImageService.deleteImages(commentId);
         commentService.deleteComment(commentId);
     }
 
