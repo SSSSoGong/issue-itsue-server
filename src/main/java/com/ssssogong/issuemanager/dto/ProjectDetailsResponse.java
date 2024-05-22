@@ -1,6 +1,5 @@
 package com.ssssogong.issuemanager.dto;
 
-import com.ssssogong.issuemanager.domain.Project;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,15 +13,4 @@ public class ProjectDetailsResponse {
     private String createdAt;
     private String adminId;
     private String adminName;
-
-    public static ProjectDetailsResponse from(final Project project) {
-        return new ProjectDetailsResponse(
-                project.getId(),
-                project.getName(),
-                project.getSubject(),
-                project.getCreatedAt().toString(),
-                project.getAdmin().getAccountId(),
-                project.getAdmin().getUsername()
-        );
-    }
 }

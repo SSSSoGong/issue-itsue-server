@@ -13,6 +13,7 @@ import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
+import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
@@ -42,24 +43,25 @@ public class ProjectService {
                 .name(projectCreationRequest.getName())
                 .subject(projectCreationRequest.getSubject())
                 .build();
-        return new ProjectIdResponse(projectRepository.save(project).getId());
+        projectRepository.save(project);
+        return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
     public ProjectDetailsResponse findById(final Long id) {
         final Project project = projectRepository.findById(id).orElseThrow();
-        return ProjectDetailsResponse.from(project);
+        return ProjectMapper.toProjectDetailsResponse(project);
     }
 
     public ProjectIdResponse updateById(final Long id, final ProjectUpdateRequest projectUpdateRequest) {
         final Project project = projectRepository.findById(id).orElseThrow();
         project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
-        return new ProjectIdResponse(id);
+        return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
     public ProjectIdResponse deleteById(final Long id) {
         //todo: 연관된 userProject.. issue... comment.. issuemodification 등등 삭제해야 함
         projectRepository.deleteById(id);
-        return new ProjectIdResponse(id);
+        return ProjectMapper.toProjectIdResponse(id);
     }
 
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
