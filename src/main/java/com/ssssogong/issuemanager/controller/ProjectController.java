@@ -12,6 +12,7 @@ import com.ssssogong.issuemanager.service.ProjectService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,8 @@ public class ProjectController {
 
     @PostMapping("/projects")
     public ResponseEntity<ProjectIdResponse> create(@RequestBody ProjectCreationRequest projectCreationRequest) {
-        final ProjectIdResponse response = projectService.create(projectCreationRequest);
+        final String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        final ProjectIdResponse response = projectService.create(accountId, projectCreationRequest);
         return ResponseEntity.ok(response);
     }
 

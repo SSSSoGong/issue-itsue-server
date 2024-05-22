@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
+import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
@@ -12,6 +13,7 @@ import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
+import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
@@ -31,10 +33,12 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final AdminRepository adminRepository;
 
-    public ProjectIdResponse create(final ProjectCreationRequest projectCreationRequest) {
+    public ProjectIdResponse create(final String adminId, final ProjectCreationRequest projectCreationRequest) {
+        final Admin admin = adminRepository.findByAccountId(adminId).orElseThrow();
         final Project project = Project.builder()
-                .admin(null) // todo: 어드민 조회해서 넣기
+                .admin(admin)
                 .name(projectCreationRequest.getName())
                 .subject(projectCreationRequest.getSubject())
                 .build();
