@@ -3,11 +3,13 @@ package com.ssssogong.issuemanager.security;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import com.ssssogong.issuemanager.service.CustomUserDetailsService;
+import com.ssssogong.issuemanager.service.UserService;
 import com.ssssogong.issuemanager.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.method.P;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,22 +31,11 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 public class SecurityConfig {
     private final AuthenticationConfiguration configuration;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
     private final CustomUserDetailsService userDetailsService;
-
-//    @Bean
-//    AuthenticationManager authenticationManager() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        //provider.setUserDetailsService(userDetailsService);
-//        return new ProviderManager(provider);
-//    }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        // 암호화 인코더 인터페이스 지정 -> 지정 안하면 시큐리티에서 오류를 뿜네요..
-        return new BCryptPasswordEncoder();  // BCrypt 해시 함수를 사용하는 인코더
-    }
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -57,7 +48,7 @@ public class SecurityConfig {
             throws Exception {
         LoginFilter loginFilter = new LoginFilter(authenticationManager(), jwtUtil);
         loginFilter.setFilterProcessesUrl("/users/login");
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository, userProjectRepository);
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtUtil, userRepository, userProjectRepository, userService);
 
         // 접근 권한 설정
         http.authorizeHttpRequests((authorizedHttpRequests) -> authorizedHttpRequests
