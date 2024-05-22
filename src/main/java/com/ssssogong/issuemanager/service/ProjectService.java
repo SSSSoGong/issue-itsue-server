@@ -124,8 +124,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
-        final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
-        //TODO : 최근에 접속한 프로젝트 순으로 정렬합니다.
+        final List<UserProject> userProjects = userProjectRepository.findAllByAccountIdOrderByAccessTime(accountId);
         //todo: 즐겨찾기를 위로??
         return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
     }
