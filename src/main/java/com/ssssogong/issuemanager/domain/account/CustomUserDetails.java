@@ -2,9 +2,12 @@ package com.ssssogong.issuemanager.domain.account;
 
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
+import com.ssssogong.issuemanager.repository.UserRepository;
+import com.ssssogong.issuemanager.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,26 +20,20 @@ import java.util.Optional;
 public class CustomUserDetails implements UserDetails {
     private final User user;
     private final UserProjectRepository userProjectRepository;
+    private final UserService userService;
     private Collection<GrantedAuthority> authorities = new ArrayList<>();
 
     /**해당 User의 권한 반환 <br>
      * User는 프로젝트마다 다른 권한을 가지는데, Privilege 뒤에 TO_PROJECTNAME 을 붙여 프로젝트 별 권한을 구분한다*/
     @Override
+    @Transactional
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // UserProject에서 해당 User의 Role을 전부 가져온다.
-        authorities = new ArrayList<>();
-        List<UserProject> userProjects = userProjectRepository.findAllByUserId(user.getId());
-        for(UserProject userProject: userProjects){
-            List<GrantedAuthority> auths = userProject.getRole().getGrantedAuthorities().stream().toList();
-            for(GrantedAuthority g : auths){
-                authorities.add(new GrantedAuthority() {
-                    @Override
-                    public String getAuthority() {
-                        return g.getAuthority() + "_TO_" + userProject.getProject().getName();
-                    }
-                });
-            }
-        }
+        System.out.println("CustomUserDetails: getting authorities for user " + user.getAccountId() + " (id: " + user.getId() + ")");
+        authorities = userService.getAuthorities(user.getId());
+        System.out.print("CustomUserDetails: got [ ");
+        authorities.iterator().forEachRemaining((auth) -> System.out.print(auth.getAuthority() + " "));
+        System.out.println("]");
         return authorities;
     }
 

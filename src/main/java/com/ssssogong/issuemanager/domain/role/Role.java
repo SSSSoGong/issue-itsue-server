@@ -40,10 +40,9 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     /**자신의 역할과 Privilege를 담은 Collection을 반환한다*/
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities() {
-        String roleName = this.getClass().getName();
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(!roleName.equals("Role"))
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+        if(!name.isBlank())
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + name.toUpperCase()));
         authorities.addAll(
                 allowedPrivileges
                         .stream()

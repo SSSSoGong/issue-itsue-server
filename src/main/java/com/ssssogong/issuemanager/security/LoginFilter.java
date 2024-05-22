@@ -56,7 +56,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             throw new AuthenticationException("invalid authentication") {};
         }
 
-
         // 스프링 시큐리티에서 username과 password를 검증하기 위해서 token에 담아야 함
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(id, password, null );
         // token 검증을 위해 AuthenticationManager에 전달
@@ -73,7 +72,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String id = authentication.getName();
         List<GrantedAuthority> authorities = new ArrayList<>(authentication.getAuthorities());
 
-        System.out.println("LoginFilter: Hello, " + id + " with role [ "); // test
+        System.out.print("LoginFilter: Hello, " + id + " with role [ "); // test
         for(GrantedAuthority auth: authorities){
             System.out.print(auth.getAuthority() + " ");
         }

@@ -4,6 +4,7 @@ import com.ssssogong.issuemanager.domain.account.CustomUserDetails;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import com.ssssogong.issuemanager.service.UserService;
 import com.ssssogong.issuemanager.util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
+    private final UserService userService;
 
     /**인증 필터 구현*/
     @Override
@@ -64,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // UserDetails에 회원 정보 담음
-        CustomUserDetails userDetails = new CustomUserDetails(user.get(), userProjectRepository);
+        CustomUserDetails userDetails = new CustomUserDetails(user.get(), userProjectRepository, userService);
 
         // 인증 토큰 생성
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
