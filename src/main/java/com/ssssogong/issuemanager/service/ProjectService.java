@@ -33,9 +33,8 @@ public class ProjectService {
     private final RoleRepository roleRepository;
 
     public ProjectIdResponse create(final ProjectCreationRequest projectCreationRequest) {
-        //todo: admin 권한 체크
         final Project project = Project.builder()
-                .admin(null) //todo
+                .admin(null) // todo: 어드민 조회해서 넣기
                 .name(projectCreationRequest.getName())
                 .subject(projectCreationRequest.getSubject())
                 .build();
@@ -54,8 +53,7 @@ public class ProjectService {
     }
 
     public ProjectIdResponse deleteById(final Long id) {
-        final Project project = projectRepository.findById(id).orElseThrow();
-        //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
+        //todo: 연관된 userProject.. issue... comment.. issuemodification 등등 삭제해야 함
         projectRepository.deleteById(id);
         return new ProjectIdResponse(id);
     }
@@ -64,7 +62,6 @@ public class ProjectService {
         final Project project = projectRepository.findById(projectId).orElseThrow();
         //todo: 유저 중복 참여X
         final List<Role> roles = roleRepository.findAll();
-        //todo: project.checkAdmin() 프로젝트를 생성한 admin인지 체크
         List<UserProject> userProjects = new ArrayList<>();
         for (ProjectUserAdditionRequest userData : request) {
             final User user = userRepository.findByAccountId(userData.getAccountId()).orElseThrow();
@@ -96,13 +93,13 @@ public class ProjectService {
     }
 
     public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
-        //todo: admin 체크
         userProjectRepository.deleteAllByProjectIdAndAccountIdIn(projectId, accountIds);
     }
 
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         //TODO : 최근에 접속한 프로젝트 순으로 정렬합니다.
+        //todo: 즐겨찾기?
         return userProjects.stream()
                 .map(each -> new UserProjectSummaryResponse(
                         each.getProject().getId(),
