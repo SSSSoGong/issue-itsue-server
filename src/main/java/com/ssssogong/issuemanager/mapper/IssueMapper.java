@@ -50,14 +50,20 @@ public class IssueMapper {
         }
     }
 
-    public static IssueResponseDto convertToIssueResponseDto(Issue issue) {
-        return IssueResponseDto.builder()
+    public static IssueIdResponseDto convertToIssueIdResponseDto(Issue issue) {
+        return IssueIdResponseDto.builder()
+                .issueId(issue.getId())
+                .build();
+    }
+
+    public static IssueShowResponseDto convertToIssueShowResponseDto(Issue issue) {
+        return IssueShowResponseDto.builder()
                 .title(issue.getTitle())
                 .description(issue.getDescription())
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
                 .category(issue.getCategory() != null ? issue.getCategory().toString() : null)
-                .reporter(issue.getReporter() != null ? issue.getReporter().getUsername() : null)
+                .reporter(issue.getReporter() != null ? issue.getReporter().getAccountId() : null)
                 .reportedDate(issue.getCreatedAt() != null ? issue.getCreatedAt().toString() : null)
                 .imageUrls(issue.getIssueImages() != null ? issue.getIssueImages().stream()
                         .map(IssueImage::getImageUrl)

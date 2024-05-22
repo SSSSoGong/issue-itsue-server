@@ -2,12 +2,13 @@ package com.ssssogong.issuemanager.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class IssueImage {
+@SuperBuilder
+public class IssueImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,13 +21,6 @@ public class IssueImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
     private Issue issue;
-
-    @Builder
-    public IssueImage(Long id, String imageUrl, Issue issue) {
-        this.id = id;
-        this.imageUrl = imageUrl;
-        this.issue = issue;
-    }
 
     public void setIssue(Issue issue) {
         if (this.issue != null) {

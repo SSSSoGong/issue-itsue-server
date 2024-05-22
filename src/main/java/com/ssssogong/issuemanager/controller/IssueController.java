@@ -18,43 +18,45 @@ public class IssueController {
     private final IssueService issueService;
 
     // 이슈 생성
-    @PostMapping("/issues")
-    public ResponseEntity<Long> create(@ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
+    @PostMapping("/projects/{projectId}/issues")
+    public ResponseEntity<IssueIdResponseDto> create(@PathVariable("projectId") Long projectId, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto,
+                                       @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
         try {
-            Long issueId = issueService.save(issueImageRequestDto, issueSaveRequestDto);
-            return new ResponseEntity<>(issueId, HttpStatus.OK);
+            IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueImageRequestDto, issueSaveRequestDto);
+            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
         } catch (NotFoundException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     // 이슈 확인
-    @GetMapping("/issues/{id}")
-    public ResponseEntity<IssueResponseDto> show(@PathVariable("id") Long id) {
+    @GetMapping("/projects/{projectId}/issues/{issueId}")
+    public ResponseEntity<IssueShowResponseDto> show(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId) {
         try {
-            IssueResponseDto issueResponseDTO = issueService.show(id);
-            return new ResponseEntity<>(issueResponseDTO, HttpStatus.OK);
+            IssueShowResponseDto issueShowResponseDTO = issueService.show(projectId, issueId);
+            return new ResponseEntity<>(issueShowResponseDTO, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
         }
     }
 
     // 이슈 수정
-    @PutMapping("/issues/{id}")
-    public ResponseEntity<Long> update(@PathVariable("id") Long id, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto requestDto) {
+    @PutMapping("/projects/{projectId}/issues/{issueId}")
+    public ResponseEntity<IssueIdResponseDto> update(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
+                                       @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) {
         try {
-            Long updateIssueId = issueService.update(id, issueImageRequestDto, requestDto);
-            return new ResponseEntity<>(updateIssueId, HttpStatus.OK);
+            IssueIdResponseDto issueIdResponseDto = issueService.update(issueId, issueImageRequestDto, issueUpdateRequestDto);
+            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
         } catch (NotFoundException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
         }
     }
 
     // 이슈 삭제
-    @DeleteMapping("/issues/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/projects/{projectId}/issues/{issueId}")
+    public ResponseEntity<Void> delete(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId) {
         try {
-            issueService.delete(id);
+            issueService.delete(issueId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
@@ -62,11 +64,12 @@ public class IssueController {
     }
 
     // 이슈 상태 변경
-    @PostMapping("/issues/{id}/state")
-    public ResponseEntity<Void> stateUpdate(@PathVariable("id") Long id, @RequestPart(value = "requestDto") IssueStateUpdateRequestDto requestDto) {
+    @PostMapping("/projects/{projectId}/issues/{issueId}/state")
+    public ResponseEntity<IssueIdResponseDto> stateUpdate(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
+                                            @RequestPart(value = "requestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         try {
-            issueService.stateUpdate(id, requestDto);
-            return new ResponseEntity<>(HttpStatus.OK);
+            IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(issueId, issueStateUpdateRequestDto);
+            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
         }
@@ -74,9 +77,9 @@ public class IssueController {
 
 
     // 프로젝트에 속한 이슈 목록 검색
-    @GetMapping("/projects/{pid}/issues")
+    @GetMapping("/projects/{projectId}/issues")
     public ResponseEntity<List<IssueProjectResponseDto>> search(
-            @PathVariable("pid") Long projectId,
+            @PathVariable("projectId") Long projectId,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "issueCount", required = false) Integer issueCount) {
