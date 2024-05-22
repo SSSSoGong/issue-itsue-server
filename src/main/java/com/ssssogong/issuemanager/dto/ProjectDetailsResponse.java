@@ -1,9 +1,11 @@
 package com.ssssogong.issuemanager.dto;
 
 import com.ssssogong.issuemanager.domain.Project;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-@AllArgsConstructor
+@Getter
+@Builder
 public class ProjectDetailsResponse {
 
     private Long projectId;

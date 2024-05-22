@@ -19,7 +19,7 @@ import org.apache.logging.log4j.util.Strings;
 public class Project extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "project_id")
     private Long id;
 

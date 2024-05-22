@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class IssueModification extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "im_id")
     private Long id;
 
