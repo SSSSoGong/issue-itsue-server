@@ -1,39 +1,32 @@
 package com.ssssogong.issuemanager.domain;
 
-import com.ssssogong.issuemanager.domain.account.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
-public class Comment extends BaseEntity {
+public class IssueImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id")
+    @Column(name="image_id")
     private Long id;
 
-    private String content;
+    @Column(nullable = false)
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
     private Issue issue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User writer;
-
-
     public void setIssue(Issue issue) {
         if (this.issue != null) {
-            this.issue.getComments().remove(this);
+            this.issue.getIssueImages().remove(this);
         }
         this.issue = issue;
-        issue.getComments().add(this);
+        issue.getIssueImages().add(this);
     }
 }

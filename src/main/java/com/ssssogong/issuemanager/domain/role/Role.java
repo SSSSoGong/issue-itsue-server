@@ -19,11 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public abstract class Role implements GrantedAuthoritiesContainer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    private Long id;
-
     /**Role에 주어진 권한 목록*/
 /*    @Convert(converter = StringCollectionConverter.class) // Collection => String 으로 변환하여 하나의 컬럼에 저장
     @Enumerated(EnumType.STRING)
@@ -32,13 +27,17 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     @Getter
     @Transient
     protected Collection<Privilege> allowedPrivileges;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    private Long id;
 
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities() {
         // 자신의 역할 + Privilege를 담아서 반환한다
         String roleName = this.getClass().getName();
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(!roleName.equals("Role"))
+        if (!roleName.equals("Role"))
             authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
         authorities.addAll(
                 allowedPrivileges

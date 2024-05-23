@@ -8,9 +8,11 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-/** String 컬렉션을 String으로 변환
- *  엔티티 속성 DB에 저장할 때 converter로 활용
- *  ex) ["ISSUE_REPORTABLE", "ISSUE_FIXABLE"] => "ISSUE_REPORTABLE;ISSUE_FIXABLE" */
+/**
+ * String 컬렉션을 String으로 변환
+ * 엔티티 속성 DB에 저장할 때 converter로 활용
+ * ex) ["ISSUE_REPORTABLE", "ISSUE_FIXABLE"] => "ISSUE_REPORTABLE;ISSUE_FIXABLE"
+ */
 public class StringCollectionConverter implements AttributeConverter<Collection<String>, String> {
     private static final String SPLIT_CHAR = ";";  // String 구분자
 

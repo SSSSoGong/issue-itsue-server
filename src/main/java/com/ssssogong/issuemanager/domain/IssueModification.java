@@ -31,7 +31,6 @@ public class IssueModification extends BaseEntity {
     @JoinColumn(name = "issue_id")
     private Issue issue;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User modifier;
@@ -43,5 +42,4 @@ public class IssueModification extends BaseEntity {
         this.issue = issue;
         issue.getIssueModifications().add(this);
     }
-
 }
