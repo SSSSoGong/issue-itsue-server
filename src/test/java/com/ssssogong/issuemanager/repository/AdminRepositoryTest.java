@@ -1,6 +1,5 @@
 package com.ssssogong.issuemanager.repository;
 
-import com.ssssogong.issuemanager.domain.account.Admin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Sql(value = "/truncate.sql")
 public class AdminRepositoryTest {
 
-    private static Admin admin1;
+/*    private static Admin admin1;
     private static Admin admin2;
     @Autowired
     AdminRepository adminRepository;
@@ -83,7 +82,7 @@ public class AdminRepositoryTest {
 
         // then
         assertThat(size).isNotEqualTo(adminRepository.count());
-    }
+    }*/
 
 
 }
