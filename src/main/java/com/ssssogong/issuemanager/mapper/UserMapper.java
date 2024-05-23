@@ -1,9 +1,12 @@
 package com.ssssogong.issuemanager.mapper;
 
+import com.ssssogong.issuemanager.config.PasswordEncoderConfig;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.FullUserDto;
 import com.ssssogong.issuemanager.dto.RegisterRequestDto;
 import com.ssssogong.issuemanager.dto.UserDto;
+import com.ssssogong.issuemanager.dto.UserResponseDto;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,13 +18,19 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
-    public final PasswordEncoder passwordEncoder;
+    public static PasswordEncoder passwordEncoder;
+    private final PasswordEncoder InjectedPasswordEncoder;
+
+    @PostConstruct
+    public void init() {
+        passwordEncoder = InjectedPasswordEncoder;
+    }
 
     /**
      * RegisterRequestDto -> User 엔티티<br>
      * 주의: password는 PasswordEncoder로 인코딩됨
      */
-    public User toRegisterDTO(RegisterRequestDto registerDTO) {
+    public static User toUser(RegisterRequestDto registerDTO) {
         return User.builder()
                 .accountId(registerDTO.getAccountId())
                 .username(registerDTO.getUsername())
@@ -33,7 +42,7 @@ public class UserMapper {
      * FullUserDto -> User 엔티티<br>
      * 주의: password는 PasswordEncoder로 인코딩됨
      */
-    public User toRegisterDTO(FullUserDto userDTO) {
+    public static User toUser(FullUserDto userDTO) {
         return User.builder()
                 .id(userDTO.getId())
                 .username(userDTO.getUsername())
@@ -42,15 +51,34 @@ public class UserMapper {
                 .build();
     }
 
-    /**
-     * User엔티티 -> UserDto
-     */
-    public UserDto toRegisterDTO(User user) {
+    public static UserDto toUserDTO(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .accountId(user.getAccountId())
+                .build();
+    }
+
+    public static FullUserDto toFullUserDTO(User user){
         return FullUserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .accountId(user.getAccountId())
                 .password(user.getPassword())
+                .build();
+    }
+
+    public static UserResponseDto toUserResponseDTO(User user){
+        return UserResponseDto.builder()
+                .username(user.getUsername())
+                .accountId(user.getAccountId())
+                .build();
+    }
+
+    public static UserResponseDto toUserResponseDTO(UserDto userDto){
+        return UserResponseDto.builder()
+                .username(userDto.getUsername())
+                .accountId(userDto.getAccountId())
                 .build();
     }
 
