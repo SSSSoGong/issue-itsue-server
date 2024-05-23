@@ -2,8 +2,8 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.dto.RegisterRequestDTO;
-import com.ssssogong.issuemanager.dto.UserDTO;
+import com.ssssogong.issuemanager.dto.RegisterRequestDto;
+import com.ssssogong.issuemanager.dto.UserDto;
 import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -23,7 +23,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
 
-    public UserDTO save(RegisterRequestDTO registerRequest) throws Exception {
+    public UserDto save(RegisterRequestDto registerRequest) throws Exception {
         // 예외 처리 : id가 존재하는 경우 기각
         if (userRepository.existsByAccountId(registerRequest.getAccountId())) {
             throw new Exception("user with id " + registerRequest.getAccountId() + " already exists.");
@@ -41,7 +41,7 @@ public class UserService {
      *
      * @param accountId 회원탈퇴할 회원의 로그인 id
      */
-    public UserDTO unregister(String accountId) throws Exception {
+    public UserDto unregister(String accountId) throws Exception {
         Optional<User> target = userRepository.findByAccountId(accountId);
         if (target.isEmpty()) {
             throw new Exception("id does not exist");
@@ -50,20 +50,20 @@ public class UserService {
         return userMapper.toRegisterDTO(target.get());
     }
 
-    public Collection<UserDTO> findUsers() {
-        List<UserDTO> userDTOs = new ArrayList<>();
+    public Collection<UserDto> findUsers() {
+        List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAll().iterator().forEachRemaining(user -> {
-            userDTOs.add(userMapper.toRegisterDTO(user));
+            userDtos.add(userMapper.toRegisterDTO(user));
         });
-        return userDTOs;
+        return userDtos;
     }
 
-    public Collection<UserDTO> findUsers(String username) {
-        List<UserDTO> userDTOs = new ArrayList<>();
+    public Collection<UserDto> findUsers(String username) {
+        List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAllByUsername(username).iterator().forEachRemaining(user -> {
-            userDTOs.add(userMapper.toRegisterDTO(user));
+            userDtos.add(userMapper.toRegisterDTO(user));
         });
-        return userDTOs;
+        return userDtos;
     }
 
     @Transactional
@@ -76,13 +76,13 @@ public class UserService {
         return userProject.getRole().getName();
     }
 
-    public UserDTO findUserByAccountId(String accountId) {
+    public UserDto findUserByAccountId(String accountId) {
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
         if (optionalUser.isEmpty()) return null;
         return userMapper.toRegisterDTO(optionalUser.get());
     }
 
-    public UserDTO updateUser() {
+    public UserDto updateUser() {
         // TODO: Update User
         return null;
     }

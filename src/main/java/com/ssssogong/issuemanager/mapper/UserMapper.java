@@ -1,9 +1,9 @@
 package com.ssssogong.issuemanager.mapper;
 
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.dto.FullUserDTO;
-import com.ssssogong.issuemanager.dto.RegisterRequestDTO;
-import com.ssssogong.issuemanager.dto.UserDTO;
+import com.ssssogong.issuemanager.dto.FullUserDto;
+import com.ssssogong.issuemanager.dto.RegisterRequestDto;
+import com.ssssogong.issuemanager.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,10 +18,10 @@ public class UserMapper {
     public final PasswordEncoder passwordEncoder;
 
     /**
-     * RegisterRequestDTO -> User 엔티티<br>
+     * RegisterRequestDto -> User 엔티티<br>
      * 주의: password는 PasswordEncoder로 인코딩됨
      */
-    public User toRegisterDTO(RegisterRequestDTO registerDTO) {
+    public User toRegisterDTO(RegisterRequestDto registerDTO) {
         return User.builder()
                 .accountId(registerDTO.getAccountId())
                 .username(registerDTO.getUsername())
@@ -30,10 +30,10 @@ public class UserMapper {
     }
 
     /**
-     * FullUserDTO -> User 엔티티<br>
+     * FullUserDto -> User 엔티티<br>
      * 주의: password는 PasswordEncoder로 인코딩됨
      */
-    public User toRegisterDTO(FullUserDTO userDTO) {
+    public User toRegisterDTO(FullUserDto userDTO) {
         return User.builder()
                 .id(userDTO.getId())
                 .username(userDTO.getUsername())
@@ -43,10 +43,10 @@ public class UserMapper {
     }
 
     /**
-     * User엔티티 -> UserDTO
+     * User엔티티 -> UserDto
      */
-    public UserDTO toRegisterDTO(User user) {
-        return FullUserDTO.builder()
+    public UserDto toRegisterDTO(User user) {
+        return FullUserDto.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .accountId(user.getAccountId())
