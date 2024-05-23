@@ -101,7 +101,7 @@ public class UserController {
     @PutMapping("/{accountId}")
     public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDTO updateRequest, @PathVariable String accountId){
         // 사용자명, password에 값 있는 경우 변경
-        // TODO
+        // TODO: Update 기능
         UserDTO user;
         if(updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank()){
             user = userService.updateUser(); // TODO : update를 필드 별로 어떻게 나누지

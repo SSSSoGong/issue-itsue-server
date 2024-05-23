@@ -35,12 +35,13 @@ public class Initializer implements ApplicationRunner {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
-
     public void saveInitialRoles(){
         System.out.println("TestAccountInitializer: saving roles");
         final List<Role> roles = roleRepository.findAll();
         final List<Role> saves = List.of(new Administrator(), new Tester(), new Developer(), new ProjectLeader());
         //todo: 새로운 Role이 추가되어도 알잘딱하게 추가해주기
+        // 1. Reflections
+        // 2. Role과 Privilege 변경
         roleRepository.saveAll(saves);
         System.out.println("TestAccountInitializer: saved roles");
     }
