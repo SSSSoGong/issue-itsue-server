@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
+// TODO 이미지 return 할 때 url로 줘도 되나..
 @Service
 @RequiredArgsConstructor
 public class IssueImageService {

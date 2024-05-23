@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,13 +87,16 @@ public class IssueService {
 
     // 프로젝트에 속한 이슈 검색
     @Transactional(readOnly = true)
-    public List<IssueProjectResponseDto> findIssuesInProject(Long projectId, String title, String state, Integer issueCount) {
+    public List<IssueProjectResponseDto> findIssuesInProject(Long projectId, String title, String priority, String state, String category, Integer issueCount) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
         List<Issue> issues = issueRepository.findByProjectId(project.getId());  // 프로젝트에 속한 issue들을 꺼낸다.
 
         List<Issue> filteredIssues = issues.stream()
+                .sorted(Comparator.comparing(Issue::getUpdatedAt).reversed()) // updatedAt 기준으로 내림차순 정렬
                 .filter(issue -> title == null || issue.getTitle().contains(title)) // title이 없을 수도 있다. (필터링 X)
-                .filter(issue -> state == null || issue.getState().toString().equals(state))    // state가 없을 수도 있다. (필터링 X)
+                .filter(issue -> priority == null || priority.isBlank() || issue.getPriority().toString().equals(priority))  // priority가 없을 수도 있다. (필터링 X)
+                .filter(issue -> state == null || state.isBlank() || issue.getState().toString().equals(state))    // state가 없을 수도 있다. (필터링 X)
+                .filter(issue -> category == null || category.isBlank() || issue.getCategory().toString().equals(category)) // category가 없을 수도 있다. (필터링 X)
                 .limit(issueCount != null ? issueCount : issues.size()) // issueCount가 지정되지 않았을 경우 모든 이슈 반환
                 .toList();
         return filteredIssues.stream()

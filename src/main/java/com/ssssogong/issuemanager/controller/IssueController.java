@@ -86,11 +86,13 @@ public class IssueController {
     public ResponseEntity<List<IssueProjectResponseDto>> search(
             @PathVariable("projectId") Long projectId,
             @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "priority", required = false) String priority,
             @RequestParam(value = "state", required = false) String state,
+            @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "issueCount", required = false) Integer issueCount) {
 
         try {
-            List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, state, issueCount);
+            List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, priority, state, category, issueCount);
             return new ResponseEntity<>(issues, HttpStatus.OK);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404

@@ -74,7 +74,9 @@ public class IssueMapper {
     public static IssueProjectResponseDto convertToIssueProjectResponseDto(Issue issue) {
         return IssueProjectResponseDto.builder()
                 .title(issue.getTitle())
+                .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
+                .category(issue.getCategory() != null ? issue.getCategory().toString() : null)
                 .createdAt(issue.getCreatedAt() != null ? issue.getCreatedAt().toString() : null)
                 .updatedAt(issue.getUpdatedAt() != null ? issue.getUpdatedAt().toString() : null)
                 .build();
