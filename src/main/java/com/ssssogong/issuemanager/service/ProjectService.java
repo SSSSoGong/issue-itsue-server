@@ -32,6 +32,7 @@ public class ProjectService {
     public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
         final User admin = userRepository.findByAccountId(adminAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
+        //todo: userRepository에 admin 저장
         final Project project = Project.builder()
                 .admin(admin)
                 .name(projectCreationRequest.getName())
