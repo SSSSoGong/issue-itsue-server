@@ -27,6 +27,7 @@ public class Initializer implements ApplicationRunner {
     private final int PL_COUNT = 2;
     private final int DEV_COUNT = 10;
     private final int TESTER_COUNT = 5;
+    private String DUMMY_ACCOUNTS_PASSWORD = "1234";
 
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
@@ -61,7 +62,7 @@ public class Initializer implements ApplicationRunner {
         admin = Admin.builder()
                 .accountId("adminID")
                 .username("Hong Gildong")
-                .password(passwordEncoder.encode("qwe1234"))
+                .password(passwordEncoder.encode(DUMMY_ACCOUNTS_PASSWORD))
                 .build();
         // PL 추가
         for(int i = 1; i <= PL_COUNT; i++){
@@ -69,7 +70,7 @@ public class Initializer implements ApplicationRunner {
                     User.builder()
                             .accountId("pl" + i)
                             .username("pl" + i)
-                            .password("zxc123")
+                            .password(DUMMY_ACCOUNTS_PASSWORD)
                             .build()
             );
         }
@@ -78,7 +79,7 @@ public class Initializer implements ApplicationRunner {
             dev.add(User.builder()
                     .accountId("dev" + i)
                     .username("dev" + i)
-                    .password("asd1234")
+                    .password(DUMMY_ACCOUNTS_PASSWORD)
                     .build()
             );
         }
@@ -87,7 +88,7 @@ public class Initializer implements ApplicationRunner {
             tester.add(User.builder()
                     .accountId("tester" + i)
                     .username("tester" + i)
-                    .password("1111")
+                    .password(DUMMY_ACCOUNTS_PASSWORD)
                     .build()
             );
         }
