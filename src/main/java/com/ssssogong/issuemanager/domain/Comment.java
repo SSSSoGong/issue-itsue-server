@@ -3,9 +3,13 @@ package com.ssssogong.issuemanager.domain;
 import com.ssssogong.issuemanager.domain.account.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,7 +36,6 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<CommentImage> commentImages = new ArrayList<>();
 
-
     public void setIssue(Issue issue) {
         if (this.issue != null) {
             this.issue.getComments().remove(this);
@@ -41,8 +44,8 @@ public class Comment extends BaseEntity {
         issue.getComments().add(this);
     }
 
-
     public void update(String content) {
         this.content = content;
     }
+
 }

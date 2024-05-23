@@ -1,24 +1,21 @@
 package com.ssssogong.issuemanager.security;
 
-import com.ssssogong.issuemanager.domain.account.CustomUserDetails;
 import com.ssssogong.issuemanager.domain.role.Privilege;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 
-/**프로젝트 권한 체크 모듈 <br> @PreAuthorize로 메소드 단위 권한 체크에 활용*/
+/**
+ * 프로젝트 권한 체크 모듈 <br> @PreAuthorize로 메소드 단위 권한 체크에 활용
+ */
 @Component("ProjectPrivilegeEvaluator")
 @RequiredArgsConstructor
-public class ProjectPrivilegeEvaluator{
+public class ProjectPrivilegeEvaluator {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     // 권한 확인을 위해선 몇 번째 project에 접근해야하는지 알아야하기 때문에 메소드 레벨 권한 체크가 필요하다
@@ -35,12 +32,14 @@ public class ProjectPrivilegeEvaluator{
      *      (어노테이션 특성 상 매개변수가 아니면 가져올 수 없음)
      */
 
-    /**유저가 해당 project에 permission이 있는지 확인<br>
-     * ex) @PreAuthorize('@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE')*/
+    /**
+     * 유저가 해당 project에 permission이 있는지 확인<br>
+     * ex) @PreAuthorize('@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE')
+     */
     public boolean hasPrivilege(Long projectId, Privilege privilege) {
         // 권한 출력
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ " );
+        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
         authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
         System.out.println("]");
 

@@ -1,11 +1,12 @@
 package com.ssssogong.issuemanager.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DisplayNameGeneration(ReplaceUnderscores.class)
@@ -24,10 +25,11 @@ class UserProjectTest {
     }
 
     @Test
-    void 유저의_프로젝트_접근_시간을_업데이트한다() {
+    void 유저의_프로젝트_접근_시간을_업데이트한다() throws InterruptedException {
         // given
         final UserProject userProject = UserProject.builder().build();
         userProject.updateAccessTime();
+        Thread.sleep(100);
         final LocalDateTime originalAccessTime = userProject.getAccessTime();
 
         // when

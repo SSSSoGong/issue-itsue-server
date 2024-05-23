@@ -22,7 +22,7 @@ public class IssueController {
     // 이슈 생성
     @PostMapping("/projects/{projectId}/issues")
     public ResponseEntity<IssueIdResponseDto> create(@PathVariable("projectId") Long projectId, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto,
-                                       @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
+                                                     @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
         try {
             IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueSaveRequestDto);
             issueImageService.save(issueIdResponseDto.getIssueId(), issueImageRequestDto.getImageFiles());
@@ -46,7 +46,7 @@ public class IssueController {
     // 이슈 수정
     @PutMapping("/projects/{projectId}/issues/{issueId}")
     public ResponseEntity<IssueIdResponseDto> update(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
-                                       @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) {
+                                                     @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) {
         try {
             issueImageService.delete(issueId);
             IssueIdResponseDto issueIdResponseDto = issueService.update(issueId, issueUpdateRequestDto);
@@ -71,7 +71,7 @@ public class IssueController {
     // 이슈 상태 변경
     @PostMapping("/projects/{projectId}/issues/{issueId}/state")
     public ResponseEntity<IssueIdResponseDto> stateUpdate(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
-                                            @RequestPart(value = "requestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+                                                          @RequestPart(value = "requestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         try {
             IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(issueId, issueStateUpdateRequestDto);
             return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);

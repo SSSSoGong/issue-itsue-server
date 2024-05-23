@@ -1,21 +1,24 @@
 package com.ssssogong.issuemanager.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserProjectSorterTest {
 
     @Test
-    void 접근시간_최신순으로_반환한다() {
+    void 접근시간_최신순으로_반환한다() throws InterruptedException {
         // given
         final UserProject userProject1 = UserProject.builder().build();
         userProject1.updateAccessTime();
+        Thread.sleep(100);
         final UserProject userProject2 = UserProject.builder().build();
         userProject2.updateAccessTime();
+        Thread.sleep(100);
         final UserProject userProject3 = UserProject.builder().build();
         userProject3.updateAccessTime();
 
@@ -37,13 +40,15 @@ class UserProjectSorterTest {
     }
 
     @Test
-    void 즐겨찾기한거_아직접근안한거_접근한거최신순으로_반환한다() {
+    void 즐겨찾기한거_아직접근안한거_접근한거최신순으로_반환한다() throws InterruptedException {
         // given
         final UserProject userProject1 = UserProject.builder().build();
         userProject1.updateAccessTime();
+        Thread.sleep(100);
         final UserProject userProject2 = UserProject.builder().build();
         userProject2.updateIsFavorite(true);
         userProject2.updateAccessTime();
+        Thread.sleep(100);
         final UserProject userProject3 = UserProject.builder().build();
         final UserProject userProject4 = UserProject.builder().build();
         userProject4.updateAccessTime();

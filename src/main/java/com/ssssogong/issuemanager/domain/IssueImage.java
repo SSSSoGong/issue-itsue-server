@@ -1,7 +1,9 @@
 package com.ssssogong.issuemanager.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -12,7 +14,7 @@ public class IssueImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="image_id")
+    @Column(name = "image_id")
     private Long id;
 
     @Column(nullable = false)

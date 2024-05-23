@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import java.util.List;
 
 @Entity
-public class Administrator extends Role{
+public class Administrator extends Role {
     {
         this.allowedPrivileges = List.of(
                 // TODO : Admin은 모든 권한을 줘도 괜찮지 않을까?

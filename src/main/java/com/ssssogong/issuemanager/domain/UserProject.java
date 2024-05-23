@@ -53,4 +53,5 @@ public class UserProject extends BaseEntity {
     public void updateIsFavorite(final boolean isFavorite) {
         this.isFavorite = isFavorite;
     }
+
 }

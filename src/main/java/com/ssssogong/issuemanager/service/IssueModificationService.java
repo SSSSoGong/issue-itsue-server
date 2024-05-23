@@ -15,7 +15,7 @@ public class IssueModificationService {
     private final IssueModificationRepository issueModificationRepository;
 
     @Transactional
-    public void save(Issue issue, State from, State to){
+    public void save(Issue issue, State from, State to) {
         IssueModification issueModification = IssueModification.builder()
                 .from(from)
                 .to(to)
