@@ -49,12 +49,12 @@ public class CommentController {
     public ResponseEntity<CommentIdResponseDto> updateComment(@PathVariable("iid") Long issueId,
                                                               @PathVariable("cid") Long commentId,
                                                               @RequestPart("content") CommentRequestDto commentRequestDto,
-                                                              @ModelAttribute List<MultipartFile> imageFiles) throws IOException {
+                                                              @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         commentImageService.deleteImages(commentId);
-        commentImageService.saveImages(commentId, imageFiles);
+        commentImageService.saveImages(commentId, commentImageRequestDto.getImageFiles());
 
-        return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent(), imageFiles), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent()), HttpStatus.OK);
     }
 
     @DeleteMapping("/issues/{iid}/comments/{cid}")
