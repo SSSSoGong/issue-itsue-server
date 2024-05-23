@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,6 +37,16 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody RegisterRequestDTO requestDTO){
         return ResponseEntity.ok().body("good job");
+    }
+
+    // TODO : TEMPORARY METHOD -> Admin Login 이슈 논의 필요/
+    @PostMapping("/admin-login")
+    public ResponseEntity<Object> adminLogin(@RequestBody RegisterRequestDTO requestDTO){
+        // admin 로그인용 메소드 (임시)
+        // TODO: Admin 로그인 문제 얘기해보기
+        Map<String, String> jwt = userService.adminLogin(requestDTO);
+        if(jwt == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        return ResponseEntity.ok(jwt);
     }
 
     /**Body에 입력한 정보로 회원가입*/
@@ -69,10 +80,17 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{accountId}/project/{projectId}/role")
+    public ResponseEntity<Object> getProjectRole(@PathVariable String accountId, @PathVariable Long projectId){
+        String role = userService.findProjectRoleName(accountId, projectId);
+        if(role == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(role);
+    }
+
     /**해당 id 회원 검색*/
     @GetMapping("/{accountId}")
     public ResponseEntity<Object> getUser(@PathVariable String accountId){
-        UserDTO user = userService.findUserByAccoundId(accountId);
+        UserDTO user = userService.findUserByAccountId(accountId);
         if(user == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않는 id입니다.");
         }
@@ -83,6 +101,7 @@ public class UserController {
     @PutMapping("/{accountId}")
     public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDTO updateRequest, @PathVariable String accountId){
         // 사용자명, password에 값 있는 경우 변경
+        // TODO
         UserDTO user;
         if(updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank()){
             user = userService.updateUser(); // TODO : update를 필드 별로 어떻게 나누지

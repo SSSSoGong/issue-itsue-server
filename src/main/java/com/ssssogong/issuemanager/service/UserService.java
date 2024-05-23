@@ -1,24 +1,27 @@
 package com.ssssogong.issuemanager.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssssogong.issuemanager.domain.UserProject;
+import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Privilege;
+import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.dto.RegisterRequestDTO;
 import com.ssssogong.issuemanager.dto.UserDTO;
 import com.ssssogong.issuemanager.dto.UserResponseDTO;
 import com.ssssogong.issuemanager.mapper.UserMapper;
+import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import com.ssssogong.issuemanager.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.io.PrintWriter;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -67,8 +70,18 @@ public class UserService {
         return userDTOs;
     }
 
+    @Transactional
+    public String findProjectRoleName(String accountId, Long projectId){
+        Optional<User> optionalUser = userRepository.findByAccountId(accountId);
+        if(optionalUser.isEmpty()) return null;
+        Optional<UserProject> optionalUserProject = userProjectRepository.findByUserIdAndProjectId(optionalUser.get().getId(), projectId);
+        if(optionalUserProject.isEmpty()) return null;
+        UserProject userProject = optionalUserProject.get();
+        return userProject.getRole().getName();
+    }
 
-    public UserDTO findUserByAccoundId(String accountId){
+
+    public UserDTO findUserByAccountId(String accountId){
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
         if(optionalUser.isEmpty()) return null;
         return userMapper.convert(optionalUser.get());
@@ -101,4 +114,22 @@ public class UserService {
         return authorities;
     }
 
+    // temp
+    private final AdminRepository adminRepository;
+    private final JwtUtil jwtUtil;
+    public Map<String, String> adminLogin(RegisterRequestDTO requestDTO) {
+        String id = requestDTO.getAccountId();
+        String pw = requestDTO.getPassword();
+        Optional<Admin> _admin = adminRepository.findByAccountId(id);
+        if(_admin.isEmpty()) return null;
+        Admin admin = _admin.get();
+        if(admin.getPassword().equals(userMapper.passwordEncoder.encode(pw))){
+            String token = jwtUtil.createToken(id, true);
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> jwtBody = new HashMap<>();
+            jwtBody.put("authorization", "Bearer " + token);
+            return jwtBody;
+        }
+        return null;
+    }
 }
