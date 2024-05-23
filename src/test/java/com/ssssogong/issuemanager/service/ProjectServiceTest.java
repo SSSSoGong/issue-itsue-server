@@ -10,8 +10,10 @@ import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
+import com.ssssogong.issuemanager.dto.ProjectUserResponse;
+import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
+import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.repository.AdminRepository;
-import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -129,13 +131,166 @@ class ProjectServiceTest {
                 .doesNotThrowAnyException();
     }
 
-    //todo: 프로젝트에 유저 추가
-    //todo: 프로젝트에 속한 유저 목록 검색
-    //todo: 프로젝트에서 유저 삭제
-    //todo: 특정 회원이 속한 프로젝트 목록 검색
-    //todo: 프로젝트-회원 간 정보 검색
     @Test
-    void 프로젝트_접근시간을_갱신한다(@Autowired RoleRepository roleRepository) {
+    void 프로젝트에_유저를_추가한다() {
+        // given
+        final User user = userRepository.save(User.builder().accountId("newUser").build());
+        final Admin admin = getAdmin();
+        final Long projectId = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+
+        assertThatCode(() -> projectService.addUsersToProject(
+                projectId,
+                List.of(ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build())
+        )).doesNotThrowAnyException();
+    }
+
+    @Test
+    void 프로젝트에_속한_유저_목록을_검색한다() {
+        // given
+        final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
+        final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
+        final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
+        final Admin admin = getAdmin();
+        final Long projectId = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+        projectService.addUsersToProject(
+                projectId,
+                List.of(
+                        ProjectUserAdditionRequest.builder().accountId(user1.getAccountId()).role("Tester").build(),
+                        ProjectUserAdditionRequest.builder().accountId(user2.getAccountId()).role("Developer").build(),
+                        ProjectUserAdditionRequest.builder().accountId(user3.getAccountId()).role("ProjectLeader")
+                                .build()
+                ));
+
+        // when
+        final List<ProjectUserResponse> users = projectService.findUsers(projectId);
+
+        // then
+        assertThat(users).hasSize(3);
+    }
+
+    @Test
+    void 프로젝트에_속한_유저를_삭제한다() {
+        // given
+        final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
+        final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
+        final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
+        final Admin admin = getAdmin();
+        final Long projectId = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+        projectService.addUsersToProject(
+                projectId,
+                List.of(
+                        ProjectUserAdditionRequest.builder().accountId(user1.getAccountId()).role("Tester").build(),
+                        ProjectUserAdditionRequest.builder().accountId(user2.getAccountId()).role("Developer").build(),
+                        ProjectUserAdditionRequest.builder().accountId(user3.getAccountId()).role("ProjectLeader")
+                                .build()
+                ));
+
+        // when
+        projectService.deleteUsersFromProject(
+                projectId,
+                List.of(user1.getAccountId(), user2.getAccountId())
+        );
+        final List<ProjectUserResponse> users = projectService.findUsers(projectId);
+
+        // then
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getAccountId()).isEqualTo(user3.getAccountId());
+    }
+
+    @Test
+    void 유저가_속한_프로젝트들을_조회한다() {
+        // given
+        final User user = userRepository.save(User.builder().accountId("newUser").build());
+        final Admin admin = getAdmin();
+        final Long projectId1 = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트1")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+        final Long projectId2 = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트2")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+        final Long projectId3 = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트3")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+
+        projectService.addUsersToProject(
+                projectId1,
+                List.of(ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build())
+        );
+        projectService.addUsersToProject(
+                projectId2,
+                List.of(ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build())
+        );
+        projectService.addUsersToProject(
+                projectId3,
+                List.of(ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build())
+        );
+
+        // when
+        final List<UserProjectSummaryResponse> projectSummaries = projectService.findProjectsByAccountId(
+                user.getAccountId());
+
+        // then
+        assertThat(projectSummaries).hasSize(3);
+    }
+
+    @Test
+    void 하나의_프로젝트와_하나의_회원간의_정보를_검색한다() {
+        // given
+        final User user = userRepository.save(User.builder().accountId("newUser").build());
+        final Admin admin = getAdmin();
+        final Long projectId = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+        projectService.addUsersToProject(
+                projectId,
+                List.of(
+                        ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build()
+                ));
+
+        // when
+        final UserProjectAssociationResponse response = projectService.findAssociationBetweenProjectAndUser(
+                user.getAccountId(), projectId);
+
+        // then
+        assertThat(response.getRole()).isEqualToIgnoringCase("Tester");
+    }
+
+    @Test
+    void 프로젝트_접근시간을_갱신한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
         final Admin admin = getAdmin();

@@ -5,6 +5,7 @@ import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import java.util.List;
+import java.util.Objects;
 
 public class UserProjectMapper {
 
@@ -33,7 +34,7 @@ public class UserProjectMapper {
         return UserProjectAssociationResponse.builder()
                 .role(userProject.getRole().getRoleName())
                 .createdAt(userProject.getProject().getCreatedAt().toString())
-                .accessTime(userProject.getAccessTime().toString())
+                .accessTime(Objects.isNull(userProject.getAccessTime()) ? null : userProject.getAccessTime().toString())
                 .build();
     }
 }
