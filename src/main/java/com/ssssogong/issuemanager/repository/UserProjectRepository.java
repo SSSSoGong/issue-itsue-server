@@ -16,7 +16,7 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
     List<UserProject> findAllByAccountIdOrderByAccessTime(@Param("accountId") String accountId);
 
     @Query("SELECT up FROM UserProject up WHERE up.user.accountId = :accountId AND up.project.id = :projectId")
-    Optional<UserProject> findByAccountIdAndProjectId(@Param("accountId") String accountId, @Param("projectId") String projectId);
+    Optional<UserProject> findByAccountIdAndProjectId(@Param("accountId") String accountId, @Param("projectId") long projectId);
 
     @Query("DELETE FROM UserProject up WHERE up.project.id = :projectId AND up.user.accountId IN :accountIds")
     @Modifying

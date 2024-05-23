@@ -40,7 +40,7 @@ public class UserProject {
 
     @Builder
     public UserProject(User user, Project project, Role role) {
-        this.accessTime = LocalDateTime.now();
+        this.accessTime = null;
         this.user = user;
         this.project = project;
         this.role = role;

@@ -120,6 +120,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
+        //todo: accessTime이 null이라면?(아직 접근하지 않은 프로젝트가 있다면?)
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountIdOrderByAccessTime(accountId);
         //todo: 즐겨찾기를 위로??
         return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
@@ -127,18 +128,18 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
-                                                                               final String projectId) {
+                                                                               final long projectId) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         return UserProjectMapper.toUserProjectAssociationResponse(userProject);
     }
 
-    private UserProject findUserProjectByAccountIdAndProjectId(final String accountId, final String projectId) {
+    private UserProject findUserProjectByAccountIdAndProjectId(final String accountId, final long projectId) {
         return userProjectRepository.findByAccountIdAndProjectId(accountId, projectId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
     }
 
     @Transactional
-    public void renewAccessTime(final String accountId, final String projectId) {
+    public void renewAccessTime(final String accountId, final long projectId) {
         UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         userProject.updateAccessTime();
     }

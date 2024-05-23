@@ -82,7 +82,7 @@ public class ProjectController {
     @GetMapping("/users/{accountId}/projects/{projectId}")
     public ResponseEntity<UserProjectAssociationResponse> findAssociationBetweenProjectAndUser(
             @PathVariable("accountId") String accountId,
-            @PathVariable("projectId") String projectId
+            @PathVariable("projectId") Long projectId
     ) {
         final UserProjectAssociationResponse response = projectService.findAssociationBetweenProjectAndUser(
                 accountId,
@@ -93,7 +93,7 @@ public class ProjectController {
 
     @PutMapping("/users/{accountId}/projects/{projectId}/access")
     public ResponseEntity<Void> renewAccessTime(@PathVariable("accountId") String accountId,
-                                                @PathVariable("projectId") String projectId) {
+                                                @PathVariable("projectId") Long projectId) {
         projectService.renewAccessTime(accountId, projectId);
         return ResponseEntity.ok().build();
     }
