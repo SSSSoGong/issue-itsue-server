@@ -12,6 +12,7 @@ import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
+import com.ssssogong.issuemanager.dto.UserProjectFavoriteRequest;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
@@ -38,8 +39,6 @@ class ProjectServiceTest {
     private AdminRepository adminRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserProjectRepository userProjectRepository;
 
     private Admin getAdmin() {
         final Admin admin = Admin.builder()
@@ -319,5 +318,32 @@ class ProjectServiceTest {
 
         // then
         assertThat(LocalDateTime.parse(updatedAccessTime).isAfter(LocalDateTime.parse(originalAccessTime))).isTrue();
+    }
+
+    @Test
+    void 프로젝트_즐겨찾기를_갱신한다() {
+        // given
+        final User user = userRepository.save(User.builder().accountId("newUser").build());
+        final Admin admin = getAdmin();
+        final Long projectId = projectService.create(
+                admin.getAccountId(),
+                ProjectCreationRequest.builder()
+                        .name("야심찬 프로젝트")
+                        .subject("어쩌구 저쩌구 프로젝트입니다.")
+                        .build()
+        ).getProjectId();
+
+        projectService.addUsersToProject(
+                projectId,
+                List.of(ProjectUserAdditionRequest.builder().accountId(user.getAccountId()).role("Tester").build())
+        );
+
+        // when
+        projectService.renewFavorite(user.getAccountId(), projectId, UserProjectFavoriteRequest.builder().isFavorite(true).build());
+        final UserProjectSummaryResponse summary = projectService.findProjectsByAccountId(
+                user.getAccountId()).get(0);
+
+        // then
+        assertThat(summary.isFavorite()).isTrue();
     }
 }

@@ -49,4 +49,8 @@ public class UserProject {
     public void updateAccessTime() {
         this.accessTime = LocalDateTime.now();
     }
+
+    public void updateIsFavorite(final boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
 }

@@ -12,6 +12,7 @@ import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
+import com.ssssogong.issuemanager.dto.UserProjectFavoriteRequest;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.mapper.UserProjectMapper;
@@ -142,5 +143,14 @@ public class ProjectService {
     public void renewAccessTime(final String accountId, final long projectId) {
         UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         userProject.updateAccessTime();
+    }
+
+    @Transactional
+    public void renewFavorite(
+            final String accountId,
+            final Long projectId,
+            final UserProjectFavoriteRequest userProjectFavoriteRequest) {
+        final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
+        userProject.updateIsFavorite(userProjectFavoriteRequest.isFavorite());
     }
 }

@@ -7,6 +7,7 @@ import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
 import com.ssssogong.issuemanager.dto.ProjectUserResponse;
 import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
+import com.ssssogong.issuemanager.dto.UserProjectFavoriteRequest;
 import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
 import com.ssssogong.issuemanager.service.ProjectService;
 import java.util.List;
@@ -91,10 +92,13 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/users/{accountId}/projects/{projectId}/access")
-    public ResponseEntity<Void> renewAccessTime(@PathVariable("accountId") String accountId,
-                                                @PathVariable("projectId") Long projectId) {
-        projectService.renewAccessTime(accountId, projectId);
+    @PutMapping("/users/{accountId}/projects/{projectId}/favorites")
+    public ResponseEntity<Void> renewAccessTime(
+            @PathVariable("accountId") String accountId,
+            @PathVariable("projectId") Long projectId,
+            @RequestBody UserProjectFavoriteRequest userProjectFavoriteRequest
+    ) {
+        projectService.renewFavorite(accountId, projectId, userProjectFavoriteRequest);
         return ResponseEntity.ok().build();
     }
 

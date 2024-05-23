@@ -37,4 +37,19 @@ class UserProjectTest {
         // then
         assertThat(originalAccessTime.isBefore(updatedAccessTime)).isTrue();
     }
+
+    @Test
+    void 유저의_프로젝트_즐겨찾기_여부를_업데이트한다() {
+        // given
+        final UserProject userProject = UserProject.builder().build();
+        final boolean before = userProject.isFavorite();
+
+        // when
+        userProject.updateIsFavorite(true);
+        final boolean after = userProject.isFavorite();
+
+        // then
+        assertThat(before).isFalse();
+        assertThat(after).isTrue();
+    }
 }
