@@ -3,7 +3,6 @@ package com.ssssogong.issuemanager.service;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.*;
-import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;

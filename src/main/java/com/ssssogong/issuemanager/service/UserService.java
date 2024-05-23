@@ -1,13 +1,10 @@
 package com.ssssogong.issuemanager.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssssogong.issuemanager.domain.UserProject;
-import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.RegisterRequestDTO;
 import com.ssssogong.issuemanager.dto.UserDTO;
 import com.ssssogong.issuemanager.mapper.UserMapper;
-import com.ssssogong.issuemanager.repository.AdminRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import com.ssssogong.issuemanager.util.JwtUtil;
@@ -24,8 +21,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProjectRepository userProjectRepository;
     private final UserMapper userMapper;
-    // temp
-    private final AdminRepository adminRepository;
     private final JwtUtil jwtUtil;
 
     public UserDTO save(RegisterRequestDTO registerRequest) throws Exception {
@@ -114,21 +109,5 @@ public class UserService {
             }
         }
         return authorities;
-    }
-
-    public Map<String, String> adminLogin(RegisterRequestDTO requestDTO) {
-        String id = requestDTO.getAccountId();
-        String pw = requestDTO.getPassword();
-        Optional<Admin> _admin = adminRepository.findByAccountId(id);
-        if (_admin.isEmpty()) return null;
-        Admin admin = _admin.get();
-        if (admin.getPassword().equals(userMapper.passwordEncoder.encode(pw))) {
-            String token = jwtUtil.createToken(id, true);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> jwtBody = new HashMap<>();
-            jwtBody.put("authorization", "Bearer " + token);
-            return jwtBody;
-        }
-        return null;
     }
 }

@@ -43,15 +43,6 @@ public class UserController {
         return ResponseEntity.ok().body("good job");
     }
 
-    // TODO : TEMPORARY METHOD -> Admin Login 이슈 논의 필요/
-    @PostMapping("/admin-login")
-    public ResponseEntity<Object> adminLogin(@RequestBody RegisterRequestDTO requestDTO) {
-        // admin 로그인용 메소드 (임시)
-        // TODO: Admin 로그인 문제 얘기해보기
-        Map<String, String> jwt = userService.adminLogin(requestDTO);
-        if (jwt == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        return ResponseEntity.ok(jwt);
-    }
 
     /**
      * Body에 입력한 정보로 회원가입

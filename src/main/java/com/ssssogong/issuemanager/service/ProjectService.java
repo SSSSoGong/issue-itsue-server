@@ -4,12 +4,14 @@ import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.Roles;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.UserProjectSorter;
-import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.mapper.UserProjectMapper;
-import com.ssssogong.issuemanager.repository.*;
+import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.RoleRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
+import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +27,10 @@ public class ProjectService {
     private final UserProjectRepository userProjectRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final AdminRepository adminRepository;
 
     @Transactional
     public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
-        final Admin admin = adminRepository.findByAccountId(adminAccountId)
+        final User admin = userRepository.findByAccountId(adminAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
         final Project project = Project.builder()
                 .admin(admin)

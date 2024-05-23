@@ -1,6 +1,6 @@
 package com.ssssogong.issuemanager.domain;
 
-import com.ssssogong.issuemanager.domain.account.Admin;
+import com.ssssogong.issuemanager.domain.account.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,7 +28,7 @@ public class Project extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
-    private Admin admin;
+    private User admin;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Builder.Default

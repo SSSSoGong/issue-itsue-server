@@ -2,10 +2,12 @@ package com.ssssogong.issuemanager.config;
 
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
-import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
-import com.ssssogong.issuemanager.repository.*;
+import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.RoleRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
+import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
@@ -24,7 +26,6 @@ public class Initializer implements ApplicationRunner {
     private final int PL_COUNT = 2;
     private final int DEV_COUNT = 10;
     private final int TESTER_COUNT = 5;
-    private final AdminRepository adminRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProjectRepository projectRepository;
@@ -63,7 +64,7 @@ public class Initializer implements ApplicationRunner {
         // todo 중복 체크
         System.out.println("TestAccountInitializer: saving accounts");
 
-        Admin admin;
+        User admin;
         List<User> pl = new ArrayList<>();
         List<User> dev = new ArrayList<>();
         List<User> tester = new ArrayList<>();
@@ -73,7 +74,7 @@ public class Initializer implements ApplicationRunner {
         Role testerRole = roleRepository.findByName("Tester").get();
 
         // admin 추가
-        admin = Admin.builder()
+        admin = User.builder()
                 .accountId("adminID")
                 .username("Hong Gildong")
                 .password(passwordEncoder.encode(DUMMY_ACCOUNTS_PASSWORD))
@@ -106,7 +107,7 @@ public class Initializer implements ApplicationRunner {
                     .build()
             );
         }
-        adminRepository.save((Admin) admin);
+        userRepository.save(admin);
         userRepository.saveAll(pl);
         userRepository.saveAll(dev);
         userRepository.saveAll(tester);
