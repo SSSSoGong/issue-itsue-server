@@ -42,7 +42,6 @@ public class UserController {
         return ResponseEntity.ok().body("good job");
     }
 
-
     /**
      * Body에 입력한 정보로 회원가입
      */
@@ -76,6 +75,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    /**특정 User가 해당 프로젝트에서 가지는 역할 조회*/
     @GetMapping("/{accountId}/project/{projectId}/role")
     public ResponseEntity<Object> getProjectRole(@PathVariable String accountId, @PathVariable Long projectId) {
         String role = userService.findProjectRoleName(accountId, projectId);
@@ -102,10 +102,7 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDto updateRequest, @PathVariable String accountId) {
         // 사용자명, password에 값 있는 경우 변경
         // TODO: Update 기능
-        UserDto user;
-        if (updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank()) {
-            user = userService.updateUser(); // TODO : update를 필드 별로 어떻게 나누지
-        }
+        userService.updateUser(updateRequest);
 
         return ResponseEntity.ok().build();
     }

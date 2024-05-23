@@ -2,8 +2,11 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.dto.FullUserDto;
 import com.ssssogong.issuemanager.dto.RegisterRequestDto;
 import com.ssssogong.issuemanager.dto.UserDto;
+import com.ssssogong.issuemanager.exception.ConflictException;
+import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -26,10 +29,10 @@ public class UserService {
     public UserDto save(RegisterRequestDto registerRequest) throws Exception {
         // 예외 처리 : id가 존재하는 경우 기각
         if (userRepository.existsByAccountId(registerRequest.getAccountId())) {
-            throw new Exception("user with id " + registerRequest.getAccountId() + " already exists.");
+            throw new ConflictException("user '" + registerRequest.getAccountId() + "' already exists.");
         }
-        User user = userRepository.save(userMapper.toRegisterDTO(registerRequest));
-        return userMapper.toRegisterDTO(user);
+        User user = userRepository.save(UserMapper.toUser(registerRequest));
+        return UserMapper.toUserDTO(user);
     }
 
     public Object login() {
@@ -44,16 +47,16 @@ public class UserService {
     public UserDto unregister(String accountId) throws Exception {
         Optional<User> target = userRepository.findByAccountId(accountId);
         if (target.isEmpty()) {
-            throw new Exception("id does not exist");
+            throw new NotFoundException("user '" + accountId + "' does not exist");
         }
         userRepository.deleteById(target.get().getId());
-        return userMapper.toRegisterDTO(target.get());
+        return UserMapper.toUserDTO(target.get());
     }
 
     public Collection<UserDto> findUsers() {
         List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAll().iterator().forEachRemaining(user -> {
-            userDtos.add(userMapper.toRegisterDTO(user));
+            userDtos.add(UserMapper.toUserDTO(user));
         });
         return userDtos;
     }
@@ -61,7 +64,7 @@ public class UserService {
     public Collection<UserDto> findUsers(String username) {
         List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAllByUsername(username).iterator().forEachRemaining(user -> {
-            userDtos.add(userMapper.toRegisterDTO(user));
+            userDtos.add(UserMapper.toUserDTO(user));
         });
         return userDtos;
     }
@@ -69,21 +72,24 @@ public class UserService {
     @Transactional
     public String findProjectRoleName(String accountId, Long projectId) {
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
-        if (optionalUser.isEmpty()) return null;
+        if (optionalUser.isEmpty()) throw new NotFoundException("user '" + accountId + "' not found");
         Optional<UserProject> optionalUserProject = userProjectRepository.findByUserIdAndProjectId(optionalUser.get().getId(), projectId);
-        if (optionalUserProject.isEmpty()) return null;
+        if (optionalUserProject.isEmpty()) throw new NotFoundException("user '" + accountId + "' doesn't belong to project");
         UserProject userProject = optionalUserProject.get();
         return userProject.getRole().getName();
     }
 
     public UserDto findUserByAccountId(String accountId) {
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
-        if (optionalUser.isEmpty()) return null;
-        return userMapper.toRegisterDTO(optionalUser.get());
+        if (optionalUser.isEmpty()) throw new NotFoundException("user '" + accountId + "' not found");
+        return UserMapper.toUserDTO(optionalUser.get());
     }
 
-    public UserDto updateUser() {
+    public UserDto updateUser(RegisterRequestDto userUpdateDto) {
         // TODO: Update User
+        // 사용자명과 password를 바꾼다
+
+
         return null;
     }
 
