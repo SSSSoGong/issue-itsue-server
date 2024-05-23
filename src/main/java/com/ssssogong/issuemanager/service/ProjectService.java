@@ -1,10 +1,10 @@
 package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.Roles;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
 import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
 import com.ssssogong.issuemanager.dto.ProjectIdResponse;
@@ -78,37 +78,34 @@ public class ProjectService {
     public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
         checkDuplicatedAddition(projectId, request);
 
-        //todo: 보기좋게 리팩터링해보기
         final Project project = findProjectById(projectId);
-        final List<Role> roles = roleRepository.findAll();
+        final Roles roles = Roles.builder().roles(roleRepository.findAll()).build();
+
         List<UserProject> userProjects = new ArrayList<>();
         for (ProjectUserAdditionRequest userData : request) {
-            final User user = userRepository.findByAccountId(userData.getAccountId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없음"));
-            final UserProject userProject = UserProject.builder()
-                    .user(user)
-                    .project(project)
-                    .role(findRole(roles, userData))
-                    .build();
-            userProjects.add(userProject);
+            userProjects.add(
+                    UserProject.builder()
+                            .user(findUserByAccountId(userData.getAccountId()))
+                            .project(project)
+                            .role(roles.findRole(userData.getRole()))
+                            .build()
+            );
         }
         userProjectRepository.saveAll(userProjects);
+    }
+
+    private User findUserByAccountId(final String accountId) {
+        return userRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없음"));
     }
 
     private void checkDuplicatedAddition(final Long projectId, final List<ProjectUserAdditionRequest> request) {
         final List<String> accountIds = request.stream()
                 .map(ProjectUserAdditionRequest::getAccountId)
                 .toList();
-        if(userProjectRepository.existsByProjectIdAndAccountIdIn(projectId, accountIds)) {
+        if (userProjectRepository.existsByProjectIdAndAccountIdIn(projectId, accountIds)) {
             throw new IllegalArgumentException("이미 프로젝트에 참여중인 유저가 포함되어 있음");
         }
-    }
-
-    private Role findRole(final List<Role> roles, final ProjectUserAdditionRequest userData) {
-        return roles.stream()
-                .filter(each -> each.isRole(userData.getRole()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("역할을 찾지 못함"));
     }
 
     @Transactional(readOnly = true)
