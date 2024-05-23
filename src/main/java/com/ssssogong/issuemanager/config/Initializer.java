@@ -9,6 +9,7 @@ import com.ssssogong.issuemanager.domain.role.*;
 import com.ssssogong.issuemanager.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProviderImpl;
+import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.core.parameters.P;
@@ -20,6 +21,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class Initializer implements ApplicationRunner {
     private final int DEV_COUNT = 10;
     private final int TESTER_COUNT = 5;
     private String DUMMY_ACCOUNTS_PASSWORD = "1234";
+    private static final String ROLE_BASE_PACKAGE = "com.ssssogong.issuemanager.domain.role";
 
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
@@ -36,19 +39,35 @@ public class Initializer implements ApplicationRunner {
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
     public void saveInitialRoles(){
-        System.out.println("TestAccountInitializer: saving roles");
         final List<Role> roles = roleRepository.findAll();
-        final List<Role> saves = List.of(new Administrator(), new Tester(), new Developer(), new ProjectLeader());
-        //todo: 새로운 Role이 추가되어도 알잘딱하게 추가해주기
-        // 1. Reflections
-        // 2. Role과 Privilege 변경
+        final List<Role> saves = new ArrayList<>();
+
+        // Reflection을 사용하여 role 패키지 내의 모든 role 하위 클래스들을 찾는다
+        Reflections reflections = new Reflections(ROLE_BASE_PACKAGE);
+        Set<Class<? extends Role>> roleClasses = reflections.getSubTypesOf(Role.class);
+
+        for (Class<? extends Role> roleClass : roleClasses) {
+            String roleName = roleClass.getSimpleName();
+            //DB에 없는 role은 반영한다
+            if (isRoleNotExist(roles, roleName)) {
+                try {
+                    Role roleInstance = roleClass.getDeclaredConstructor().newInstance();
+                    saves.add(roleInstance);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                }
+            }
+        }
         roleRepository.saveAll(saves);
-        System.out.println("TestAccountInitializer: saved roles");
+    }
+
+    private boolean isRoleNotExist(final List<Role> roles, final String expectedRoleName) {
+        return roles.stream().noneMatch(each -> each.isRole(expectedRoleName));
     }
 
     public void saveInitialAccounts(){
+        // todo 중복 체크
         System.out.println("TestAccountInitializer: saving accounts");
-
 
         Admin admin;
         List<User> pl = new ArrayList<>();
