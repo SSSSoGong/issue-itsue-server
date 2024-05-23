@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class IssueModification extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "im_id")
     private Long id;
 
@@ -30,8 +30,7 @@ public class IssueModification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id")
     private Issue issue;
-
-
+  
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User modifier;
@@ -43,5 +42,4 @@ public class IssueModification extends BaseEntity {
         this.issue = issue;
         issue.getIssueModifications().add(this);
     }
-
 }

@@ -26,13 +26,26 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	implementation 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	compileOnly 'org.projectlombok:lombok'
+
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	annotationProcessor 'org.projectlombok:lombok'
+
+
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
 //	testImplementation("org.junit.vintage:junit-vintage-engine") {
 //		exclude group: "org.hamcrest", module: "hamcrest-core"
 //	}
@@ -43,6 +56,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+	//reflection
+	implementation "org.reflections:reflections:0.10.2"
+
 }
 
 tasks.named('test') {

@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import java.util.List;
 
 @Entity
-public class Tester extends Role{
+public class Tester extends Role {
     {
         this.allowedPrivileges = List.of(
                 Privilege.ISSUE_REPORTABLE,
