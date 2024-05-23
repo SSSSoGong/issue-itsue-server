@@ -28,6 +28,7 @@ public abstract class Role implements GrantedAuthoritiesContainer {
 
     // TODO: enum Role을 새로 만들고, 이 클래스는 RolePrivilege로 개명해서 Role과 Privilege를 매핑하는 엔티티로 바꿀까?
     @Column(insertable = false, updatable = false)
+    @Getter
     private String name;
 
     /**Role에 주어진 권한 목록*/
