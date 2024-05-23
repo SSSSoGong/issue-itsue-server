@@ -82,7 +82,7 @@ class UserProjectRepositoryTest {
             userProjectRepository.save(UserProject.builder().project(project3).user(user).build());
 
             // when
-            final List<UserProject> userProjects = userProjectRepository.findAllByAccountIdOrderByAccessTime(
+            final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(
                     user.getAccountId());
             final UserProject userProject0 = userProjects.get(0);
             final UserProject userProject1 = userProjects.get(1);

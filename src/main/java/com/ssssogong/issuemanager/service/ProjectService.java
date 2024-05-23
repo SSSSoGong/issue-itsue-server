@@ -121,7 +121,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
         //todo: accessTime이 null이라면?(아직 접근하지 않은 프로젝트가 있다면?)
-        final List<UserProject> userProjects = userProjectRepository.findAllByAccountIdOrderByAccessTime(accountId);
+        final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         //todo: 즐겨찾기를 위로??
         return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
     }

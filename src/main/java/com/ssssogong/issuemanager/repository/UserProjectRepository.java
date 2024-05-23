@@ -12,8 +12,8 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 
     List<UserProject> findAllByProjectId(Long id);
 
-    @Query("SELECT up FROM UserProject up WHERE up.user.accountId = :accountId ORDER BY up.accessTime DESC")
-    List<UserProject> findAllByAccountIdOrderByAccessTime(@Param("accountId") String accountId);
+    @Query("SELECT up FROM UserProject up WHERE up.user.accountId = :accountId")
+    List<UserProject> findAllByAccountId(@Param("accountId") String accountId);
 
     @Query("SELECT up FROM UserProject up WHERE up.user.accountId = :accountId AND up.project.id = :projectId")
     Optional<UserProject> findByAccountIdAndProjectId(@Param("accountId") String accountId, @Param("projectId") long projectId);
