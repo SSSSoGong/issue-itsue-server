@@ -19,3 +19,4 @@ auth:
   jwt:
     secret-key: tmp-key-hahahahahahahahaahahahahahahaha
     expiration-minutes: 30
+

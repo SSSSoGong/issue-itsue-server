@@ -28,6 +28,10 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User writer;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<CommentImage> commentImages = new ArrayList<>();
+
 
     public void setIssue(Issue issue) {
         if (this.issue != null) {
@@ -35,5 +39,10 @@ public class Comment extends BaseEntity {
         }
         this.issue = issue;
         issue.getComments().add(this);
+    }
+
+
+    public void update(String content) {
+        this.content = content;
     }
 }
