@@ -1,6 +1,5 @@
 package com.ssssogong.issuemanager.service;
 
-import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -28,16 +27,14 @@ class ProjectServiceTest {
     @Autowired
     private ProjectService projectService;
     @Autowired
-    private AdminRepository adminRepository;
-    @Autowired
     private UserRepository userRepository;
 
-    private Admin getAdmin() {
-        final Admin admin = Admin.builder()
+    private User getAdmin() {
+        final User admin = User.builder()
                 .accountId("admin")
                 .username("어드민")
                 .password("password").build();
-        adminRepository.save(admin);
+        userRepository.save(admin);
         return admin;
     }
 
@@ -61,7 +58,7 @@ class ProjectServiceTest {
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequest).getProjectId();
 
         // when
@@ -85,7 +82,7 @@ class ProjectServiceTest {
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequest).getProjectId();
         final ProjectUpdateRequest projectUpdateRequest = ProjectUpdateRequest.builder()
                 .name("야심찬 프로젝트(수정)")
@@ -114,7 +111,7 @@ class ProjectServiceTest {
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequest).getProjectId();
 
         // when, then
@@ -126,7 +123,7 @@ class ProjectServiceTest {
     void 프로젝트에_유저를_추가한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -147,7 +144,7 @@ class ProjectServiceTest {
         final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
         final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
         final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -177,7 +174,7 @@ class ProjectServiceTest {
         final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
         final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
         final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -210,7 +207,7 @@ class ProjectServiceTest {
     void 유저가_속한_프로젝트들을_조회한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId1 = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -258,7 +255,7 @@ class ProjectServiceTest {
     void 하나의_프로젝트와_하나의_회원간의_정보를_검색한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -284,7 +281,7 @@ class ProjectServiceTest {
     void 프로젝트_접근시간을_갱신한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
@@ -316,7 +313,7 @@ class ProjectServiceTest {
     void 프로젝트_즐겨찾기를_갱신한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final Admin admin = getAdmin();
+        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequest.builder()
