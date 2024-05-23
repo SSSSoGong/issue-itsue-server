@@ -5,10 +5,7 @@ import com.ssssogong.issuemanager.domain.enumeration.Category;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -16,12 +13,13 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class Issue extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "issue_id")
     private Long id;
 
@@ -53,13 +51,17 @@ public class Issue extends BaseEntity {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "issue")
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "issue")
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<IssueModification> issueModifications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
+    @Builder.Default
+    private List<IssueImage> issueImages = new ArrayList<>();
 
     public void setProject(Project project) {
         if (this.project != null) {

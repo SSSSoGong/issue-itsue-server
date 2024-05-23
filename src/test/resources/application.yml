@@ -14,3 +14,9 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+auth:
+  jwt:
+    secret-key: tmp-key-hahahahahahahahaahahahahahahaha
+    expiration-minutes: 30
+

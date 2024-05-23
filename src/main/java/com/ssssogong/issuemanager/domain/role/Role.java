@@ -32,10 +32,12 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     private String name;
 
     /**Role에 주어진 권한 목록*/
-    @Convert(converter = StringCollectionConverter.class) // Collection => String 으로 변환하여 하나의 컬럼에 저장
+/*    @Convert(converter = StringCollectionConverter.class) // Collection => String 으로 변환하여 하나의 컬럼에 저장
     @Enumerated(EnumType.STRING)
     @Column
+    */
     @Getter
+    @Transient
     protected Collection<Privilege> allowedPrivileges;
 
     /**자신의 역할과 Privilege를 담은 Collection을 반환한다*/
@@ -44,6 +46,7 @@ public abstract class Role implements GrantedAuthoritiesContainer {
         List<GrantedAuthority> authorities = new ArrayList<>();
         if(!name.isBlank())
             authorities.add(new SimpleGrantedAuthority("ROLE_" + name.toUpperCase()));
+
         authorities.addAll(
                 allowedPrivileges
                         .stream()
@@ -51,5 +54,13 @@ public abstract class Role implements GrantedAuthoritiesContainer {
                         .toList()
         );
         return authorities;
+    }
+
+    public boolean isRole(String roleName) {
+        return this.getClass().getSimpleName().equalsIgnoreCase(roleName);
+    }
+
+    public String getRoleName() {
+        return this.getClass().getSimpleName();
     }
 }

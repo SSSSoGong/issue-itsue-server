@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 public class UserProject extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_project_id")
     private Long id;
 
     @Column(name = "is_favorite")
-    private Boolean isFavorite;
+    private boolean isFavorite;
 
     @Column(name = "access_time")
     private LocalDateTime accessTime;
@@ -39,11 +39,18 @@ public class UserProject extends BaseEntity {
     private Role role;
 
     @Builder
-    public UserProject(Boolean isFavorite, LocalDateTime accessTime, User user, Project project, Role role) {
-        this.isFavorite = isFavorite;
-        this.accessTime = accessTime;
+    public UserProject(User user, Project project, Role role) {
+        this.accessTime = null;
         this.user = user;
         this.project = project;
         this.role = role;
+    }
+
+    public void updateAccessTime() {
+        this.accessTime = LocalDateTime.now();
+    }
+
+    public void updateIsFavorite(final boolean isFavorite) {
+        this.isFavorite = isFavorite;
     }
 }

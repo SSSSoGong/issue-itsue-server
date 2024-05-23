@@ -58,22 +58,23 @@ public class SecurityConfig {
         );
         // 필터 등록
         http
-//                .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 자리에 LoginFilter 등록
-                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 자리에 LoginFilter 등록
                 .addFilterBefore(jwtAuthenticationFilter, LoginFilter.class) // LoginFilter 앞에 JwtAuthenticationFilter 등록
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세선 정책 설정 (rest api에 필요하다고 함..)
         ;
         // 기타 설정
         http.formLogin((auth)->auth.disable()) // form 로그인 방식 해제
+
                 .httpBasic((auth) -> auth.disable()) // http basic 해제
-                .csrf((auth)->auth.disable()) // csrf 해제
+                .csrf((auth) -> auth.disable()) // csrf 해제
                 .headers((headers) -> headers // 프레임 관련 (h2)
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN
                         ))
                 )
         ;
+
 
         return http.build();
     }
