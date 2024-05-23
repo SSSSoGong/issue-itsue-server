@@ -3,6 +3,7 @@ package com.ssssogong.issuemanager.service;
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.Roles;
 import com.ssssogong.issuemanager.domain.UserProject;
+import com.ssssogong.issuemanager.domain.UserProjectSorter;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
@@ -121,10 +122,9 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
-        //todo: accessTime이 null이라면?(아직 접근하지 않은 프로젝트가 있다면?)
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
-        //todo: 즐겨찾기를 위로??
-        return UserProjectMapper.toUserProjectSummaryResponse(userProjects);
+        final List<UserProject> sortedUserProjects = UserProjectSorter.sortByAccessTimeAndIsFavorite(userProjects);
+        return UserProjectMapper.toUserProjectSummaryResponse(sortedUserProjects);
     }
 
     @Transactional(readOnly = true)

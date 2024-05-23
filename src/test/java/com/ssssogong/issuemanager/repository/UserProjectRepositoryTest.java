@@ -66,36 +66,4 @@ class UserProjectRepositoryTest {
             assertThat(exists).isFalse();
         }
     }
-
-    @Nested
-    class findAllByAccountIdOrderByAccessTime {
-
-        @Test
-        void 데이터를_최신순으로_반환한다() {
-            // given
-            final User user = userRepository.save(User.builder().accountId("user").build());
-            final Project project1 = projectRepository.save(Project.builder().name("project1").build());
-            final Project project2 = projectRepository.save(Project.builder().name("project2").build());
-            final Project project3 = projectRepository.save(Project.builder().name("project3").build());
-            userProjectRepository.save(UserProject.builder().project(project1).user(user).build());
-            userProjectRepository.save(UserProject.builder().project(project2).user(user).build());
-            userProjectRepository.save(UserProject.builder().project(project3).user(user).build());
-
-            // when
-            final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(
-                    user.getAccountId());
-            final UserProject userProject0 = userProjects.get(0);
-            final UserProject userProject1 = userProjects.get(1);
-            final UserProject userProject2 = userProjects.get(2);
-
-/*            for (UserProject userProject : userProjects) {
-                System.out.println("userProject.getAccessTime() = " + userProject.getAccessTime());
-            }*/
-
-            // then
-            assertThat(userProject0.getAccessTime().isAfter(userProject1.getAccessTime())).isTrue();
-            assertThat(userProject0.getAccessTime().isAfter(userProject2.getAccessTime())).isTrue();
-            assertThat(userProject1.getAccessTime().isAfter(userProject2.getAccessTime())).isTrue();
-        }
-    }
 }
