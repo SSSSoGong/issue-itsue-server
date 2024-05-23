@@ -30,15 +30,15 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "admin_id")
     private Admin admin;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Issue> issues = new ArrayList<>();
 
     public void update(final String name, final String subject) {
-        if(Strings.isNotEmpty(name)) {
+        if (Strings.isNotEmpty(name)) {
             this.name = name;
         }
-        if(Strings.isNotEmpty(subject)){
+        if (Strings.isNotEmpty(subject)) {
             this.subject = subject;
         }
     }

@@ -69,7 +69,6 @@ public class ProjectService {
 
     @Transactional
     public ProjectIdResponse deleteById(final Long id) {
-        //todo: 연관된 userProject.. issue... comment.. issuemodification 등등 삭제해야 함
         projectRepository.deleteById(id);
         return ProjectMapper.toProjectIdResponse(id);
     }
