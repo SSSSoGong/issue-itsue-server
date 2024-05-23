@@ -1,6 +1,7 @@
 package com.ssssogong.issuemanager.domain.account;
 
 import com.ssssogong.issuemanager.domain.BaseEntity;
+import com.ssssogong.issuemanager.domain.role.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
