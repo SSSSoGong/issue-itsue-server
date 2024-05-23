@@ -1,8 +1,10 @@
 package com.ssssogong.issuemanager.controller;
 
+import com.ssssogong.issuemanager.dto.FullUserDto;
 import com.ssssogong.issuemanager.dto.RegisterRequestDto;
 import com.ssssogong.issuemanager.dto.UserDto;
 import com.ssssogong.issuemanager.dto.UserResponseDto;
+import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -102,8 +104,7 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@RequestBody RegisterRequestDto updateRequest, @PathVariable String accountId) {
         // 사용자명, password에 값 있는 경우 변경
         // TODO: Update 기능
-        userService.updateUser(updateRequest);
-
-        return ResponseEntity.ok().build();
+        FullUserDto updated = userService.updateUser(accountId, updateRequest);
+        return ResponseEntity.ok(updated);
     }
 }

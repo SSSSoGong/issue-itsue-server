@@ -85,12 +85,16 @@ public class UserService {
         return UserMapper.toUserDTO(optionalUser.get());
     }
 
-    public UserDto updateUser(RegisterRequestDto userUpdateDto) {
+    public FullUserDto updateUser(String accountId, RegisterRequestDto updateRequest) {
         // TODO: Update User
-        // 사용자명과 password를 바꾼다
-
-
-        return null;
+        // username과 password 수정
+        User target = userRepository.findByAccountId(accountId).orElseThrow(NotFoundException::new);
+        if(updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank())
+            target.setUsername(updateRequest.getUsername());
+        if(updateRequest.getPassword() != null && !updateRequest.getPassword().isBlank())
+            target.setPassword(updateRequest.getPassword());
+        User updated = userRepository.save(target);
+        return UserMapper.toFullUserDTO(updated);
     }
 
     /**
