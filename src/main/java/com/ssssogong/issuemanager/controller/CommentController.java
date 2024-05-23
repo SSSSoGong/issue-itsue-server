@@ -34,7 +34,7 @@ public class CommentController {
 
     }
 
-    @GetMapping("/issues/{iid}/comments-all")
+    @GetMapping("/issues/{iid}/comments")
     public ResponseEntity<List<CommentResponseDto>> findAllComment(@PathVariable("iid") Long issueId) {
         return new ResponseEntity<>(commentService.findAllComment(issueId), HttpStatus.OK);
     }
