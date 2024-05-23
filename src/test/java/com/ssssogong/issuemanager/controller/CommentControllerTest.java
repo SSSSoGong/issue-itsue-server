@@ -1,42 +1,11 @@
 package com.ssssogong.issuemanager.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssssogong.issuemanager.domain.Comment;
-import com.ssssogong.issuemanager.dto.CommentIdResponseDto;
-import com.ssssogong.issuemanager.dto.CommentRequestDto;
-import com.ssssogong.issuemanager.dto.CommentResponseDto;
 import com.ssssogong.issuemanager.security.SecurityConfig;
-import com.ssssogong.issuemanager.service.CommentService;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CommentController.class)
 @ContextConfiguration(classes = {CommentController.class, SecurityConfig.class})
-
 class CommentControllerTest {
 //
 //    @Autowired

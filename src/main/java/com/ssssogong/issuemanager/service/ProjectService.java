@@ -6,27 +6,16 @@ import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.UserProjectSorter;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
-import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
-import com.ssssogong.issuemanager.dto.ProjectIdResponse;
-import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
-import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
-import com.ssssogong.issuemanager.dto.ProjectUserResponse;
-import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
-import com.ssssogong.issuemanager.dto.UserProjectFavoriteRequest;
-import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
+import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.mapper.UserProjectMapper;
-import com.ssssogong.issuemanager.repository.AdminRepository;
-import com.ssssogong.issuemanager.repository.ProjectRepository;
-import com.ssssogong.issuemanager.repository.RoleRepository;
-import com.ssssogong.issuemanager.repository.UserProjectRepository;
-import com.ssssogong.issuemanager.repository.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
+import com.ssssogong.issuemanager.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service

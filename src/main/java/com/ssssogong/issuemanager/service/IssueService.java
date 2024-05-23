@@ -38,9 +38,9 @@ public class IssueService {
         User reporter = userRepository.findByAccountId("tlsgusdn4818@gmail.com").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
 
-        Issue issue = IssueMapper.convertToIssueSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
+        Issue issue = IssueMapper.toIssueSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
         issueRepository.save(issue);    // issue 저장
-        return IssueMapper.convertToIssueIdResponseDto(issue);
+        return IssueMapper.toIssueIdResponseDto(issue);
     }
 
     //  이슈 확인
@@ -48,7 +48,7 @@ public class IssueService {
     public IssueShowResponseDto show(Long projectId, Long issueId) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        return IssueMapper.convertToIssueShowResponseDto(issue);    // entity -> dto
+        return IssueMapper.toIssueShowResponseDto(issue);    // entity -> dto
     }
 
     //  이슈 수정
@@ -57,7 +57,7 @@ public class IssueService {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         IssueMapper.updateFromIssueUpdateRequestDto(issue, issueUpdateRequestDto);  // dto -> entity : update 처리
         issueRepository.save(issue);    // DB에 issue 저장(수정)
-        return IssueMapper.convertToIssueIdResponseDto(issue);  // entity -> dto
+        return IssueMapper.toIssueIdResponseDto(issue);  // entity -> dto
     }
 
     //  이슈 삭제
@@ -82,7 +82,7 @@ public class IssueService {
         }
         issueRepository.save(issue);    // issue 저장(수정)
         issueModificationService.save(issue, from, to); // issueModification 저장
-        return IssueMapper.convertToIssueIdResponseDto(issue); // entity -> dto
+        return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
 
     // 프로젝트에 속한 이슈 검색
@@ -100,7 +100,7 @@ public class IssueService {
                 .limit(issueCount != null ? issueCount : issues.size()) // issueCount가 지정되지 않았을 경우 모든 이슈 반환
                 .toList();
         return filteredIssues.stream()
-                .map(IssueMapper::convertToIssueProjectResponseDto) // entity -> dto
+                .map(IssueMapper::toIssueProjectResponseDto) // entity -> dto
                 .collect(Collectors.toList());
     }
 }

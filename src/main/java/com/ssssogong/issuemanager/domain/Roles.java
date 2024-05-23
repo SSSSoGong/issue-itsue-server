@@ -1,8 +1,9 @@
 package com.ssssogong.issuemanager.domain;
 
 import com.ssssogong.issuemanager.domain.role.Role;
-import java.util.List;
 import lombok.Builder;
+
+import java.util.List;
 
 @Builder
 public class Roles {

@@ -1,24 +1,10 @@
 package com.ssssogong.issuemanager.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.dto.ProjectCreationRequest;
-import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
-import com.ssssogong.issuemanager.dto.ProjectUpdateRequest;
-import com.ssssogong.issuemanager.dto.ProjectUserAdditionRequest;
-import com.ssssogong.issuemanager.dto.ProjectUserResponse;
-import com.ssssogong.issuemanager.dto.UserProjectAssociationResponse;
-import com.ssssogong.issuemanager.dto.UserProjectFavoriteRequest;
-import com.ssssogong.issuemanager.dto.UserProjectSummaryResponse;
+import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.repository.AdminRepository;
-import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
@@ -26,6 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DisplayNameGeneration(ReplaceUnderscores.class)

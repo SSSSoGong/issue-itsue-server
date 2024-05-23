@@ -1,14 +1,15 @@
 package com.ssssogong.issuemanager.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.ssssogong.issuemanager.domain.role.Developer;
 import com.ssssogong.issuemanager.domain.role.ProjectLeader;
 import com.ssssogong.issuemanager.domain.role.Tester;
-import java.util.List;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DisplayNameGeneration(ReplaceUnderscores.class)

@@ -4,10 +4,8 @@ import com.ssssogong.issuemanager.domain.Comment;
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.CommentIdResponseDto;
-import com.ssssogong.issuemanager.dto.CommentImageRequestDto;
 import com.ssssogong.issuemanager.dto.CommentRequestDto;
 import com.ssssogong.issuemanager.dto.CommentResponseDto;
-import com.ssssogong.issuemanager.repository.CommentImageRepository;
 import com.ssssogong.issuemanager.repository.CommentRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -16,7 +14,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;

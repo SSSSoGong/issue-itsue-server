@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class IssueMapper {
 
 
-    public static Issue convertToIssueSaveRequestDto(User reporter, Project project, IssueSaveRequestDto issueSaveRequestDto) {
+    public static Issue toIssueSaveRequestDto(User reporter, Project project, IssueSaveRequestDto issueSaveRequestDto) {
         return Issue.builder()
                 .title(issueSaveRequestDto.getTitle())
                 .description(issueSaveRequestDto.getDescription())
@@ -50,13 +50,13 @@ public class IssueMapper {
         }
     }
 
-    public static IssueIdResponseDto convertToIssueIdResponseDto(Issue issue) {
+    public static IssueIdResponseDto toIssueIdResponseDto(Issue issue) {
         return IssueIdResponseDto.builder()
                 .issueId(issue.getId())
                 .build();
     }
 
-    public static IssueShowResponseDto convertToIssueShowResponseDto(Issue issue) {
+    public static IssueShowResponseDto toIssueShowResponseDto(Issue issue) {
         return IssueShowResponseDto.builder()
                 .title(issue.getTitle())
                 .description(issue.getDescription())
@@ -71,7 +71,7 @@ public class IssueMapper {
                 .build();
     }
 
-    public static IssueProjectResponseDto convertToIssueProjectResponseDto(Issue issue) {
+    public static IssueProjectResponseDto toIssueProjectResponseDto(Issue issue) {
         return IssueProjectResponseDto.builder()
                 .title(issue.getTitle())
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)

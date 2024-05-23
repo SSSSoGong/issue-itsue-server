@@ -2,43 +2,37 @@ package com.ssssogong.issuemanager.config;
 
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
-import com.ssssogong.issuemanager.domain.account.Account;
 import com.ssssogong.issuemanager.domain.account.Admin;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.domain.role.*;
+import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.engine.jdbc.connections.internal.UserSuppliedConnectionProviderImpl;
 import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.swing.text.html.StyleSheet;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 public class Initializer implements ApplicationRunner {
+    private static final String ROLE_BASE_PACKAGE = "com.ssssogong.issuemanager.domain.role";
     private final int PL_COUNT = 2;
     private final int DEV_COUNT = 10;
     private final int TESTER_COUNT = 5;
-    private String DUMMY_ACCOUNTS_PASSWORD = "1234";
-    private static final String ROLE_BASE_PACKAGE = "com.ssssogong.issuemanager.domain.role";
-
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
-    public void saveInitialRoles(){
+    private String DUMMY_ACCOUNTS_PASSWORD = "1234";
+
+    public void saveInitialRoles() {
         final List<Role> roles = roleRepository.findAll();
         final List<Role> saves = new ArrayList<>();
 
@@ -65,7 +59,7 @@ public class Initializer implements ApplicationRunner {
         return roles.stream().noneMatch(each -> each.isRole(expectedRoleName));
     }
 
-    public void saveInitialAccounts(){
+    public void saveInitialAccounts() {
         // todo 중복 체크
         System.out.println("TestAccountInitializer: saving accounts");
 
@@ -85,7 +79,7 @@ public class Initializer implements ApplicationRunner {
                 .password(passwordEncoder.encode(DUMMY_ACCOUNTS_PASSWORD))
                 .build();
         // PL 추가
-        for(int i = 1; i <= PL_COUNT; i++){
+        for (int i = 1; i <= PL_COUNT; i++) {
             pl.add(
                     User.builder()
                             .accountId("pl" + i)
@@ -95,7 +89,7 @@ public class Initializer implements ApplicationRunner {
             );
         }
         // dev 추가
-        for(int i = 1; i <= DEV_COUNT; i++){
+        for (int i = 1; i <= DEV_COUNT; i++) {
             dev.add(User.builder()
                     .accountId("dev" + i)
                     .username("dev" + i)
@@ -104,7 +98,7 @@ public class Initializer implements ApplicationRunner {
             );
         }
         // tester 추가
-        for(int i = 1; i <= TESTER_COUNT; i++){
+        for (int i = 1; i <= TESTER_COUNT; i++) {
             tester.add(User.builder()
                     .accountId("tester" + i)
                     .username("tester" + i)
@@ -112,7 +106,7 @@ public class Initializer implements ApplicationRunner {
                     .build()
             );
         }
-        adminRepository.save((Admin)admin);
+        adminRepository.save((Admin) admin);
         userRepository.saveAll(pl);
         userRepository.saveAll(dev);
         userRepository.saveAll(tester);
@@ -130,26 +124,26 @@ public class Initializer implements ApplicationRunner {
 //                        .user(admin)
 //                        .role(administrator)
 //                        .build());
-        for(int i = 0; i < PL_COUNT; i++){
+        for (int i = 0; i < PL_COUNT; i++) {
             userProjects.add(UserProject.builder()
-                            .project(project)
-                            .user(pl.get(i))
-                            .role(projectLeader)
-                            .build());
+                    .project(project)
+                    .user(pl.get(i))
+                    .role(projectLeader)
+                    .build());
         }
-        for(int i = 0; i < DEV_COUNT; i++){
+        for (int i = 0; i < DEV_COUNT; i++) {
             userProjects.add(UserProject.builder()
-                            .project(project)
-                            .user(dev.get(i))
-                            .role(developer)
-                            .build());
+                    .project(project)
+                    .user(dev.get(i))
+                    .role(developer)
+                    .build());
         }
-        for(int i = 0; i < TESTER_COUNT; i++){
+        for (int i = 0; i < TESTER_COUNT; i++) {
             userProjects.add(UserProject.builder()
-                            .project(project)
-                            .user(tester.get(i))
-                            .role(testerRole)
-                            .build());
+                    .project(project)
+                    .user(tester.get(i))
+                    .role(testerRole)
+                    .build());
         }
         userProjectRepository.saveAll(userProjects);
 

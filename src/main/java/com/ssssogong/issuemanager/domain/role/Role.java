@@ -1,7 +1,5 @@
 package com.ssssogong.issuemanager.domain.role;
 
-import com.ssssogong.issuemanager.util.StringCollectionConverter;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,17 +19,9 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public abstract class Role implements GrantedAuthoritiesContainer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
-    private Long id;
-
-    // TODO: enum Role을 새로 만들고, 이 클래스는 RolePrivilege로 개명해서 Role과 Privilege를 매핑하는 엔티티로 바꿀까?
-    @Column(insertable = false, updatable = false)
-    @Getter
-    private String name;
-
-    /**Role에 주어진 권한 목록*/
+    /**
+     * Role에 주어진 권한 목록
+     */
 /*    @Convert(converter = StringCollectionConverter.class) // Collection => String 으로 변환하여 하나의 컬럼에 저장
     @Enumerated(EnumType.STRING)
     @Column
@@ -39,12 +29,22 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     @Getter
     @Transient
     protected Collection<Privilege> allowedPrivileges;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    private Long id;
+    // TODO: enum Role을 새로 만들고, 이 클래스는 RolePrivilege로 개명해서 Role과 Privilege를 매핑하는 엔티티로 바꿀까?
+    @Column(insertable = false, updatable = false)
+    @Getter
+    private String name;
 
-    /**자신의 역할과 Privilege를 담은 Collection을 반환한다*/
+    /**
+     * 자신의 역할과 Privilege를 담은 Collection을 반환한다
+     */
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(!name.isBlank())
+        if (!name.isBlank())
             authorities.add(new SimpleGrantedAuthority("ROLE_" + name.toUpperCase()));
 
         authorities.addAll(

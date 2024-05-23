@@ -1,7 +1,5 @@
 package com.ssssogong.issuemanager.repository;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -10,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SuppressWarnings("NonAsciiCharacters")
 @DisplayNameGeneration(ReplaceUnderscores.class)
