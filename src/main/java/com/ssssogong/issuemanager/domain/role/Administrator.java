@@ -17,7 +17,9 @@ public class Administrator extends Role {
                 Privilege.ISSUE_FIXABLE,
                 Privilege.ISSUE_REOPENABLE,
                 Privilege.ISSUE_REPORTABLE,
-                Privilege.ISSUE_RESOLVABLE
+                Privilege.ISSUE_RESOLVABLE,
+                Privilege.ISSUE_DELETABLE,
+                Privilege.ISSUE_UPDATABLE
         );
     }
 }

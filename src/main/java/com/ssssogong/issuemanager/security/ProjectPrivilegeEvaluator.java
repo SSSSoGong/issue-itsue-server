@@ -1,6 +1,11 @@
 package com.ssssogong.issuemanager.security;
 
+import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Privilege;
+import com.ssssogong.issuemanager.dto.IssueStateUpdateRequestDto;
+import com.ssssogong.issuemanager.exception.NotFoundException;
+import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 
 /**
@@ -17,6 +24,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProjectPrivilegeEvaluator {
     private final ProjectRepository projectRepository;
+    private final IssueRepository issueRepository;
     private final UserProjectRepository userProjectRepository;
     // 권한 확인을 위해선 몇 번째 project에 접근해야하는지 알아야하기 때문에 메소드 레벨 권한 체크가 필요하다
     /**
@@ -32,6 +40,13 @@ public class ProjectPrivilegeEvaluator {
      *      (어노테이션 특성 상 매개변수가 아니면 가져올 수 없음)
      */
 
+    /**콘솔에 권한 출력 (디버깅용)*/
+    private void printPrivileges(Authentication authentication){
+        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
+        authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
+        System.out.println("]");
+    }
+
     /**
      * 유저가 해당 project에 permission이 있는지 확인<br>
      * ex) @PreAuthorize('@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE')
@@ -39,9 +54,7 @@ public class ProjectPrivilegeEvaluator {
     public boolean hasPrivilege(Long projectId, Privilege privilege) {
         // 권한 출력
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
-        authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
-        System.out.println("]");
+        printPrivileges(authentication);
 
         // 권한의 형태 : DEVELOPER_TO_PROJECT_ID 혹은 ISSUE_FIXABLE_TO_PROJECT_ID 등
         // permission이 포함되고 projectName으로 끝나는 권한이 있는지 찾는다
@@ -51,5 +64,44 @@ public class ProjectPrivilegeEvaluator {
             }
         }
         return false;
+    }
+
+    /**유저가 해당 프로젝트의 생성자인지 확인*/
+    public boolean isAdmin(Long projectId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        printPrivileges(authentication);
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(()-> new NotFoundException("project " + projectId + " not found"));
+        return Objects.equals(project.getAdmin().getAccountId(), authentication.getName());
+    }
+
+    /**유저가 해당 이슈에 상태 변경 권한이 있는지 확인*/
+    public boolean canChangeIssueState(Long issueId, IssueStateUpdateRequestDto updateRequest){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        printPrivileges(authentication);
+        // issueId로부터 projectId 조회
+        Long projectId = issueRepository.findById(issueId)
+                .orElseThrow(()->new NotFoundException("issue " + issueId + " not found"))
+                .getProject().getId();
+        // 변경할 state에 따라 권한 판단
+        String changeTo = updateRequest.getState();
+        switch(changeTo){
+            case "NEW":
+                return hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
+            case "ASSIGNED":
+                return hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
+            case "FIXED":
+                return hasPrivilege(projectId, Privilege.ISSUE_FIXABLE);
+            case "RESOLVED":
+                return hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE);
+            case "REOPENED":
+                return hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE);
+            case "CLOSED":
+                return hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
+            default:
+                throw new IllegalArgumentException("input state " + changeTo + " is not valid");
+        }
+
     }
 }
