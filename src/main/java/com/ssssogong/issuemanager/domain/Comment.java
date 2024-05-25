@@ -36,7 +36,6 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<CommentImage> commentImages = new ArrayList<>();
 
-
     public void setIssue(Issue issue) {
         if (this.issue != null) {
             this.issue.getComments().remove(this);
@@ -45,8 +44,8 @@ public class Comment extends BaseEntity {
         issue.getComments().add(this);
     }
 
-
     public void update(String content) {
         this.content = content;
     }
+
 }
