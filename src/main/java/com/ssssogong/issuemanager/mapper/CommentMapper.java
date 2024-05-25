@@ -55,7 +55,7 @@ public class CommentMapper {
     }
 
     public static Comment toCommentRequestDto(final Issue issue, final User writer, final CommentRequestDto commentRequestDto) {
-       // 코멘트 생성
+        // 코멘트 생성
         return Comment.builder()
                 .content(commentRequestDto.getContent())
                 .writer(writer)

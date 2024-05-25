@@ -4,24 +4,20 @@ import com.ssssogong.issuemanager.domain.Comment;
 import com.ssssogong.issuemanager.domain.CommentImage;
 import com.ssssogong.issuemanager.repository.CommentImageRepository;
 import com.ssssogong.issuemanager.repository.CommentRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/truncate.sql")
@@ -47,6 +43,7 @@ class CommentImageServiceTest {
     }
 
     @Test
+    @Transactional
     void 이미지_저장하기() throws IOException {
         //given
         MockMultipartFile image = new MockMultipartFile(
@@ -57,12 +54,13 @@ class CommentImageServiceTest {
         );
 
         //when, then
-        assertThatCode(() ->commentImageService.saveImages(getComment().getId(), List.of(image)))
+        assertThatCode(() -> commentImageService.saveImages(getComment().getId(), List.of(image)))
                 .doesNotThrowAnyException();
 
 
         // 더미 이미지 삭제
-        for(CommentImage commentImage: commentImageRepository.findAll()) {
+        for (CommentImage commentImage : commentImageRepository.findAll()) {
+            System.out.println(commentImage.getImageUrl());
             String imageUrl = commentImage.getImageUrl();
             cleanUp(imageUrl);
         }
@@ -70,6 +68,7 @@ class CommentImageServiceTest {
     }
 
     @Test
+    @Transactional
     void 이미지_삭제하기() throws IOException {
         //given
         MockMultipartFile image = new MockMultipartFile(
@@ -96,6 +95,7 @@ class CommentImageServiceTest {
 
     void cleanUp(String imageUrl) {
         // 저장된거 삭제
+        System.out.println(imageUrl);
         File deleteFile = new File(imageUrl);
         deleteFile.delete();
     }

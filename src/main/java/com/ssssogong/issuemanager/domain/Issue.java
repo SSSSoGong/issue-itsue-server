@@ -6,7 +6,6 @@ import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
 import lombok.*;
-
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class Issue extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
-  
+
     @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();

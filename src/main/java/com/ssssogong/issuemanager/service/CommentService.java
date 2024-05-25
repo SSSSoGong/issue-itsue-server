@@ -12,10 +12,11 @@ import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -37,8 +38,8 @@ public class CommentService {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IllegalArgumentException("Issue not found"));
 
-        //writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User writer = userRepository.findByAccountId("dev1")
+        writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User writer = userRepository.findByAccountId(writerAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Comment comment = CommentMapper.toCommentRequestDto(issue, writer, commentRequestDto);
@@ -61,16 +62,17 @@ public class CommentService {
     public CommentResponseDto getComment(Long id) {
 
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(()-> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         return CommentMapper.toCommentResponseDto(comment);
     }
 
     @Transactional
-    public CommentIdResponseDto updateComment(Long commentId, String content) throws IOException {
+    @PreAuthorize("@CommentPrivilegeEvaluator.isOwner(#commentId)")
+    public CommentIdResponseDto updateComment(@P("commentId") Long commentId, String content) throws IOException {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()-> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         comment.update(content); // comment 내용 update
 
@@ -81,10 +83,11 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
+    @PreAuthorize("@CommentPrivilegeEvaluator.isOwner(#commentId)")
+    public void deleteComment(@P("commentId") Long commentId) {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(()-> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         commentRepository.delete(comment);
     }

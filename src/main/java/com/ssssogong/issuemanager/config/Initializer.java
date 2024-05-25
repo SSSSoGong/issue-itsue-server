@@ -1,13 +1,11 @@
 package com.ssssogong.issuemanager.config;
 
+import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
-import com.ssssogong.issuemanager.repository.ProjectRepository;
-import com.ssssogong.issuemanager.repository.RoleRepository;
-import com.ssssogong.issuemanager.repository.UserProjectRepository;
-import com.ssssogong.issuemanager.repository.UserRepository;
+import com.ssssogong.issuemanager.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
@@ -31,7 +29,13 @@ public class Initializer implements ApplicationRunner {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
+    private final IssueRepository issueRepository;
     private String DUMMY_ACCOUNTS_PASSWORD = "1234";
+
+    public void setIssue() {
+        Issue issue = Issue.builder().build();
+        issueRepository.save(issue);
+    }
 
     public void saveInitialRoles() {
         final List<Role> roles = roleRepository.findAll();
