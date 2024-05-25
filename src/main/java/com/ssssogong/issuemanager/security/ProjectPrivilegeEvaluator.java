@@ -1,6 +1,9 @@
 package com.ssssogong.issuemanager.security;
 
+import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Privilege;
+import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 
 /**
@@ -32,6 +37,13 @@ public class ProjectPrivilegeEvaluator {
      *      (어노테이션 특성 상 매개변수가 아니면 가져올 수 없음)
      */
 
+    /**콘솔에 권한 출력 (디버깅용)*/
+    private void printPrivileges(Authentication authentication){
+        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
+        authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
+        System.out.println("]");
+    }
+
     /**
      * 유저가 해당 project에 permission이 있는지 확인<br>
      * ex) @PreAuthorize('@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE')
@@ -39,9 +51,7 @@ public class ProjectPrivilegeEvaluator {
     public boolean hasPrivilege(Long projectId, Privilege privilege) {
         // 권한 출력
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
-        authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
-        System.out.println("]");
+        printPrivileges(authentication);
 
         // 권한의 형태 : DEVELOPER_TO_PROJECT_ID 혹은 ISSUE_FIXABLE_TO_PROJECT_ID 등
         // permission이 포함되고 projectName으로 끝나는 권한이 있는지 찾는다
@@ -52,4 +62,15 @@ public class ProjectPrivilegeEvaluator {
         }
         return false;
     }
+
+    /**유저가 해당 프로젝트의 생성자인지 확인*/
+    public boolean isAdmin(Long projectId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        printPrivileges(authentication);
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(()-> new NotFoundException("project " + projectId + " not found"));
+        return Objects.equals(project.getAdmin().getAccountId(), authentication.getName());
+    }
+
 }
