@@ -12,6 +12,7 @@ import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +29,6 @@ public class CommentService {
     private final IssueRepository issueRepository;
     private final UserRepository userRepository;
 
-
     private String writerAccountId;
 
     @Transactional
@@ -38,7 +38,7 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("Issue not found"));
 
         //writerAccountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User writer = userRepository.findByAccountId("Jin")
+        User writer = userRepository.findByAccountId("dev1")
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Comment comment = CommentMapper.toCommentRequestDto(issue, writer, commentRequestDto);
