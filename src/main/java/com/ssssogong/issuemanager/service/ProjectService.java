@@ -7,6 +7,8 @@ import com.ssssogong.issuemanager.domain.UserProjectSorter;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Administrator;
 import com.ssssogong.issuemanager.dto.*;
+import com.ssssogong.issuemanager.exception.NotFoundException;
+import com.ssssogong.issuemanager.exception.RoleSettingException;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.mapper.UserProjectMapper;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
@@ -32,7 +34,7 @@ public class ProjectService {
     @Transactional
     public ProjectIdResponseDto create(final String adminAccountId, final ProjectCreationRequestDto projectCreationRequestDto) {
         final User admin = userRepository.findByAccountId(adminAccountId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundException("해당 계정을 찾을 수 없음"));
         final Project project = Project.builder()
                 .admin(admin)
                 .name(projectCreationRequestDto.getName())
@@ -42,7 +44,7 @@ public class ProjectService {
         final UserProject userProject = UserProject.builder()
                 .project(project)
                 .user(admin)
-                .role(roleRepository.findByName("Administrator").orElseThrow(() -> new IllegalArgumentException("어드민 role을 찾을 수 없음")))
+                .role(roleRepository.findByName("Administrator").orElseThrow(() -> new RoleSettingException("데이터베이스에서 어드민 role을 찾을 수 없음")))
                 .build();
         userProjectRepository.save(userProject);
         return ProjectMapper.toProjectIdResponse(project.getId());
@@ -56,7 +58,7 @@ public class ProjectService {
 
     private Project findProjectById(final Long id) {
         return projectRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundException("해당 프로젝트를 찾을 수 없음"));
     }
 
     @Transactional
@@ -95,7 +97,7 @@ public class ProjectService {
 
     private User findUserByAccountId(final String accountId) {
         return userRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundException("해당 유저를 찾을 수 없음"));
     }
 
     private void checkDuplicatedAddition(final Long projectId, final List<ProjectUserAdditionRequestDto> request) {
@@ -136,7 +138,7 @@ public class ProjectService {
 
     private UserProject findUserProjectByAccountIdAndProjectId(final String accountId, final long projectId) {
         return userProjectRepository.findByAccountIdAndProjectId(accountId, projectId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트를 찾을 수 없음"));
+                .orElseThrow(() -> new NotFoundException("해당 프로젝트를 찾을 수 없음"));
     }
 
     @Transactional

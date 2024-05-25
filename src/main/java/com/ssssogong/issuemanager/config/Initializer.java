@@ -4,11 +4,13 @@ import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
+import com.ssssogong.issuemanager.exception.RoleSettingException;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Initializer implements ApplicationRunner {
@@ -49,7 +52,8 @@ public class Initializer implements ApplicationRunner {
                     Role roleInstance = roleClass.getDeclaredConstructor().newInstance();
                     saves.add(roleInstance);
                 } catch (Exception e) {
-                    throw new IllegalArgumentException("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                    log.error("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                    throw new RoleSettingException("DB에 Role 생성 실패: " + roleClass.getName());
                 }
             }
         }
