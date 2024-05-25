@@ -5,7 +5,6 @@ import com.ssssogong.issuemanager.domain.Roles;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.UserProjectSorter;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.domain.role.Administrator;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.exception.RoleSettingException;
@@ -16,6 +15,8 @@ import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,21 +63,24 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectIdResponseDto updateById(final Long id, final ProjectUpdateRequestDto projectUpdateRequestDto) {
-        final Project project = findProjectById(id);
+    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.PROJECT_UPDATABLE)")
+    public ProjectIdResponseDto updateById(@Param("projectId")final long projectId, final ProjectUpdateRequestDto projectUpdateRequestDto) {
+        final Project project = findProjectById(projectId);
         project.update(projectUpdateRequestDto.getName(), projectUpdateRequestDto.getSubject());
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
     @Transactional
-    public ProjectIdResponseDto deleteById(final Long id) {
-        userProjectRepository.deleteAllByProjectId(id);
-        projectRepository.deleteById(id);
-        return ProjectMapper.toProjectIdResponse(id);
+    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.PROJECT_DELETABLE)")
+    public ProjectIdResponseDto deleteById(@Param("projectId")final long projectId) {
+        userProjectRepository.deleteAllByProjectId(projectId);
+        projectRepository.deleteById(projectId);
+        return ProjectMapper.toProjectIdResponse(projectId);
     }
 
     @Transactional
-    public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequestDto> request) {
+    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.PROJECT_UPDATABLE)")
+    public void addUsersToProject(@Param("projectId")final Long projectId, final List<ProjectUserAdditionRequestDto> request) {
         checkDuplicatedAddition(projectId, request);
 
         final Project project = findProjectById(projectId);
@@ -118,7 +122,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public void deleteUsersFromProject(final Long projectId, final List<String> accountIds) {
+    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.PROJECT_UPDATABLE)")
+    public void deleteUsersFromProject(@Param("projectId")final Long projectId, final List<String> accountIds) {
         userProjectRepository.deleteAllByProjectIdAndAccountIdIn(projectId, accountIds);
     }
 

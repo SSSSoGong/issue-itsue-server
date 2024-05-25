@@ -129,6 +129,12 @@ public class Initializer implements ApplicationRunner {
 //                        .user(admin)
 //                        .role(administrator)
 //                        .build());
+        //todo: userProjectRepository에 admin것도 추가했음
+        userProjects.add(UserProject.builder()
+                .project(project)
+                .user(admin)
+                .role(administrator)
+                .build());
         for (int i = 0; i < PL_COUNT; i++) {
             userProjects.add(UserProject.builder()
                     .project(project)
