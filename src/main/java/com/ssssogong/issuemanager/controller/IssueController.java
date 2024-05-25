@@ -1,12 +1,11 @@
 package com.ssssogong.issuemanager.controller;
 
 import com.ssssogong.issuemanager.dto.*;
-import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.service.IssueImageService;
 import com.ssssogong.issuemanager.service.IssueService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,62 +21,42 @@ public class IssueController {
     // 이슈 생성
     @PostMapping("/projects/{projectId}/issues")
     public ResponseEntity<IssueIdResponseDto> create(@PathVariable("projectId") Long projectId, @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto,
-                                                     @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) {
-        try {
-            IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueSaveRequestDto);
-            issueImageService.save(issueIdResponseDto.getIssueId(), issueImageRequestDto.getImageFiles());
-            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
-        } catch (NotFoundException | IOException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+                                                     @RequestPart(value = "requestDto") IssueSaveRequestDto issueSaveRequestDto) throws IOException {
+        IssueIdResponseDto issueIdResponseDto = issueService.save(projectId, issueSaveRequestDto);
+        issueImageService.save(issueIdResponseDto.getIssueId(), issueImageRequestDto.getImageFiles());
+        return ResponseEntity.ok(issueIdResponseDto);
     }
 
     // 이슈 확인
     @GetMapping("/projects/{projectId}/issues/{issueId}")
     public ResponseEntity<IssueShowResponseDto> show(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId) {
-        try {
-            IssueShowResponseDto issueShowResponseDTO = issueService.show(projectId, issueId);
-            return new ResponseEntity<>(issueShowResponseDTO, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
+        IssueShowResponseDto issueShowResponseDTO = issueService.show(projectId, issueId);
+        return ResponseEntity.ok(issueShowResponseDTO);
     }
 
     // 이슈 수정
     @PutMapping("/projects/{projectId}/issues/{issueId}")
     public ResponseEntity<IssueIdResponseDto> update(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
-                                                     @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) {
-        try {
-            issueImageService.delete(issueId);
-            IssueIdResponseDto issueIdResponseDto = issueService.update(issueId, issueUpdateRequestDto);
-            issueImageService.save(issueId, issueImageRequestDto.getImageFiles());
-            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
-        } catch (NotFoundException | IOException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
+                                                     @ModelAttribute("imageFiles") IssueImageRequestDto issueImageRequestDto, @RequestPart(value = "requestDto") IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+        issueImageService.delete(issueId);
+        IssueIdResponseDto issueIdResponseDto = issueService.update(projectId, issueId, issueUpdateRequestDto);
+        issueImageService.save(issueId, issueImageRequestDto.getImageFiles());
+        return ResponseEntity.ok(issueIdResponseDto);
     }
 
     // 이슈 삭제
     @DeleteMapping("/projects/{projectId}/issues/{issueId}")
     public ResponseEntity<Void> delete(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId) {
-        try {
-            issueService.delete(issueId);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
+        issueService.delete(projectId, issueId);
+        return ResponseEntity.ok().build();
     }
 
     // 이슈 상태 변경
     @PostMapping("/projects/{projectId}/issues/{issueId}/state")
     public ResponseEntity<IssueIdResponseDto> stateUpdate(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
                                                           @RequestPart(value = "requestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
-        try {
-            IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(issueId, issueStateUpdateRequestDto);
-            return new ResponseEntity<>(issueIdResponseDto, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
+        IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(issueId, issueStateUpdateRequestDto);
+        return ResponseEntity.ok(issueIdResponseDto);
     }
 
 
@@ -89,13 +68,12 @@ public class IssueController {
             @RequestParam(value = "priority", required = false) String priority,
             @RequestParam(value = "state", required = false) String state,
             @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "reporter", required = false) String reporter,
+            @RequestParam(value = "fixer", required = false) String fixer,
+            @RequestParam(value = "assignee", required = false) String assignee,
             @RequestParam(value = "issueCount", required = false) Integer issueCount) {
 
-        try {
-            List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, priority, state, category, issueCount);
-            return new ResponseEntity<>(issues, HttpStatus.OK);
-        } catch (NotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
-        }
+        List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, priority, state, category, reporter, fixer, assignee, issueCount);
+        return ResponseEntity.ok(issues);
     }
 }
