@@ -36,8 +36,9 @@ public class IssueService {
     @Transactional
     public IssueIdResponseDto save(Long projectId, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
 
+        // TODO : security에서 reporter 가져오기
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User reporter = userRepository.findByAccountId("dev1").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
+        User reporter = userRepository.findByAccountId("tester1").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
 
         Issue issue = IssueMapper.toIssueFromSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
@@ -75,16 +76,17 @@ public class IssueService {
     //  이슈 상태 변경
 //    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE, @Privilege.ISSUE_ASSIGNABLE, @Privilege.ISSUE_FIXABLE, @Privilege.ISSUE_RESOLVABLE, @Privilege.ISSUE_CLOSABLE, @Privilege.ISSUE_REOPENABLE)")
     @Transactional
-    public IssueIdResponseDto stateUpdate(Long issueId, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+    public IssueIdResponseDto stateUpdate(Long projectId, Long issueId, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         State from = issue.getState();
         issue.update(issueStateUpdateRequestDto.getState());
         State to = issue.getState();
-        if (!issueStateUpdateRequestDto.getAssignee().isBlank()) {  // assignee가 없으면 저장 X
+        if (issueStateUpdateRequestDto.getAssignee() != null && !issueStateUpdateRequestDto.getAssignee().isBlank()) {  // assignee가 없으면 저장 X
             User assignee = userRepository.findByAccountId(issueStateUpdateRequestDto.getAssignee()).orElseThrow(() -> new NotFoundException("해당 user가 없습니다"));
             issue.setAssignee(assignee);
         }
-        issueModificationService.save(issue, from, to); // issueModification 저장
+        // TODO : modifier를 security에서 추출해서 넣어줘야 함
+        issueModificationService.save(issue, from, to, null); // issueModification 저장
         return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
 

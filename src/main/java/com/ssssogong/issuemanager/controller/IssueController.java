@@ -55,7 +55,7 @@ public class IssueController {
     @PostMapping("/projects/{projectId}/issues/{issueId}/state")
     public ResponseEntity<IssueIdResponseDto> stateUpdate(@PathVariable("projectId") Long projectId, @PathVariable("issueId") Long issueId,
                                                           @RequestPart(value = "requestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
-        IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(issueId, issueStateUpdateRequestDto);
+        IssueIdResponseDto issueIdResponseDto = issueService.stateUpdate(projectId, issueId, issueStateUpdateRequestDto);
         return ResponseEntity.ok(issueIdResponseDto);
     }
 

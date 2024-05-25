@@ -59,6 +59,9 @@ public class IssueMapper {
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
                 .category(issue.getCategory() != null ? issue.getCategory().toString() : null)
+                .reporter(issue.getReporter() != null ? issue.getReporter().getAccountId() : null)
+                .fixer(issue.getFixer() != null ? issue.getFixer().getAccountId() : null)
+                .assignee(issue.getAssignee() != null ? issue.getAssignee().getAccountId() : null)
                 .createdAt(issue.getCreatedAt() != null ? issue.getCreatedAt().toString() : null)
                 .updatedAt(issue.getUpdatedAt() != null ? issue.getUpdatedAt().toString() : null)
                 .build();
