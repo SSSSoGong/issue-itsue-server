@@ -42,7 +42,7 @@ public class ProjectService {
         final UserProject userProject = UserProject.builder()
                 .project(project)
                 .user(admin)
-                .role(new Administrator())
+                .role(roleRepository.findByName("Administrator").orElseThrow(() -> new IllegalArgumentException("어드민 role을 찾을 수 없음")))
                 .build();
         userProjectRepository.save(userProject);
         return ProjectMapper.toProjectIdResponse(project.getId());
@@ -68,6 +68,7 @@ public class ProjectService {
 
     @Transactional
     public ProjectIdResponseDto deleteById(final Long id) {
+        userProjectRepository.deleteAllByProjectId(id);
         projectRepository.deleteById(id);
         return ProjectMapper.toProjectIdResponse(id);
     }
@@ -108,7 +109,9 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectUserResponseDto> findUsers(final Long id) {
-        List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id);
+        List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id)
+                .stream()
+                .filter(each -> !each.getRole().isRole("Administrator")).toList();
         return UserProjectMapper.toProjectUserResponse(userProjects);
     }
 
