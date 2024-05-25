@@ -3,9 +3,11 @@ package com.ssssogong.issuemanager.controller;
 import com.ssssogong.issuemanager.dto.ExceptionResponse;
 import com.ssssogong.issuemanager.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -21,6 +23,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(final IllegalArgumentException e) {
         final ExceptionResponse response = ExceptionResponse.builder().errorMessage(e.getMessage()).build();
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNoResourceFoundException(final NoResourceFoundException e) {
+        final ExceptionResponse response = ExceptionResponse.builder().errorMessage("리소스를 찾을 수 없음").build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(Exception.class)

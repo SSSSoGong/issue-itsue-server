@@ -5,6 +5,7 @@ import com.ssssogong.issuemanager.domain.Roles;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.UserProjectSorter;
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.domain.role.Administrator;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.mapper.ProjectMapper;
 import com.ssssogong.issuemanager.mapper.UserProjectMapper;
@@ -32,13 +33,18 @@ public class ProjectService {
     public ProjectIdResponseDto create(final String adminAccountId, final ProjectCreationRequestDto projectCreationRequestDto) {
         final User admin = userRepository.findByAccountId(adminAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
-        //todo: userRepository에 admin 저장
         final Project project = Project.builder()
                 .admin(admin)
                 .name(projectCreationRequestDto.getName())
                 .subject(projectCreationRequestDto.getSubject())
                 .build();
         projectRepository.save(project);
+        final UserProject userProject = UserProject.builder()
+                .project(project)
+                .user(admin)
+                .role(new Administrator())
+                .build();
+        userProjectRepository.save(userProject);
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
