@@ -3,12 +3,19 @@ package com.ssssogong.issuemanager.service;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContext;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
@@ -29,13 +36,15 @@ class ProjectServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User getAdmin() {
-        final User admin = User.builder()
-                .accountId("admin")
+    private User admin;
+
+    @BeforeEach
+    void setUp() {
+        this.admin = User.builder()
+                .accountId("adminAccount")
                 .username("어드민")
                 .password("password").build();
         userRepository.save(admin);
-        return admin;
     }
 
     @Test
@@ -47,7 +56,7 @@ class ProjectServiceTest {
                 .build();
 
         //when, then
-        assertThatCode(() -> projectService.create(getAdmin().getAccountId(), projectCreationRequestDto))
+        assertThatCode(() -> projectService.create(admin.getAccountId(), projectCreationRequestDto))
                 .doesNotThrowAnyException();
     }
 
@@ -58,7 +67,6 @@ class ProjectServiceTest {
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequestDto).getProjectId();
 
         // when
@@ -76,13 +84,13 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트_정보를_수정한다() {
         // given
         final ProjectCreationRequestDto projectCreationRequestDto = ProjectCreationRequestDto.builder()
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequestDto).getProjectId();
         final ProjectUpdateRequestDto projectUpdateRequestDto = ProjectUpdateRequestDto.builder()
                 .name("야심찬 프로젝트(수정)")
@@ -105,13 +113,13 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_DELETABLE_TO_PROJECT_1"})
     void 프로젝트를_삭제한다() {
         // given
         final ProjectCreationRequestDto projectCreationRequestDto = ProjectCreationRequestDto.builder()
                 .name("야심찬 프로젝트")
                 .subject("어쩌구 저쩌구 프로젝트입니다.")
                 .build();
-        final User admin = getAdmin();
         final Long projectId = projectService.create(admin.getAccountId(), projectCreationRequestDto).getProjectId();
 
         // when, then
@@ -120,10 +128,10 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트에_유저를_추가한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -139,12 +147,12 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트에_속한_유저_목록을_검색한다() {
         // given
         final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
         final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
         final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -169,12 +177,12 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트에_속한_유저를_삭제한다() {
         // given
         final User user1 = userRepository.save(User.builder().accountId("newUser1").build());
         final User user2 = userRepository.save(User.builder().accountId("newUser2").build());
         final User user3 = userRepository.save(User.builder().accountId("newUser3").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -204,10 +212,10 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1", "PROJECT_UPDATABLE_TO_PROJECT_2", "PROJECT_UPDATABLE_TO_PROJECT_3"})
     void 유저가_속한_프로젝트들을_조회한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final User admin = getAdmin();
         final Long projectId1 = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -230,6 +238,9 @@ class ProjectServiceTest {
                         .build()
         ).getProjectId();
 
+        System.out.println("projectId3 = " + projectId3);
+        System.out.println("projectId1 = " + projectId1);
+        System.out.println("projectId2 = " + projectId2);
         projectService.addUsersToProject(
                 projectId1,
                 List.of(ProjectUserAdditionRequestDto.builder().accountId(user.getAccountId()).role("Tester").build())
@@ -252,10 +263,10 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 하나의_프로젝트와_하나의_회원간의_정보를_검색한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -278,10 +289,10 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트_접근시간을_갱신한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
@@ -310,10 +321,10 @@ class ProjectServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "adminAccount", authorities = {"PROJECT_UPDATABLE_TO_PROJECT_1"})
     void 프로젝트_즐겨찾기를_갱신한다() {
         // given
         final User user = userRepository.save(User.builder().accountId("newUser").build());
-        final User admin = getAdmin();
         final Long projectId = projectService.create(
                 admin.getAccountId(),
                 ProjectCreationRequestDto.builder()
