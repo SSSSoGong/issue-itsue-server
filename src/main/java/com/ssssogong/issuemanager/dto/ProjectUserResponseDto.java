@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProjectUserResponse {
+public class ProjectUserResponseDto {
 
     private String accountId;
     private String username;

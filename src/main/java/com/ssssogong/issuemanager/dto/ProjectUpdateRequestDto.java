@@ -5,12 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProjectDetailsResponse {
+public class ProjectUpdateRequestDto {
 
-    private Long projectId;
     private String name;
     private String subject;
-    private String createdAt;
-    private String adminId;
-    private String adminName;
 }

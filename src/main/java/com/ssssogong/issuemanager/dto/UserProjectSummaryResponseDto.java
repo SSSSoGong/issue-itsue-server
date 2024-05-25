@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class UserProjectAssociationResponse {
+public class UserProjectSummaryResponseDto {
 
-    private String role;
+    private Long projectId;
+    private String name;
     private String createdAt;
-    private String accessTime;
+    private boolean isFavorite;
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ProjectUserAdditionRequest {
+public class ProjectUserAdditionRequestDto {
 
     private String accountId;
     private String role;

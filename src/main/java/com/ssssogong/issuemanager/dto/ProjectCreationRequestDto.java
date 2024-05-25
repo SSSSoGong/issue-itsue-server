@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class ProjectUpdateRequest {
+public class ProjectCreationRequestDto {
 
     private String name;
     private String subject;

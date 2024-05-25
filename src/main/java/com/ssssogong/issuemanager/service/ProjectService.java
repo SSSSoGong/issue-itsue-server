@@ -29,21 +29,21 @@ public class ProjectService {
     private final RoleRepository roleRepository;
 
     @Transactional
-    public ProjectIdResponse create(final String adminAccountId, final ProjectCreationRequest projectCreationRequest) {
+    public ProjectIdResponseDto create(final String adminAccountId, final ProjectCreationRequestDto projectCreationRequestDto) {
         final User admin = userRepository.findByAccountId(adminAccountId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 어드민 계정을 찾을 수 없음"));
         //todo: userRepository에 admin 저장
         final Project project = Project.builder()
                 .admin(admin)
-                .name(projectCreationRequest.getName())
-                .subject(projectCreationRequest.getSubject())
+                .name(projectCreationRequestDto.getName())
+                .subject(projectCreationRequestDto.getSubject())
                 .build();
         projectRepository.save(project);
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
     @Transactional(readOnly = true)
-    public ProjectDetailsResponse findById(final Long id) {
+    public ProjectDetailsResponseDto findById(final Long id) {
         final Project project = findProjectById(id);
         return ProjectMapper.toProjectDetailsResponse(project);
     }
@@ -54,27 +54,27 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectIdResponse updateById(final Long id, final ProjectUpdateRequest projectUpdateRequest) {
+    public ProjectIdResponseDto updateById(final Long id, final ProjectUpdateRequestDto projectUpdateRequestDto) {
         final Project project = findProjectById(id);
-        project.update(projectUpdateRequest.getName(), projectUpdateRequest.getSubject());
+        project.update(projectUpdateRequestDto.getName(), projectUpdateRequestDto.getSubject());
         return ProjectMapper.toProjectIdResponse(project.getId());
     }
 
     @Transactional
-    public ProjectIdResponse deleteById(final Long id) {
+    public ProjectIdResponseDto deleteById(final Long id) {
         projectRepository.deleteById(id);
         return ProjectMapper.toProjectIdResponse(id);
     }
 
     @Transactional
-    public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequest> request) {
+    public void addUsersToProject(final Long projectId, final List<ProjectUserAdditionRequestDto> request) {
         checkDuplicatedAddition(projectId, request);
 
         final Project project = findProjectById(projectId);
         final Roles roles = Roles.builder().roles(roleRepository.findAll()).build();
 
         List<UserProject> userProjects = new ArrayList<>();
-        for (ProjectUserAdditionRequest userData : request) {
+        for (ProjectUserAdditionRequestDto userData : request) {
             userProjects.add(
                     UserProject.builder()
                             .user(findUserByAccountId(userData.getAccountId()))
@@ -91,9 +91,9 @@ public class ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없음"));
     }
 
-    private void checkDuplicatedAddition(final Long projectId, final List<ProjectUserAdditionRequest> request) {
+    private void checkDuplicatedAddition(final Long projectId, final List<ProjectUserAdditionRequestDto> request) {
         final List<String> accountIds = request.stream()
-                .map(ProjectUserAdditionRequest::getAccountId)
+                .map(ProjectUserAdditionRequestDto::getAccountId)
                 .toList();
         if (userProjectRepository.existsByProjectIdAndAccountIdIn(projectId, accountIds)) {
             throw new IllegalArgumentException("이미 프로젝트에 참여중인 유저가 포함되어 있음");
@@ -101,7 +101,7 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectUserResponse> findUsers(final Long id) {
+    public List<ProjectUserResponseDto> findUsers(final Long id) {
         List<UserProject> userProjects = userProjectRepository.findAllByProjectId(id);
         return UserProjectMapper.toProjectUserResponse(userProjects);
     }
@@ -112,15 +112,15 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserProjectSummaryResponse> findProjectsByAccountId(final String accountId) {
+    public List<UserProjectSummaryResponseDto> findProjectsByAccountId(final String accountId) {
         final List<UserProject> userProjects = userProjectRepository.findAllByAccountId(accountId);
         final List<UserProject> sortedUserProjects = UserProjectSorter.sortByAccessTimeAndIsFavorite(userProjects);
         return UserProjectMapper.toUserProjectSummaryResponse(sortedUserProjects);
     }
 
     @Transactional(readOnly = true)
-    public UserProjectAssociationResponse findAssociationBetweenProjectAndUser(final String accountId,
-                                                                               final long projectId) {
+    public UserProjectAssociationResponseDto findAssociationBetweenProjectAndUser(final String accountId,
+                                                                                  final long projectId) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
         return UserProjectMapper.toUserProjectAssociationResponse(userProject);
     }
@@ -140,8 +140,8 @@ public class ProjectService {
     public void renewFavorite(
             final String accountId,
             final Long projectId,
-            final UserProjectFavoriteRequest userProjectFavoriteRequest) {
+            final UserProjectFavoriteRequestDto userProjectFavoriteRequestDto) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
-        userProject.updateIsFavorite(userProjectFavoriteRequest.isFavorite());
+        userProject.updateIsFavorite(userProjectFavoriteRequestDto.isFavorite());
     }
 }

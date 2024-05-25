@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class UserProjectFavoriteRequest {
+public class UserProjectFavoriteRequestDto {
 
     private boolean isFavorite;
 }

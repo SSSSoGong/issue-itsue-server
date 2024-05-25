@@ -1,13 +1,13 @@
 package com.ssssogong.issuemanager.mapper;
 
 import com.ssssogong.issuemanager.domain.Project;
-import com.ssssogong.issuemanager.dto.ProjectDetailsResponse;
-import com.ssssogong.issuemanager.dto.ProjectIdResponse;
+import com.ssssogong.issuemanager.dto.ProjectDetailsResponseDto;
+import com.ssssogong.issuemanager.dto.ProjectIdResponseDto;
 
 public class ProjectMapper {
 
-    public static ProjectDetailsResponse toProjectDetailsResponse(final Project project) {
-        return ProjectDetailsResponse.builder()
+    public static ProjectDetailsResponseDto toProjectDetailsResponse(final Project project) {
+        return ProjectDetailsResponseDto.builder()
                 .projectId(project.getId())
                 .name(project.getName())
                 .subject(project.getSubject())
@@ -17,8 +17,8 @@ public class ProjectMapper {
                 .build();
     }
 
-    public static ProjectIdResponse toProjectIdResponse(final long projectId) {
-        return ProjectIdResponse.builder()
+    public static ProjectIdResponseDto toProjectIdResponse(final long projectId) {
+        return ProjectIdResponseDto.builder()
                 .projectId(projectId)
                 .build();
     }
