@@ -11,5 +11,4 @@ public class ProjectLeader extends Role {
                 Privilege.ISSUE_CLOSABLE
         );
     }
-
 }

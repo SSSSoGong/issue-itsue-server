@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Component("ProjectPrivilegeEvaluator")
+@Component("CommentPrivilegeEvaluator")
 @RequiredArgsConstructor
 public class CommentPrivilegeEvaluator {
     private final CommentRepository commentRepository;

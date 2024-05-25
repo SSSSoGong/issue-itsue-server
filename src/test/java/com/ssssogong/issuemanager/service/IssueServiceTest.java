@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class IssueServiceTest {
     void setUp() {
         final User user = User.builder()
                 .id(1L)
-                .accountId("tester1")
+                .accountId("tester")
                 .username("Hyun")
                 .build();
         final Project project = Project.builder()
@@ -63,6 +64,7 @@ public class IssueServiceTest {
                 .priority(Priority.MAJOR)
                 .state(State.ASSIGNED)
                 .category(Category.REFACTORING)
+                .project(project)
                 .build();
         userRepository.save(user);
         projectRepository.save(project);
@@ -70,6 +72,7 @@ public class IssueServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "tester", roles = {"ISSUE_REPORTABLE_1"})
     void tester_이슈_생성() throws IOException {
         // given
         final IssueSaveRequestDto issueSaveRequestDto = IssueSaveRequestDto.builder()
@@ -115,6 +118,7 @@ public class IssueServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "tester", roles = {"ISSUE_UPDATABLE_1"})
     void tester_admin_이슈_수정() throws IOException {
         // given
         final IssueUpdateRequestDto issueUpdateRequestDto = IssueUpdateRequestDto.builder()
@@ -139,6 +143,7 @@ public class IssueServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "tester", roles = {"ISSUE_DELETABLE_1"})
     void 이슈_삭제() {
         // given
         final Long projectId = 1L;
@@ -154,6 +159,7 @@ public class IssueServiceTest {
 
     @Transactional
     @Test
+    @WithMockUser(username = "tester", roles = {"ISSUE_ASSIGNABLE_1"})
     void 이슈_상태_변경() {
         // given
         final Long projectId = 1L;
@@ -259,12 +265,12 @@ public class IssueServiceTest {
         List<IssueProjectResponseDto> assignedToUser4 = issueService.findIssuesInProject(projectId, null, null, null, null, null, null, "dev2", null);
 
         // then
-        assertThat(issues).hasSize(3);
+        assertThat(issues).hasSize(4);
 
-        assertThat(majorIssues).hasSize(1);
+        assertThat(majorIssues).hasSize(2);
         assertThat(majorIssues.get(0).getTitle()).isEqualTo("이슈1");
 
-        assertThat(refactoringIssues).hasSize(1);
+        assertThat(refactoringIssues).hasSize(2);
         assertThat(refactoringIssues.get(0).getTitle()).isEqualTo("이슈1");
 
         assertThat(newIssues).hasSize(1);
