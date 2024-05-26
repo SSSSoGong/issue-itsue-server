@@ -1,6 +1,5 @@
 package com.ssssogong.issuemanager.config;
 
-import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
@@ -29,7 +28,6 @@ public class Initializer implements ApplicationRunner {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
-    private final IssueRepository issueRepository;
     private String DUMMY_ACCOUNTS_PASSWORD = "1234";
 
 
