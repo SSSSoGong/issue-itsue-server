@@ -64,6 +64,7 @@ public class IssueServiceTest {
                 .priority(Priority.MAJOR)
                 .state(State.ASSIGNED)
                 .category(Category.REFACTORING)
+                .reporter(user)
                 .project(project)
                 .build();
         userRepository.save(user);
@@ -116,7 +117,7 @@ public class IssueServiceTest {
                 () -> assertThat(issueShowResponseDto.getCategory()).isEqualTo("REFACTORING")
         );
     }
-
+    @Transactional
     @Test
     @WithMockUser(username = "tester", roles = {"ISSUE_UPDATABLE_1"})
     void tester_admin_이슈_수정() throws IOException {

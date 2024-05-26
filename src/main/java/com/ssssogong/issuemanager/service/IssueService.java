@@ -11,7 +11,6 @@ import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class IssueService {
     }
 
     //  이슈 수정
-    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE)")
+    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE) and @ProjectPrivilegeEvaluator.isReporter(#issueId)")
     @Transactional
     public IssueIdResponseDto update(Long projectId, Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
@@ -89,6 +88,9 @@ public class IssueService {
             User assignee = userRepository.findByAccountId(issueStateUpdateRequestDto.getAssignee()).orElseThrow(() -> new NotFoundException("해당 user가 없습니다"));
             issue.setAssignee(assignee);
         }
+        if (to.equals(State.FIXED))
+            issue.setFixer(modifier);
+
         issueModificationService.save(issue, from, to, modifier); // issueModification 저장
         return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
