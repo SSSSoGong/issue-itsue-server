@@ -32,10 +32,6 @@ public class Initializer implements ApplicationRunner {
     private final IssueRepository issueRepository;
     private String DUMMY_ACCOUNTS_PASSWORD = "1234";
 
-    public void setIssue() {
-        Issue issue = Issue.builder().build();
-        issueRepository.save(issue);
-    }
 
     public void saveInitialRoles() {
         final List<Role> roles = roleRepository.findAll();
