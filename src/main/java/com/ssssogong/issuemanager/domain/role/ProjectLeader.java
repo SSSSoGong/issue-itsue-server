@@ -8,7 +8,8 @@ public class ProjectLeader extends Role {
     {
         this.allowedPrivileges = List.of(
                 Privilege.ISSUE_ASSIGNABLE,
-                Privilege.ISSUE_CLOSABLE
+                Privilege.ISSUE_CLOSABLE,
+                Privilege.ISSUE_DELETABLE
         );
     }
 }
