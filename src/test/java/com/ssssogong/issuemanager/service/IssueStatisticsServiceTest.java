@@ -3,6 +3,8 @@ package com.ssssogong.issuemanager.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssssogong.issuemanager.domain.Issue;
+import com.ssssogong.issuemanager.domain.enumeration.Category;
+import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDateTime;
@@ -76,6 +78,27 @@ class IssueStatisticsServiceTest {
             } else {
                 assertThat(dto.getIssueCount()).isZero(); //그 외엔 이슈가 발생하지 않음
             }
+        }
+    }
+
+    @Test
+    void 카테고리별_이슈_통계를_조회한다() {
+        // given
+        List<Issue> setUp = new ArrayList<>();
+
+        final Category[] categories = Category.values();
+        for (int i = 0; i < categories.length; i++) {
+            setUp.add(Issue.builder().category(categories[i]).build());
+        }
+        issueRepository.saveAll(setUp);
+
+        // when
+        final List<CategoryStatisticsResponseDto> categoryStatistics = issueStatisticsService.getCategoryStatistics();
+
+        // then
+        assertThat(categoryStatistics).hasSize(categories.length); //카테고리 개수만큼
+        for (CategoryStatisticsResponseDto dto : categoryStatistics) {
+            assertThat(dto.getIssueCount()).isOne();
         }
     }
 }

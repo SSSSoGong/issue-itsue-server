@@ -1,6 +1,8 @@
 package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Issue;
+import com.ssssogong.issuemanager.domain.enumeration.Category;
+import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDate;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class IssueStatisticsService {
 
     private static final Integer DEFAULT_DAILY_PERIOD = 7;
@@ -27,7 +30,6 @@ public class IssueStatisticsService {
 
     private final IssueRepository issueRepository;
 
-    @Transactional(readOnly = true)
     public List<DateStatisticsResponseDto> getDailyStatistics(Integer period) {
         if (Objects.isNull(period)) {
             period = DEFAULT_DAILY_PERIOD;
@@ -65,6 +67,21 @@ public class IssueStatisticsService {
         return recentMonths.stream()
                 .map(month -> new DateStatisticsResponseDto(month.format(formatter),
                         issuesByMonth.getOrDefault(month, 0L).intValue()))
+                .toList();
+    }
+
+    public List<CategoryStatisticsResponseDto> getCategoryStatistics() {
+        final List<Issue> issues = issueRepository.findAll();
+        Map<Category, Long> issuesByCategory = issues.stream()
+                .collect(Collectors.groupingBy(Issue::getCategory, Collectors.counting()));
+
+        //이슈가 0개인 카테고리 추가
+        for (Category category : Category.values()) {
+            issuesByCategory.putIfAbsent(category, 0L);
+        }
+
+        return issuesByCategory.entrySet().stream()
+                .map(entry -> new CategoryStatisticsResponseDto(entry.getKey().name(), entry.getValue().intValue()))
                 .toList();
     }
 }

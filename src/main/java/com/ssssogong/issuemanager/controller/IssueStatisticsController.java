@@ -1,5 +1,6 @@
 package com.ssssogong.issuemanager.controller;
 
+import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.service.IssueStatisticsService;
 import java.util.List;
@@ -30,6 +31,12 @@ public class IssueStatisticsController {
             @RequestParam(name = "period", required = false) final Integer period
     ) {
         final List<DateStatisticsResponseDto> response = issueStatisticsService.getMonthlyStatistics(period);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/category")
+    public ResponseEntity<List<CategoryStatisticsResponseDto>> getCategoryStatistics() {
+        List<CategoryStatisticsResponseDto> response = issueStatisticsService.getCategoryStatistics();
         return ResponseEntity.ok(response);
     }
 }
