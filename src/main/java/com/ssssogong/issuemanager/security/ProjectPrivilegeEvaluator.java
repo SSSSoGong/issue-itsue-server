@@ -42,7 +42,7 @@ public class ProjectPrivilegeEvaluator {
 
     /**콘솔에 권한 출력 (디버깅용)*/
     private void printPrivileges(Authentication authentication){
-        System.out.print("ProjectPermissionEvaluator: " + authentication.getName() + " with role [ ");
+        System.out.print("ProjectPermissionEvaluator: account id '" + authentication.getName() + "' with role [ ");
         authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
         System.out.println("]");
     }
@@ -86,22 +86,40 @@ public class ProjectPrivilegeEvaluator {
                 .getProject().getId();
         // 변경할 state에 따라 권한 판단
         String changeTo = updateRequest.getState();
-        switch(changeTo){
-            case "NEW":
-                return hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
-            case "ASSIGNED":
-                return hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
-            case "FIXED":
-                return hasPrivilege(projectId, Privilege.ISSUE_FIXABLE);
-            case "RESOLVED":
-                return hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE);
-            case "REOPENED":
-                return hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE);
-            case "CLOSED":
-                return hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
-            default:
-                throw new IllegalArgumentException("input state " + changeTo + " is not valid");
-        }
+        return switch (changeTo) {
+            case "NEW" -> hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
+            case "ASSIGNED" -> hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
+            case "FIXED" -> hasPrivilege(projectId, Privilege.ISSUE_FIXABLE);
+            case "RESOLVED" -> hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE);
+            case "REOPENED" -> hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE);
+            case "CLOSED" -> hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
+            default -> throw new IllegalArgumentException("input state " + changeTo + " is not valid");
+        };
+    }
+    
+    /**유저와 이슈 작성자가 일치하는지 확인*/
+    public boolean isReporter(Long issueId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        printPrivileges(authentication);
+        // issueId의 reporter와 유저 비교
+        User owner = issueRepository.findById(issueId)
+                .orElseThrow(()-> new NotFoundException("issue " + issueId + " not found"))
+                .getReporter();
+        Objects.requireNonNull(owner, "issue " + issueId + " does not have reporter");
+        String ownerId = owner.getAccountId();
+        return ownerId.equals(authentication.getName());
+    }
 
+    /**유저와 이슈 assignee가 일치하는지 확인*/
+    public boolean isAssignee(Long issueId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        printPrivileges(authentication);
+        // issueId의 reporter와 유저 비교
+        User assignee = issueRepository.findById(issueId)
+                .orElseThrow(()-> new NotFoundException("issue " + issueId + " not found"))
+                .getReporter();
+        Objects.requireNonNull(assignee, "issue " + issueId + " does not have assignee");
+        String assigneeId = assignee.getAccountId();
+        return assigneeId.equals(authentication.getName());
     }
 }
