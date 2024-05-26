@@ -2,8 +2,10 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.enumeration.Category;
+import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.PriorityStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -82,6 +84,21 @@ public class IssueStatisticsService {
 
         return issuesByCategory.entrySet().stream()
                 .map(entry -> new CategoryStatisticsResponseDto(entry.getKey().name(), entry.getValue().intValue()))
+                .toList();
+    }
+
+    public List<PriorityStatisticsResponseDto> getPriorityStatistics() {
+        final List<Issue> issues = issueRepository.findAll();
+        Map<Priority, Long> issuesByPriority = issues.stream()
+                .collect(Collectors.groupingBy(Issue::getPriority, Collectors.counting()));
+
+        //이슈가 0개인 우선순위 추가
+        for (Priority priority : Priority.values()) {
+            issuesByPriority.putIfAbsent(priority, 0L);
+        }
+
+        return issuesByPriority.entrySet().stream()
+                .map(entry -> new PriorityStatisticsResponseDto(entry.getKey().name(), entry.getValue().intValue()))
                 .toList();
     }
 }

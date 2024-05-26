@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.enumeration.Category;
+import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.PriorityStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -98,6 +100,27 @@ class IssueStatisticsServiceTest {
         // then
         assertThat(categoryStatistics).hasSize(categories.length); //카테고리 개수만큼
         for (CategoryStatisticsResponseDto dto : categoryStatistics) {
+            assertThat(dto.getIssueCount()).isOne();
+        }
+    }
+
+    @Test
+    void 우선순위별_이슈_통계를_조회한다() {
+        // given
+        List<Issue> setUp = new ArrayList<>();
+
+        final Priority[] priorities = Priority.values();
+        for (int i = 0; i < priorities.length; i++) {
+            setUp.add(Issue.builder().priority(priorities[i]).build());
+        }
+        issueRepository.saveAll(setUp);
+
+        // when
+        final List<PriorityStatisticsResponseDto> priorityStatistics = issueStatisticsService.getPriorityStatistics();
+
+        // then
+        assertThat(priorityStatistics).hasSize(priorities.length); //우선순위 개수만큼
+        for (PriorityStatisticsResponseDto dto : priorityStatistics) {
             assertThat(dto.getIssueCount()).isOne();
         }
     }

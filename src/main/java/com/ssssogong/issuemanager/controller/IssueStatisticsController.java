@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.controller;
 
 import com.ssssogong.issuemanager.dto.CategoryStatisticsResponseDto;
 import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.PriorityStatisticsResponseDto;
 import com.ssssogong.issuemanager.service.IssueStatisticsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,12 @@ public class IssueStatisticsController {
     @GetMapping("/category")
     public ResponseEntity<List<CategoryStatisticsResponseDto>> getCategoryStatistics() {
         List<CategoryStatisticsResponseDto> response = issueStatisticsService.getCategoryStatistics();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/priority")
+    public ResponseEntity<List<PriorityStatisticsResponseDto>> getPriorityStatistics() {
+        List<PriorityStatisticsResponseDto> response = issueStatisticsService.getPriorityStatistics();
         return ResponseEntity.ok(response);
     }
 }
