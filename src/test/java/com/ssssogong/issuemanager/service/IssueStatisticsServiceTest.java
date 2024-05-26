@@ -3,7 +3,7 @@ package com.ssssogong.issuemanager.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ssssogong.issuemanager.domain.Issue;
-import com.ssssogong.issuemanager.dto.DailyStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,13 +40,39 @@ class IssueStatisticsServiceTest {
         issueRepository.saveAll(setUp);
 
         // when
-        final List<DailyStatisticsResponseDto> dailyStatistics = issueStatisticsService.getDailyStatistics(null);
+        final List<DateStatisticsResponseDto> dailyStatistics = issueStatisticsService.getDailyStatistics(null);
 
         // then
         assertThat(dailyStatistics).hasSize(7); //총 7일간의 이슈 발생 기록
-        for (DailyStatisticsResponseDto dto : dailyStatistics) {
+        for (DateStatisticsResponseDto dto : dailyStatistics) {
             if (dto.getDate().equals(LocalDateTime.now().toLocalDate().format(formatter))) {
                 assertThat(dto.getIssueCount()).isEqualTo(todayIssueCount); //오늘 발생한 이슈가 10개
+            } else {
+                assertThat(dto.getIssueCount()).isZero(); //그 외엔 이슈가 발생하지 않음
+            }
+        }
+    }
+
+    @Test
+    void 최근_6개월간의_월별_이슈_발생_횟수_통계를_조회한다() {
+        // given
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        final int thisMonthIssueCount = 10;
+        List<Issue> setUp = new ArrayList<>();
+
+        for (int i = 0; i < thisMonthIssueCount; i++) {
+            setUp.add(Issue.builder().build());
+        }
+        issueRepository.saveAll(setUp);
+
+        // when
+        final List<DateStatisticsResponseDto> monthlyStatistics = issueStatisticsService.getMonthlyStatistics(null);
+
+        // then
+        assertThat(monthlyStatistics).hasSize(6); //총 6개월간의 이슈 발생 기록
+        for (DateStatisticsResponseDto dto : monthlyStatistics) {
+            if (dto.getDate().equals(LocalDateTime.now().toLocalDate().format(formatter))) {
+                assertThat(dto.getIssueCount()).isEqualTo(thisMonthIssueCount); //이번달 발생한 이슈가 10개
             } else {
                 assertThat(dto.getIssueCount()).isZero(); //그 외엔 이슈가 발생하지 않음
             }

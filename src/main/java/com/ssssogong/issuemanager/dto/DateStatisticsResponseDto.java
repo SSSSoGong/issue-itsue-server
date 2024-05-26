@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyStatisticsResponseDto {
+public class DateStatisticsResponseDto {
 
     private String date;
     private Integer issueCount;

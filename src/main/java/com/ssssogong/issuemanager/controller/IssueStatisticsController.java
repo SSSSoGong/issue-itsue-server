@@ -1,6 +1,6 @@
 package com.ssssogong.issuemanager.controller;
 
-import com.ssssogong.issuemanager.dto.DailyStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.service.IssueStatisticsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +18,18 @@ public class IssueStatisticsController {
     private final IssueStatisticsService issueStatisticsService;
 
     @GetMapping("/daily")
-    public ResponseEntity<List<DailyStatisticsResponseDto>> getDailyStatistics(
+    public ResponseEntity<List<DateStatisticsResponseDto>> getDailyStatistics(
             @RequestParam(name = "period", required = false) final Integer period
     ) {
-        final List<DailyStatisticsResponseDto> response = issueStatisticsService.getDailyStatistics(period);
+        final List<DateStatisticsResponseDto> response = issueStatisticsService.getDailyStatistics(period);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<List<DateStatisticsResponseDto>> getMonthlyStatistics(
+            @RequestParam(name = "period", required = false) final Integer period
+    ) {
+        final List<DateStatisticsResponseDto> response = issueStatisticsService.getMonthlyStatistics(period);
         return ResponseEntity.ok(response);
     }
 }

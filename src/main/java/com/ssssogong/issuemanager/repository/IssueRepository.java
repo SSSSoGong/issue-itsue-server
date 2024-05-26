@@ -11,6 +11,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     List<Issue> findByProjectId(Long projectId);
 
-    @Query("SELECT i FROM Issue i WHERE i.createdAt > :startDate")
-    List<Issue> findIssuesCreatedAfter(@Param("startDate") LocalDateTime startDate);
+    @Query("SELECT i FROM Issue i WHERE i.createdAt >= :startDate")
+    List<Issue> findIssuesCreatedSince(@Param("startDate") LocalDateTime startDate);
 }

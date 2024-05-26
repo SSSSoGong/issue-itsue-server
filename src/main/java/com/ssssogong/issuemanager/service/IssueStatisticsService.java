@@ -1,10 +1,11 @@
 package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Issue;
-import com.ssssogong.issuemanager.dto.DailyStatisticsResponseDto;
+import com.ssssogong.issuemanager.dto.DateStatisticsResponseDto;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -19,29 +20,51 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class IssueStatisticsService {
 
-    private static final Integer DEFAULT_PERIOD = 7;
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final Integer DEFAULT_DAILY_PERIOD = 7;
+    private static final String DAILY_FORMAT = "yyyy-MM-dd";
+    private static final Integer DEFAULT_MONTHLY_PERIOD = 6;
+    private static final String MONTHLY_FORMAT = "yyyy-MM";
 
     private final IssueRepository issueRepository;
 
     @Transactional(readOnly = true)
-    public List<DailyStatisticsResponseDto> getDailyStatistics(Integer period) {
-        if(Objects.isNull(period)) {
-            period = DEFAULT_PERIOD;
+    public List<DateStatisticsResponseDto> getDailyStatistics(Integer period) {
+        if (Objects.isNull(period)) {
+            period = DEFAULT_DAILY_PERIOD;
         }
-        LocalDateTime nDaysAgo = LocalDateTime.now().minus(period, ChronoUnit.DAYS);
-        final List<Issue> issues = issueRepository.findIssuesCreatedAfter(nDaysAgo);
+        LocalDateTime nDaysAgo = LocalDateTime.now().minus(period - 1, ChronoUnit.DAYS);
+        final List<Issue> issues = issueRepository.findIssuesCreatedSince(nDaysAgo);
 
-        List<LocalDate> recentDays = LocalDate.now().minusDays(DEFAULT_PERIOD-1).datesUntil(LocalDate.now().plusDays(1))
+        List<LocalDate> recentDays = nDaysAgo.toLocalDate().datesUntil(LocalDate.now().plusDays(1))
                 .toList();
 
         //일별로 분류해서 이슈 발생 횟수를 센다
         Map<LocalDate, Long> issuesByDate = issues.stream()
                 .collect(Collectors.groupingBy(issue -> issue.getCreatedAt().toLocalDate(), Collectors.counting()));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DAILY_FORMAT);
         return recentDays.stream()
-                .map(date -> new DailyStatisticsResponseDto(date.format(formatter),
+                .map(date -> new DateStatisticsResponseDto(date.format(formatter),
                         issuesByDate.getOrDefault(date, 0L).intValue()))
+                .toList();
+    }
+
+    public List<DateStatisticsResponseDto> getMonthlyStatistics(Integer period) {
+        if (Objects.isNull(period)) {
+            period = DEFAULT_MONTHLY_PERIOD;
+        }
+        LocalDateTime nMonthsAgo = LocalDateTime.now().minusMonths(period - 1).withDayOfMonth(1);
+        final List<Issue> issues = issueRepository.findIssuesCreatedSince(nMonthsAgo);
+        List<LocalDate> recentMonths = nMonthsAgo.toLocalDate().datesUntil(LocalDate.now(), Period.ofMonths(1))
+                .toList();
+
+        //월별로 분류해서 이슈 발생 횟수를 센다
+        Map<LocalDate, Long> issuesByMonth = issues.stream()
+                .collect(Collectors.groupingBy(issue -> issue.getCreatedAt().toLocalDate().withDayOfMonth(1),
+                        Collectors.counting()));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(MONTHLY_FORMAT);
+        return recentMonths.stream()
+                .map(month -> new DateStatisticsResponseDto(month.format(formatter),
+                        issuesByMonth.getOrDefault(month, 0L).intValue()))
                 .toList();
     }
 }
