@@ -11,6 +11,8 @@ import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +32,16 @@ public class IssueService {
     private final IssueModificationService issueModificationService;
 
     // 이슈 생성
+//    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE)")
     @Transactional
     public IssueIdResponseDto save(Long projectId, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
 
-        // TODO 이슈 생성 시 Security에서 User를 가져와서 reporter 필드에 넣어야 함
+        // TODO : security에서 reporter 가져오기
 //        String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User reporter = userRepository.findByAccountId("tlsgusdn4818@gmail.com").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
+        User reporter = userRepository.findByAccountId("tester1").orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
 
-        Issue issue = IssueMapper.toIssueSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
+        Issue issue = IssueMapper.toIssueFromSaveRequestDto(reporter, project, issueSaveRequestDto); // dto -> entity
         issueRepository.save(issue);    // issue 저장
         return IssueMapper.toIssueIdResponseDto(issue);
     }
@@ -52,17 +55,18 @@ public class IssueService {
     }
 
     //  이슈 수정
+//    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE)")
     @Transactional
-    public IssueIdResponseDto update(Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+    public IssueIdResponseDto update(Long projectId, Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        IssueMapper.updateFromIssueUpdateRequestDto(issue, issueUpdateRequestDto);  // dto -> entity : update 처리
-        issueRepository.save(issue);    // DB에 issue 저장(수정)
+        issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority());
         return IssueMapper.toIssueIdResponseDto(issue);  // entity -> dto
     }
 
     //  이슈 삭제
+//    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_DELETABLE)")
     @Transactional
-    public void delete(Long issueId) {
+    public void delete(Long projectId, Long issueId) {
         if (!issueRepository.existsById(issueId))
             throw new NotFoundException("해당 issue가 없습니다.");
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
@@ -70,33 +74,37 @@ public class IssueService {
     }
 
     //  이슈 상태 변경
+//    @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE, @Privilege.ISSUE_ASSIGNABLE, @Privilege.ISSUE_FIXABLE, @Privilege.ISSUE_RESOLVABLE, @Privilege.ISSUE_CLOSABLE, @Privilege.ISSUE_REOPENABLE)")
     @Transactional
-    public IssueIdResponseDto stateUpdate(Long issueId, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+    public IssueIdResponseDto stateUpdate(Long projectId, Long issueId, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         State from = issue.getState();
-        IssueMapper.updateFromIssueStateUpdateRequestDto(issue, issueStateUpdateRequestDto);    // dto -> entity : update 처리
+        issue.update(issueStateUpdateRequestDto.getState());
         State to = issue.getState();
-        if (!issueStateUpdateRequestDto.getAssignee().isBlank()) {  // assignee가 없으면 저장 X
+        if (issueStateUpdateRequestDto.getAssignee() != null && !issueStateUpdateRequestDto.getAssignee().isBlank()) {  // assignee가 없으면 저장 X
             User assignee = userRepository.findByAccountId(issueStateUpdateRequestDto.getAssignee()).orElseThrow(() -> new NotFoundException("해당 user가 없습니다"));
             issue.setAssignee(assignee);
         }
-        issueRepository.save(issue);    // issue 저장(수정)
-        issueModificationService.save(issue, from, to); // issueModification 저장
+        // TODO : modifier를 security에서 추출해서 넣어줘야 함
+        issueModificationService.save(issue, from, to, null); // issueModification 저장
         return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
 
     // 프로젝트에 속한 이슈 검색
     @Transactional(readOnly = true)
-    public List<IssueProjectResponseDto> findIssuesInProject(Long projectId, String title, String priority, String state, String category, Integer issueCount) {
+    public List<IssueProjectResponseDto> findIssuesInProject(Long projectId, String title, String priority, String state, String category, String reporter, String fixer, String assignee, Integer issueCount) {
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("해당 project가 없습니다"));
         List<Issue> issues = issueRepository.findByProjectId(project.getId());  // 프로젝트에 속한 issue들을 꺼낸다.
 
         List<Issue> filteredIssues = issues.stream()
                 .sorted(Comparator.comparing(Issue::getUpdatedAt).reversed()) // updatedAt 기준으로 내림차순 정렬
-                .filter(issue -> title == null || issue.getTitle().contains(title)) // title이 없을 수도 있다. (필터링 X)
-                .filter(issue -> priority == null || priority.isBlank() || issue.getPriority().toString().equals(priority))  // priority가 없을 수도 있다. (필터링 X)
-                .filter(issue -> state == null || state.isBlank() || issue.getState().toString().equals(state))    // state가 없을 수도 있다. (필터링 X)
-                .filter(issue -> category == null || category.isBlank() || issue.getCategory().toString().equals(category)) // category가 없을 수도 있다. (필터링 X)
+                .filter(issue -> title == null || issue.getTitle().contains(title)) // title 검색 (부분일치)
+                .filter(issue -> priority == null || priority.isBlank() || issue.getPriority().toString().equals(priority))  // priority 검색
+                .filter(issue -> state == null || state.isBlank() || issue.getState().toString().equals(state))    // state 검색
+                .filter(issue -> category == null || category.isBlank() || issue.getCategory().toString().equals(category)) // category 검색
+                .filter(issue -> reporter == null || reporter.isBlank() || issue.getReporter().getAccountId().contains(reporter)) // reporter 검색
+                .filter(issue -> fixer == null || fixer.isBlank() || issue.getFixer().getAccountId().contains(fixer)) // fixer 검색
+                .filter(issue -> assignee == null || assignee.isBlank() || issue.getAssignee().getAccountId().contains(assignee)) // assignee 검색
                 .limit(issueCount != null ? issueCount : issues.size()) // issueCount가 지정되지 않았을 경우 모든 이슈 반환
                 .toList();
         return filteredIssues.stream()

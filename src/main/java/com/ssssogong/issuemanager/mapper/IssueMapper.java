@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class IssueMapper {
 
 
-    public static Issue toIssueSaveRequestDto(User reporter, Project project, IssueSaveRequestDto issueSaveRequestDto) {
+    public static Issue toIssueFromSaveRequestDto(User reporter, Project project, IssueSaveRequestDto issueSaveRequestDto) {
         return Issue.builder()
                 .title(issueSaveRequestDto.getTitle())
                 .description(issueSaveRequestDto.getDescription())
@@ -30,24 +30,6 @@ public class IssueMapper {
                 .issueModifications(new ArrayList<>())
                 .issueImages(new ArrayList<>())
                 .build();
-    }
-
-    public static void updateFromIssueUpdateRequestDto(Issue issue, IssueUpdateRequestDto issueUpdateRequestDto) {
-        if (!issueUpdateRequestDto.getTitle().isBlank()) {
-            issue.setTitle(issueUpdateRequestDto.getTitle());
-        }
-        if (!issueUpdateRequestDto.getDescription().isBlank()) {
-            issue.setDescription(issueUpdateRequestDto.getDescription());
-        }
-        if (!issueUpdateRequestDto.getPriority().isBlank()) {
-            issue.setPriority(Priority.valueOf(issueUpdateRequestDto.getPriority()));
-        }
-    }
-
-    public static void updateFromIssueStateUpdateRequestDto(Issue issue, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
-        if (!issueStateUpdateRequestDto.getState().isBlank()) {
-            issue.setState(State.valueOf(issueStateUpdateRequestDto.getState()));
-        }
     }
 
     public static IssueIdResponseDto toIssueIdResponseDto(Issue issue) {
@@ -77,6 +59,9 @@ public class IssueMapper {
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
                 .category(issue.getCategory() != null ? issue.getCategory().toString() : null)
+                .reporter(issue.getReporter() != null ? issue.getReporter().getAccountId() : null)
+                .fixer(issue.getFixer() != null ? issue.getFixer().getAccountId() : null)
+                .assignee(issue.getAssignee() != null ? issue.getAssignee().getAccountId() : null)
                 .createdAt(issue.getCreatedAt() != null ? issue.getCreatedAt().toString() : null)
                 .updatedAt(issue.getUpdatedAt() != null ? issue.getUpdatedAt().toString() : null)
                 .build();
