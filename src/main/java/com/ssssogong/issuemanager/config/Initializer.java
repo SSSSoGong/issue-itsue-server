@@ -158,6 +158,7 @@ public class Initializer implements ApplicationRunner {
                 if (userDoesNotExist(existingUsers, d.getAccountId())) userRepository.save(d);
             for (User t : tester)
                 if (userDoesNotExist(existingUsers, admin.getAccountId())) userRepository.save(t);
+
             // 프로젝트 생성
             List<Project> existingProjects = projectRepository.findAll();
             Project project = Project.builder()

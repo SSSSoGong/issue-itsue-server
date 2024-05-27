@@ -96,6 +96,7 @@ public class ProjectPrivilegeEvaluator {
             default -> throw new IllegalArgumentException("input state " + changeTo + " is not valid");
         };
     }
+    
 
     /**유저와 이슈 작성자가 일치하는지 확인*/
     public boolean isReporter(Long issueId){
