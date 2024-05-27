@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,12 +48,13 @@ public class CommentController {
     public ResponseEntity<CommentIdResponseDto> updateComment(@PathVariable("iid") Long issueId,
                                                               @PathVariable("cid") Long commentId,
                                                               @RequestPart("content") CommentRequestDto commentRequestDto,
-                                                              @ModelAttribute List<MultipartFile> imageFiles) throws IOException {
+                                                              @ModelAttribute("imageFiles") CommentImageRequestDto commentImageRequestDto) throws IOException {
 
         commentImageService.deleteImages(commentId);
-        commentImageService.saveImages(commentId, imageFiles);
+        commentImageService.saveImages(commentId, commentImageRequestDto.getImageFiles());
+        System.out.println("controller : " + commentId);
 
-        return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent(), imageFiles), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent()), HttpStatus.OK);
     }
 
     @DeleteMapping("/issues/{iid}/comments/{cid}")

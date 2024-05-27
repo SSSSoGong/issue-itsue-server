@@ -29,7 +29,7 @@ public abstract class Role implements GrantedAuthoritiesContainer {
     @Getter
     @Transient
     protected Collection<Privilege> allowedPrivileges;
-  
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter

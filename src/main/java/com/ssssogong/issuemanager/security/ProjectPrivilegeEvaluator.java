@@ -89,14 +89,15 @@ public class ProjectPrivilegeEvaluator {
         return switch (changeTo) {
             case "NEW" -> hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
             case "ASSIGNED" -> hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
-            case "FIXED" -> hasPrivilege(projectId, Privilege.ISSUE_FIXABLE);
-            case "RESOLVED" -> hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE);
-            case "REOPENED" -> hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE);
+            case "FIXED" -> hasPrivilege(projectId, Privilege.ISSUE_FIXABLE) && isAssignee(issueId);
+            case "RESOLVED" -> hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE) && isReporter(issueId);
+            case "REOPENED" -> hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE) && isReporter(issueId);
             case "CLOSED" -> hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
             default -> throw new IllegalArgumentException("input state " + changeTo + " is not valid");
         };
     }
     
+
     /**유저와 이슈 작성자가 일치하는지 확인*/
     public boolean isReporter(Long issueId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -117,7 +118,7 @@ public class ProjectPrivilegeEvaluator {
         // issueId의 reporter와 유저 비교
         User assignee = issueRepository.findById(issueId)
                 .orElseThrow(()-> new NotFoundException("issue " + issueId + " not found"))
-                .getReporter();
+                .getAssignee();
         Objects.requireNonNull(assignee, "issue " + issueId + " does not have assignee");
         String assigneeId = assignee.getAccountId();
         return assigneeId.equals(authentication.getName());

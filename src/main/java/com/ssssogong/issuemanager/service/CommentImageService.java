@@ -31,7 +31,7 @@ public class CommentImageService {
     public void saveImages(Long commentId, List<MultipartFile> imageFiles) throws IOException {
 
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
         Path saveImagesPath = currentPath.resolve("save_images"); // 현재 경로에 save_images 경로 추가
