@@ -124,12 +124,6 @@ public class Initializer implements ApplicationRunner {
         projectRepository.save(project);
         // UserProject 객체 생성
         List<UserProject> userProjects = new ArrayList<>();
-//        userProjects.add(UserProject.builder()
-//                        .project(project)
-//                        .user(admin)
-//                        .role(administrator)
-//                        .build());
-        //todo: userProjectRepository에 admin것도 추가했음
         userProjects.add(UserProject.builder()
                 .project(project)
                 .user(admin)
