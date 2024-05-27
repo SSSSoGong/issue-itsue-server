@@ -1,11 +1,15 @@
 package com.ssssogong.issuemanager.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Builder
 @Getter
-public class ProjectUserAdditionRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectUserAdditionRequestDto {
 
     private String accountId;
     private String role;

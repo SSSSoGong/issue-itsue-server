@@ -1,11 +1,15 @@
 package com.ssssogong.issuemanager.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-public class ProjectUpdateRequest {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectUpdateRequestDto {
 
     private String name;
     private String subject;

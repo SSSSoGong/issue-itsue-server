@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.IssueModification;
+import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.repository.IssueModificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,11 @@ public class IssueModificationService {
     private final IssueModificationRepository issueModificationRepository;
 
     @Transactional
-    public void save(Issue issue, State from, State to) {
+    public void save(Issue issue, State from, State to, User modifier) {
         IssueModification issueModification = IssueModification.builder()
                 .from(from)
                 .to(to)
-                .modifier(null)
+                .modifier(modifier)
                 .build();
         issueModification.setIssue(issue);
         issueModificationRepository.save(issueModification);
