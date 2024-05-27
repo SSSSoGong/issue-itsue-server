@@ -32,5 +32,7 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 
     @Query("SELECT CASE WHEN COUNT(up) > 0 THEN TRUE ELSE FALSE END FROM UserProject up WHERE up.project.id = :projectId AND up.user.accountId IN :accountIds")
     boolean existsByProjectIdAndAccountIdIn(@Param("projectId") Long projectId, @Param("accountIds") List<String> accountIds);
+
+    void deleteAllByProjectId(Long id);
 }
 

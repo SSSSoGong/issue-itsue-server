@@ -1,11 +1,15 @@
 package com.ssssogong.issuemanager.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-public class ProjectDetailsResponse {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectDetailsResponseDto {
 
     private Long projectId;
     private String name;
