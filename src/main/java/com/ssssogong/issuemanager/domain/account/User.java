@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -21,6 +22,9 @@ public class User extends BaseEntity {
     @Column(name = "account_id", unique = true)
     private String accountId;
 
+    @Setter
     private String password;
+
+    @Setter
     private String username;
 }

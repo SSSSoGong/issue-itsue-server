@@ -158,7 +158,7 @@ public class Initializer implements ApplicationRunner {
                 if (userDoesNotExist(existingUsers, d.getAccountId())) userRepository.save(d);
             for (User t : tester)
                 if (userDoesNotExist(existingUsers, admin.getAccountId())) userRepository.save(t);
-          
+
             // 프로젝트 생성
             List<Project> existingProjects = projectRepository.findAll();
             Project project = Project.builder()
@@ -171,6 +171,7 @@ public class Initializer implements ApplicationRunner {
             // UserProject 객체 생성
             List<UserProject> existingUserProjects = userProjectRepository.findAll();
             List<UserProject> userProjects = new ArrayList<>();
+
             userProjects.add(UserProject.builder()
                     .project(project)
                     .user(admin)

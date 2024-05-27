@@ -13,6 +13,7 @@ import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class IssueService {
     // 이슈 생성
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE)")
     @Transactional
-    public IssueIdResponseDto save(Long projectId, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
+    public IssueIdResponseDto save(@P("projectId") Long projectId, IssueSaveRequestDto issueSaveRequestDto) throws IOException {
 
         String accountId = SecurityContextHolder.getContext().getAuthentication().getName();
         User reporter = userRepository.findByAccountId(accountId).orElseThrow(() -> new NotFoundException("해당 user가 없습니다."));
@@ -56,7 +57,7 @@ public class IssueService {
     //  이슈 수정
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE) and @ProjectPrivilegeEvaluator.isReporter(#issueId)")
     @Transactional
-    public IssueIdResponseDto update(Long projectId, Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+    public IssueIdResponseDto update(@P("projectId") Long projectId, @P("issueId")Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority());
         return IssueMapper.toIssueIdResponseDto(issue);  // entity -> dto
@@ -65,7 +66,7 @@ public class IssueService {
     //  이슈 삭제
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_DELETABLE)")
     @Transactional
-    public void delete(Long projectId, Long issueId) {
+    public void delete(@P("projectId")Long projectId, @P("issueId") Long issueId) {
         if (!issueRepository.existsById(issueId))
             throw new NotFoundException("해당 issue가 없습니다.");
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
@@ -75,7 +76,7 @@ public class IssueService {
     //  이슈 상태 변경
     @PreAuthorize("@ProjectPrivilegeEvaluator.canChangeIssueState(#issueId, #issueStateUpdateRequestDto)")
     @Transactional
-    public IssueIdResponseDto stateUpdate(Long projectId, Long issueId, IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+    public IssueIdResponseDto stateUpdate(@P("projectId")Long projectId, @P("issueId")Long issueId, @P("issueStateUpdateRequestDto")IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         State from = issue.getState();
         issue.update(issueStateUpdateRequestDto.getState());

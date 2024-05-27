@@ -2,8 +2,11 @@ package com.ssssogong.issuemanager.service;
 
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.dto.RegisterRequestDTO;
-import com.ssssogong.issuemanager.dto.UserDTO;
+import com.ssssogong.issuemanager.dto.FullUserDto;
+import com.ssssogong.issuemanager.dto.RegisterRequestDto;
+import com.ssssogong.issuemanager.dto.UserDto;
+import com.ssssogong.issuemanager.exception.ConflictException;
+import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
@@ -26,13 +29,13 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
 
-    public UserDTO save(RegisterRequestDTO registerRequest) throws Exception {
+    public UserDto save(RegisterRequestDto registerRequest) throws Exception {
         // 예외 처리 : id가 존재하는 경우 기각
         if (userRepository.existsByAccountId(registerRequest.getAccountId())) {
-            throw new Exception("user with id " + registerRequest.getAccountId() + " already exists.");
+            throw new ConflictException("user '" + registerRequest.getAccountId() + "' already exists.");
         }
-        User user = userRepository.save(userMapper.toRegisterDTO(registerRequest));
-        return userMapper.toRegisterDTO(user);
+        User user = userRepository.save(UserMapper.toUser(registerRequest));
+        return UserMapper.toUserDTO(user);
     }
 
     public Object login() {
@@ -44,50 +47,57 @@ public class UserService {
      *
      * @param accountId 회원탈퇴할 회원의 로그인 id
      */
-    public UserDTO unregister(String accountId) throws Exception {
+    public UserDto unregister(String accountId) throws Exception {
         Optional<User> target = userRepository.findByAccountId(accountId);
         if (target.isEmpty()) {
-            throw new Exception("id does not exist");
+            throw new NotFoundException("user '" + accountId + "' does not exist");
         }
         userRepository.deleteById(target.get().getId());
-        return userMapper.toRegisterDTO(target.get());
+        return UserMapper.toUserDTO(target.get());
     }
 
-    public Collection<UserDTO> findUsers() {
-        List<UserDTO> userDTOs = new ArrayList<>();
+    public Collection<UserDto> findUsers() {
+        List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAll().iterator().forEachRemaining(user -> {
-            userDTOs.add(userMapper.toRegisterDTO(user));
+            userDtos.add(UserMapper.toUserDTO(user));
         });
-        return userDTOs;
+        return userDtos;
     }
 
-    public Collection<UserDTO> findUsers(String username) {
-        List<UserDTO> userDTOs = new ArrayList<>();
+    public Collection<UserDto> findUsers(String username) {
+        List<UserDto> userDtos = new ArrayList<>();
         userRepository.findAllByUsername(username).iterator().forEachRemaining(user -> {
-            userDTOs.add(userMapper.toRegisterDTO(user));
+            userDtos.add(UserMapper.toUserDTO(user));
         });
-        return userDTOs;
+        return userDtos;
     }
 
     @Transactional
     public String findProjectRoleName(String accountId, Long projectId) {
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
-        if (optionalUser.isEmpty()) return null;
+        if (optionalUser.isEmpty()) throw new NotFoundException("user '" + accountId + "' not found");
         Optional<UserProject> optionalUserProject = userProjectRepository.findByUserIdAndProjectId(optionalUser.get().getId(), projectId);
-        if (optionalUserProject.isEmpty()) return null;
+        if (optionalUserProject.isEmpty()) throw new NotFoundException("user '" + accountId + "' doesn't belong to project");
         UserProject userProject = optionalUserProject.get();
         return userProject.getRole().getName();
     }
 
-    public UserDTO findUserByAccountId(String accountId) {
+    public UserDto findUserByAccountId(String accountId) {
         Optional<User> optionalUser = userRepository.findByAccountId(accountId);
-        if (optionalUser.isEmpty()) return null;
-        return userMapper.toRegisterDTO(optionalUser.get());
+        if (optionalUser.isEmpty()) throw new NotFoundException("user '" + accountId + "' not found");
+        return UserMapper.toUserDTO(optionalUser.get());
     }
 
-    public UserDTO updateUser() {
+    public FullUserDto updateUser(String accountId, RegisterRequestDto updateRequest) {
         // TODO: Update User
-        return null;
+        // username과 password 수정
+        User target = userRepository.findByAccountId(accountId).orElseThrow(NotFoundException::new);
+        if(updateRequest.getUsername() != null && !updateRequest.getUsername().isBlank())
+            target.setUsername(updateRequest.getUsername());
+        if(updateRequest.getPassword() != null && !updateRequest.getPassword().isBlank())
+            target.setPassword(updateRequest.getPassword());
+        User updated = userRepository.save(target);
+        return UserMapper.toFullUserDTO(updated);
     }
 
     /**

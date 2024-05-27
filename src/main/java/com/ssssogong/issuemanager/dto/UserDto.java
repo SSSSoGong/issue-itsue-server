@@ -5,6 +5,6 @@ import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @Data
-public class UserDTO extends UserResponseDTO {
+public class UserDto extends UserResponseDto {
     private Long id;
 }
