@@ -22,7 +22,6 @@ public class CommentImage {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-
     @Builder
     public CommentImage(Long id, String imageUrl, Comment comment) {
         this.id = id;

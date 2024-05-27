@@ -10,6 +10,8 @@ public enum Privilege {
     ISSUE_RESOLVABLE,
     ISSUE_CLOSABLE,
     ISSUE_REOPENABLE,
+    ISSUE_DELETABLE,
+    ISSUE_UPDATABLE,
     PROJECT_CREATABLE,
     PROJECT_DELETABLE,
     PROJECT_UPDATABLE;
@@ -27,6 +29,8 @@ public enum Privilege {
         private final Privilege ISSUE_RESOLVABLE = Privilege.ISSUE_RESOLVABLE;
         private final Privilege ISSUE_CLOSABLE = Privilege.ISSUE_CLOSABLE;
         private final Privilege ISSUE_REOPENABLE = Privilege.ISSUE_REOPENABLE;
+        private final Privilege ISSUE_DELETABLE = Privilege.ISSUE_DELETABLE;
+        private final Privilege ISSUE_UPDATABLE = Privilege.ISSUE_UPDATABLE;
         private final Privilege PROJECT_CREATABLE = Privilege.PROJECT_CREATABLE;
         private final Privilege PROJECT_DELETABLE = Privilege.PROJECT_DELETABLE;
         private final Privilege PROJECT_UPDATABLE = Privilege.PROJECT_UPDATABLE;

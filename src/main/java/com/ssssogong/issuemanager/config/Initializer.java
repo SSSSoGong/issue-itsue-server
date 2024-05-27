@@ -4,8 +4,13 @@ import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.role.Role;
-import com.ssssogong.issuemanager.repository.*;
+import com.ssssogong.issuemanager.exception.RoleSettingException;
+import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.RoleRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
+import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class Initializer implements ApplicationRunner {
@@ -29,7 +35,6 @@ public class Initializer implements ApplicationRunner {
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
     private String DUMMY_ACCOUNTS_PASSWORD = "1234";
-
 
     public void saveInitialRoles() {
         final List<Role> roles = roleRepository.findAll();
@@ -47,7 +52,8 @@ public class Initializer implements ApplicationRunner {
                     Role roleInstance = roleClass.getDeclaredConstructor().newInstance();
                     saves.add(roleInstance);
                 } catch (Exception e) {
-                    throw new IllegalArgumentException("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                    log.error("DB에 Role 생성 실패: " + roleClass.getName(), e);
+                    throw new RoleSettingException("DB에 Role 생성 실패: " + roleClass.getName());
                 }
             }
         }
@@ -118,11 +124,11 @@ public class Initializer implements ApplicationRunner {
         projectRepository.save(project);
         // UserProject 객체 생성
         List<UserProject> userProjects = new ArrayList<>();
-//        userProjects.add(UserProject.builder()
-//                        .project(project)
-//                        .user(admin)
-//                        .role(administrator)
-//                        .build());
+        userProjects.add(UserProject.builder()
+                .project(project)
+                .user(admin)
+                .role(administrator)
+                .build());
         for (int i = 0; i < PL_COUNT; i++) {
             userProjects.add(UserProject.builder()
                     .project(project)
