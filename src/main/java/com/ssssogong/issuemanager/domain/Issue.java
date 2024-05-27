@@ -6,7 +6,6 @@ import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import jakarta.persistence.*;
 import lombok.*;
-
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class Issue extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
-  
+
     @OneToMany(mappedBy = "issue", cascade = CascadeType.REMOVE)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
@@ -70,5 +69,20 @@ public class Issue extends BaseEntity {
         }
         this.project = project;
         project.getIssues().add(this);
+    }
+
+    public void update(String title, String description, String priority) {
+        if (title != null && !title.isBlank())
+            this.title = title;
+        if (description != null && !description.isBlank())
+            this.description = description;
+        if (priority != null && !priority.isBlank())
+            this.priority = Priority.valueOf(priority);
+    }
+
+    public void update(String state) {
+        if(state != null && !state.isBlank())
+            this.state = State.valueOf(state);
+
     }
 }
