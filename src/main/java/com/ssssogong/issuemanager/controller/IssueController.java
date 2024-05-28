@@ -5,7 +5,6 @@ import com.ssssogong.issuemanager.service.IssueImageService;
 import com.ssssogong.issuemanager.service.IssueService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -75,5 +74,16 @@ public class IssueController {
 
         List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, priority, state, category, reporter, fixer, assignee, issueCount);
         return ResponseEntity.ok(issues);
+    }
+
+    // 이슈에 대한 assignee 추천
+    //todo: 응답 포맷
+    @GetMapping("/projects/{projectId}/issues/{issueId}/assignee-suggestion")
+    public ResponseEntity<List<UserResponseDto>> suggestAssignee(
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("issueId") Long issueId
+    ) {
+        List<UserResponseDto> response = issueService.suggestAssignee(projectId, issueId);
+        return ResponseEntity.ok(response);
     }
 }

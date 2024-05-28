@@ -7,6 +7,7 @@ import com.ssssogong.issuemanager.dto.RegisterRequestDto;
 import com.ssssogong.issuemanager.dto.UserDto;
 import com.ssssogong.issuemanager.dto.UserResponseDto;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -73,6 +74,12 @@ public class UserMapper {
                 .username(user.getUsername())
                 .accountId(user.getAccountId())
                 .build();
+    }
+
+    public static List<UserResponseDto> toUserResponseDTO(List<User> users){
+        return users.stream()
+                .map(UserMapper::toUserResponseDTO)
+                .toList();
     }
 
     public static UserResponseDto toUserResponseDTO(UserDto userDto){
