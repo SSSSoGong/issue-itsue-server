@@ -77,7 +77,6 @@ public class IssueController {
     }
 
     // 이슈에 대한 assignee 추천
-    //todo: 응답 포맷
     @GetMapping("/projects/{projectId}/issues/{issueId}/assignee-suggestion")
     public ResponseEntity<List<UserResponseDto>> suggestAssignee(
             @PathVariable("projectId") Long projectId,

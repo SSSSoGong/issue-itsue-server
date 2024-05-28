@@ -3,14 +3,19 @@ package com.ssssogong.issuemanager.service;
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.IssueModification;
 import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.Roles;
+import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.Category;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
+import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.repository.IssueModificationRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.RoleRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +49,8 @@ public class IssueServiceTest {
     private ProjectRepository projectRepository;
     @Autowired
     private IssueModificationRepository issueModificationRepository;
+    @Autowired
+    private UserProjectRepository userProjectRepository;
 
     @BeforeEach
     void setUp() {
@@ -288,5 +295,93 @@ public class IssueServiceTest {
 
         assertThat(assignedToUser4).hasSize(1);
         assertThat(assignedToUser4.get(0).getTitle()).isEqualTo("이슈3");
+    }
+
+    @Test
+    void assignee_추천(@Autowired RoleRepository roleRepository) {
+        // given
+        // 유저 생성
+        final User user1 = User.builder().accountId("dev1").username("name1").build();
+        final User user2 = User.builder().accountId("dev2").username("name2").build();
+        final User user3 = User.builder().accountId("dev3").username("name3").build();
+        final User user4 = User.builder().accountId("dev4").username("name4").build();
+        final User user5 = User.builder().accountId("dev5").username("name5").build();
+        userRepository.saveAll(List.of(user1, user2, user3, user4, user5));
+
+        // 프로젝트 생성
+        final Project project = projectRepository.save(Project.builder().build());
+
+        // 프로젝트에 유저 추가
+        final Role developer = Roles.builder().roles(roleRepository.findAll()).build().findRole("Developer");
+        final UserProject userProject1 = UserProject.builder().project(project).user(user1)
+                .role(developer).build();
+        final UserProject userProject2 = UserProject.builder().project(project).user(user2)
+                .role(developer).build();
+        final UserProject userProject3 = UserProject.builder().project(project).user(user3)
+                .role(developer).build();
+        final UserProject userProject4 = UserProject.builder().project(project).user(user4)
+                .role(developer).build();
+        final UserProject userProject5 = UserProject.builder().project(project).user(user5)
+                .role(developer).build();
+        userProjectRepository.saveAll(List.of(userProject1, userProject2, userProject3, userProject4, userProject5));
+
+        // 지난 이슈들 생성
+        final Issue issue1 = Issue.builder()
+                .project(project)
+                .priority(Priority.TRIVIAL) //1
+                .category(Category.FEATURE_REQUEST) //5
+                .fixer(user3)
+                .state(State.RESOLVED)
+                .build();
+        final IssueModification modification1 = IssueModification.builder()
+                .issue(issue1)
+                .from(State.FIXED)
+                .to(State.RESOLVED)
+                .build();
+        final Issue issue2 = Issue.builder()
+                .project(project)
+                .priority(Priority.TRIVIAL) //1
+                .category(Category.REFACTORING)
+                .fixer(user3)
+                .state(State.CLOSED)
+                .build();
+        final IssueModification modification2 = IssueModification.builder()
+                .issue(issue2)
+                .from(State.FIXED)
+                .to(State.RESOLVED)
+                .build();
+        final Issue issue3 = Issue.builder()
+                .project(project)
+                .priority(Priority.MAJOR) //3
+                .category(Category.FEATURE_REQUEST) //5
+                .fixer(user1)
+                .state(State.RESOLVED)
+                .build();
+        final IssueModification modification3 = IssueModification.builder()
+                .issue(issue3)
+                .from(State.FIXED)
+                .to(State.RESOLVED)
+                .build();
+        final Issue issue4 = Issue.builder()
+                .project(project)
+                .priority(Priority.CRITICAL)
+                .category(Category.FEATURE_REQUEST)
+                .fixer(user2)
+                .state(State.NEW)
+                .build();
+        issueRepository.saveAll(List.of(issue1, issue2, issue3, issue4));
+        issueModificationRepository.saveAll(List.of(modification1, modification2, modification3));
+
+        // when
+        final Issue issue = issueRepository.save(Issue.builder()
+                .project(project)
+                .category(Category.FEATURE_REQUEST)
+                .build());
+        final List<UserResponseDto> response = issueService.suggestAssignee(project.getId(), issue.getId());
+
+        // then
+        assertThat(response).hasSize(3);
+        assertThat(response.get(0).getAccountId()).isEqualTo("dev1"); //가중치 최고
+        assertThat(response.get(1).getAccountId()).isEqualTo("dev3"); //가중치 위에서 두번째
     }
 }
