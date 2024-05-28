@@ -57,16 +57,16 @@ public class IssueService {
     //  이슈 수정
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE) and @ProjectPrivilegeEvaluator.isReporter(#issueId)")
     @Transactional
-    public IssueIdResponseDto update(@P("projectId") Long projectId, @P("issueId")Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+    public IssueIdResponseDto update(@P("projectId") Long projectId, @P("issueId") Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority());
+        issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority(), issueUpdateRequestDto.getCategory());
         return IssueMapper.toIssueIdResponseDto(issue);  // entity -> dto
     }
 
     //  이슈 삭제
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_DELETABLE)")
     @Transactional
-    public void delete(@P("projectId")Long projectId, @P("issueId") Long issueId) {
+    public void delete(@P("projectId") Long projectId, @P("issueId") Long issueId) {
         if (!issueRepository.existsById(issueId))
             throw new NotFoundException("해당 issue가 없습니다.");
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
@@ -76,7 +76,7 @@ public class IssueService {
     //  이슈 상태 변경
     @PreAuthorize("@ProjectPrivilegeEvaluator.canChangeIssueState(#issueId, #issueStateUpdateRequestDto)")
     @Transactional
-    public IssueIdResponseDto stateUpdate(@P("projectId")Long projectId, @P("issueId")Long issueId, @P("issueStateUpdateRequestDto")IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+    public IssueIdResponseDto stateUpdate(@P("projectId") Long projectId, @P("issueId") Long issueId, @P("issueStateUpdateRequestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         State from = issue.getState();
         issue.update(issueStateUpdateRequestDto.getState());
@@ -95,6 +95,8 @@ public class IssueService {
         issueModificationService.save(issue, from, to, modifier); // issueModification 저장
         return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
+
+
 
     // 프로젝트에 속한 이슈 검색
     @Transactional(readOnly = true)
