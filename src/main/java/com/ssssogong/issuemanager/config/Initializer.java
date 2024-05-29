@@ -19,9 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -29,20 +27,20 @@ import java.util.stream.Collectors;
 public class Initializer implements ApplicationRunner {
     /**
      * 스프링 실행 시 시작 데이터 넣어주는 클래스
-     *
+     * <p>
      * 시작 데이터 :
-     *
+     * <p>
      * - Role
-     *
+     * <p>
      * - 더미 계정 (admin, tester, dev, pl)
-     *   각 계정 아이디는 'role{i}' 형태 -> admin, dev1, pl2, ...
-     *   계정 비밀번호는 전역변수로 지정
-     *
+     * 각 계정 아이디는 'role{i}' 형태 -> admin, dev1, pl2, ...
+     * 계정 비밀번호는 전역변수로 지정
+     * <p>
      * - 더미 프로젝트
-     *   프로젝트명, subject는 전역변수로 지정
-     *
+     * 프로젝트명, subject는 전역변수로 지정
+     * <p>
      * - 더미 권한 (UserProject)
-     *   계정명에 맞게 들어있음
+     * 계정명에 맞게 들어있음
      */
     private static final String ROLE_BASE_PACKAGE = "com.ssssogong.issuemanager.domain.role";
     private final String DUMMY_ACCOUNTS_PASSWORD = "1234";
@@ -58,16 +56,15 @@ public class Initializer implements ApplicationRunner {
     private final PasswordEncoder passwordEncoder;
 
 
-
     private boolean roleDoesNotExist(final List<Role> roles, final String expectedRoleName) {
         return roles.stream().noneMatch(each -> each.isRole(expectedRoleName));
     }
 
-    private boolean userDoesNotExist(final List<User> users, final String accountId){
+    private boolean userDoesNotExist(final List<User> users, final String accountId) {
         return users.stream().noneMatch(each -> each.getAccountId().equals(accountId));
     }
 
-    private boolean userProjectDoesNotExist(final List<UserProject> userProjects, String projectName, String accountId, String roleName){
+    private boolean userProjectDoesNotExist(final List<UserProject> userProjects, String projectName, String accountId, String roleName) {
         return userProjects.stream().noneMatch(each ->
                 (each.getProject().getName().equals(projectName)
                         && each.getUser().getAccountId().equals(accountId)
@@ -75,7 +72,7 @@ public class Initializer implements ApplicationRunner {
         );
     }
 
-    private boolean projectDoesNotExist(final List<Project> projects, final String projectName, final String adminAccountId){
+    private boolean projectDoesNotExist(final List<Project> projects, final String projectName, final String adminAccountId) {
         return projects.stream().noneMatch(each ->
                 (each.getName().equals(projectName) && each.getAdmin().getAccountId().equals(adminAccountId))
         );
@@ -106,7 +103,6 @@ public class Initializer implements ApplicationRunner {
     }
 
 
-
     public void saveInitialAccounts() {
         System.out.println("TestAccountInitializer: saving accounts");
 
@@ -121,7 +117,7 @@ public class Initializer implements ApplicationRunner {
         Role projectLeader = roleRepository.findByName("ProjectLeader").get();
         Role testerRole = roleRepository.findByName("Tester").get();
 
-        try {        
+        try {
             // 계정 추가
             // admin 추가
             admin = User.builder()
@@ -163,20 +159,20 @@ public class Initializer implements ApplicationRunner {
             if (userDoesNotExist(existingUsers, admin.getAccountId())) userRepository.save(admin);
             else admin = userRepository.findByAccountId(admin.getAccountId()).get();
 
-            for(int i = 0; i < pl.size(); i++)
+            for (int i = 0; i < pl.size(); i++)
                 if (userDoesNotExist(existingUsers, pl.get(i).getAccountId())) userRepository.save(pl.get(i));
                 else pl.set(i, userRepository.findByAccountId(pl.get(i).getAccountId()).get());
 
-            for(int i = 0; i < dev.size(); i++)
+            for (int i = 0; i < dev.size(); i++)
                 if (userDoesNotExist(existingUsers, dev.get(i).getAccountId())) userRepository.save(dev.get(i));
                 else dev.set(i, userRepository.findByAccountId(dev.get(i).getAccountId()).get());
 
-            for(int i = 0; i < tester.size(); i++)
+            for (int i = 0; i < tester.size(); i++)
                 if (userDoesNotExist(existingUsers, tester.get(i).getAccountId())) userRepository.save(tester.get(i));
                 else tester.set(i, userRepository.findByAccountId(tester.get(i).getAccountId()).get());
 
             System.out.println("Initializer: saved users");
-            
+
             // 프로젝트 생성
             System.out.println("Initializer: saving projects to projectRepository");
             List<Project> existingProjects = projectRepository.findAllFetchJoinAdmin();
@@ -190,12 +186,11 @@ public class Initializer implements ApplicationRunner {
             if (projectDoesNotExist) {
                 projectRepository.save(project);
                 System.out.println("Initializer: saved projects");
-            }
-            else{
+            } else {
                 System.out.println("Initializer: project already exists");
                 // 이미 존재할 시, db에 저장된 객체로 바꿔치기한다 (userProject 저장 시 referential error 방지)
-                for(Project proj : existingProjects){
-                    if(project.getAdmin().getAccountId().equals(admin.getAccountId()) && proj.getName().equals(DUMMY_PROJECT_NAME)){
+                for (Project proj : existingProjects) {
+                    if (project.getAdmin().getAccountId().equals(admin.getAccountId()) && proj.getName().equals(DUMMY_PROJECT_NAME)) {
                         project = proj;
                     }
                 }
@@ -251,8 +246,7 @@ public class Initializer implements ApplicationRunner {
                     userProjectRepository.save(userProjects.get(idx++));
             }
             System.out.println("Initializer: saved userProjects");
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 //            System.out.println("Initializer Exception: " + e.getMessage());
             log.error("Initializer Exception", e);
         }
