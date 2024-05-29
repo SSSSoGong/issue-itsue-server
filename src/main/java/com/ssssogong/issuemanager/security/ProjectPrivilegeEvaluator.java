@@ -102,7 +102,7 @@ public class ProjectPrivilegeEvaluator {
         // 변경할 state에 따라 권한 판단
         return switch (changeTo) {
             case "NEW" -> hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
-            case "ASSIGNED" -> changeFrom.equals("NEW") && hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
+            case "ASSIGNED" -> (changeFrom.equals("REOPENED") || changeFrom.equals("NEW")) && hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
             case "FIXED" -> changeFrom.equals("ASSIGNED") && hasPrivilege(projectId, Privilege.ISSUE_FIXABLE) && isAssignee(issueId);
             case "RESOLVED" -> changeFrom.equals("FIXED") && hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE) && isReporter(issueId);
             case "CLOSED" -> changeFrom.equals("RESOLVED") && hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
