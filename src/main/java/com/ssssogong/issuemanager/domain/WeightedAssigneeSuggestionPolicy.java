@@ -1,7 +1,6 @@
 package com.ssssogong.issuemanager.domain;
 
 import com.ssssogong.issuemanager.domain.account.User;
-import com.ssssogong.issuemanager.domain.enumeration.Category;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -20,35 +19,34 @@ public class WeightedAssigneeSuggestionPolicy implements AssigneeSuggestionPolic
      */
 
     private static final int MAX_SUGGESTION_COUNT = 3;
-    private static final int SAME_CATEGORY_WEIGHT = 5; //같은 카테고리의 이슈를 해결했다면 가중치 준다.
-    private static final Map<Priority, Integer> priorityWeights = new EnumMap<>(Priority.class);
-
-    static {
-        // 해결한 이슈의 중요도에 따른 가중치를 준다.
+    private final WeightCalculator categoryWeightCalculator = (currentIssue, pastIssue) -> {
+        int SAME_CATEGORY_WEIGHT = 5; //같은 카테고리의 이슈를 해결했다면 가중치 준다.
+        return currentIssue.getCategory() == pastIssue.getCategory() ? SAME_CATEGORY_WEIGHT : 0;
+    };
+    private final WeightCalculator priorityWeightCalculator = (currentIssue, pastIssue) -> {
+        // 우선순위에 따른 가중치를 준다.
+        Map<Priority, Integer> priorityWeights = new EnumMap<>(Priority.class);
         priorityWeights.put(Priority.BLOCKER, 5);
         priorityWeights.put(Priority.CRITICAL, 4);
         priorityWeights.put(Priority.MAJOR, 3);
         priorityWeights.put(Priority.MINOR, 2);
         priorityWeights.put(Priority.TRIVIAL, 1);
-    }
+
+        return priorityWeights.getOrDefault(pastIssue.getPriority(), 0);
+    };
 
     @Override
     public List<User> suggest(final Issue issue, final List<User> developers) {
         final Project project = issue.getProject();
         final List<Issue> issues = project.getIssues();
-        final Category category = issue.getCategory();
         Map<User, Integer> userWeights = initializeWeights(developers);
 
         for (Issue each : issues) {
-            if(each.hasResolvedHistory()) {
+            if (each.hasResolvedHistory()) {
                 final User fixer = each.getFixer();
-                //중요도 가중치
-                final Priority priority = each.getPriority();
-                userWeights.computeIfPresent(fixer, (key, weight) -> weight + priorityWeights.get(priority));
-                //카테고리 가중치
-                if(category == each.getCategory()) {
-                    userWeights.computeIfPresent(fixer, (key, weight) -> weight + SAME_CATEGORY_WEIGHT);
-                }
+                int categoryWeight = categoryWeightCalculator.calculateWeight(issue, each);
+                int priorityWeight = priorityWeightCalculator.calculateWeight(issue, each);
+                userWeights.computeIfPresent(fixer, (key, weight) -> weight + priorityWeight + categoryWeight);
             }
         }
 
