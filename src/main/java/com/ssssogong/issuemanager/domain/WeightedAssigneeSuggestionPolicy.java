@@ -37,7 +37,6 @@ public class WeightedAssigneeSuggestionPolicy implements AssigneeSuggestionPolic
         final Project project = issue.getProject();
         final List<Issue> issues = project.getIssues();
         final Category category = issue.getCategory();
-        System.out.println("category = " + category);
 
         // 유저별 가중치 초기화
         Map<User, Integer> userWeights = new HashMap<>();
@@ -52,17 +51,10 @@ public class WeightedAssigneeSuggestionPolicy implements AssigneeSuggestionPolic
                 final Priority priority = each.getPriority();
                 userWeights.computeIfPresent(fixer, (key, weight) -> weight + priorityWeights.get(priority));
                 //카테고리 가중치
-                System.out.println("each.getCategory() = " + each.getCategory());
                 if(category == each.getCategory()) {
-                    System.out.println("들어왔다!: " + fixer.getAccountId());
                     userWeights.computeIfPresent(fixer, (key, weight) -> weight + SAME_CATEGORY_WEIGHT);
                 }
             }
-        }
-
-        for (User user : userWeights.keySet()) {
-            System.out.println("user = " + user.getAccountId());
-            System.out.println("userWeights.get(user) = " + userWeights.get(user));
         }
 
         // 최대 MAX_SUGGESTION_COUNT 만큼의 유저 리스트를 반환
