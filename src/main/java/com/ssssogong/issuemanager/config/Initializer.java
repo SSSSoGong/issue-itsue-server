@@ -231,18 +231,18 @@ public class Initializer implements ApplicationRunner {
             }
 
             int idx = 0;
-            if (userProjectDoesNotExist(existingUserProjects, project.getName(), admin.getAccountId(), admin.toString()))
+            if (userProjectDoesNotExist(existingUserProjects, project.getName(), admin.getAccountId(), "Administrator"))
                 userProjectRepository.save(userProjects.get(idx++));
             for (int i = 0; i < PL_COUNT; i++) {
-                if (userProjectDoesNotExist(existingUserProjects, project.getName(), pl.get(i).getAccountId(), pl.get(i).toString()))
+                if (userProjectDoesNotExist(existingUserProjects, project.getName(), pl.get(i).getAccountId(), "ProjectLeader"))
                     userProjectRepository.save(userProjects.get(idx++));
             }
             for (int i = 0; i < TESTER_COUNT; i++) {
-                if (userProjectDoesNotExist(existingUserProjects, project.getName(), tester.get(i).getAccountId(), tester.get(i).toString()))
+                if (userProjectDoesNotExist(existingUserProjects, project.getName(), tester.get(i).getAccountId(), "Tester"))
                     userProjectRepository.save(userProjects.get(idx++));
             }
             for (int i = 0; i < DEV_COUNT; i++) {
-                if (userProjectDoesNotExist(existingUserProjects, project.getName(), dev.get(i).getAccountId(), dev.get(i).toString()))
+                if (userProjectDoesNotExist(existingUserProjects, project.getName(), dev.get(i).getAccountId(), "Developer"))
                     userProjectRepository.save(userProjects.get(idx++));
             }
             System.out.println("Initializer: saved userProjects");
