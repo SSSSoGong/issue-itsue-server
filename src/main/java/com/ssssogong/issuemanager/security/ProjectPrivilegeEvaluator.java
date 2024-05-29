@@ -2,6 +2,7 @@ package com.ssssogong.issuemanager.security;
 
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.domain.role.Privilege;
 import com.ssssogong.issuemanager.dto.IssueStateUpdateRequestDto;
 import com.ssssogong.issuemanager.exception.NotFoundException;
@@ -40,8 +41,10 @@ public class ProjectPrivilegeEvaluator {
      *      (어노테이션 특성 상 매개변수가 아니면 가져올 수 없음)
      */
 
-    /**콘솔에 권한 출력 (디버깅용)*/
-    private void printPrivileges(Authentication authentication){
+    /**
+     * 콘솔에 권한 출력 (디버깅용)
+     */
+    private void printPrivileges(Authentication authentication) {
         System.out.print("ProjectPermissionEvaluator: account id '" + authentication.getName() + "' with role [ ");
         authentication.getAuthorities().forEach(auth -> System.out.print(auth.getAuthority() + " "));
         System.out.println("]");
@@ -66,58 +69,73 @@ public class ProjectPrivilegeEvaluator {
         return false;
     }
 
-    /**유저가 해당 프로젝트의 생성자인지 확인*/
+    /**
+     * 유저가 해당 프로젝트의 생성자인지 확인
+     */
     public boolean isAdmin(Long projectId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         printPrivileges(authentication);
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(()-> new NotFoundException("project " + projectId + " not found"));
+                .orElseThrow(() -> new NotFoundException("project " + projectId + " not found"));
         return Objects.equals(project.getAdmin().getAccountId(), authentication.getName());
     }
 
-    /**유저가 해당 이슈에 상태 변경 권한이 있는지 확인*/
-    public boolean canChangeIssueState(Long issueId, IssueStateUpdateRequestDto updateRequest){
+    /**
+     * 유저가 해당 이슈에 상태 변경 권한이 있는지 확인
+     */
+    public boolean canChangeIssueState(Long issueId, IssueStateUpdateRequestDto updateRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         printPrivileges(authentication);
         // issueId로부터 projectId 조회
         Long projectId = issueRepository.findById(issueId)
-                .orElseThrow(()->new NotFoundException("issue " + issueId + " not found"))
+                .orElseThrow(() -> new NotFoundException("issue " + issueId + " not found"))
                 .getProject().getId();
-        // 변경할 state에 따라 권한 판단
+
+        // issueId로부터 state 조회
+        String changeFrom = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NotFoundException("issue " + issueId + "not found"))
+                .getState().toString();
         String changeTo = updateRequest.getState();
+
+        // state 변경은 2단계 이상 건너 뛸 수 없다.
+        // 변경할 state에 따라 권한 판단
         return switch (changeTo) {
             case "NEW" -> hasPrivilege(projectId, Privilege.ISSUE_REPORTABLE);
-            case "ASSIGNED" -> hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
-            case "FIXED" -> hasPrivilege(projectId, Privilege.ISSUE_FIXABLE) && isAssignee(issueId);
-            case "RESOLVED" -> hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE) && isReporter(issueId);
-            case "REOPENED" -> hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE) && isReporter(issueId);
-            case "CLOSED" -> hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
+            case "ASSIGNED" -> (changeFrom.equals("REOPENED") || changeFrom.equals("NEW")) && hasPrivilege(projectId, Privilege.ISSUE_ASSIGNABLE);
+            case "FIXED" -> changeFrom.equals("ASSIGNED") && hasPrivilege(projectId, Privilege.ISSUE_FIXABLE) && isAssignee(issueId);
+            case "RESOLVED" -> changeFrom.equals("FIXED") && hasPrivilege(projectId, Privilege.ISSUE_RESOLVABLE) && isReporter(issueId);
+            case "CLOSED" -> changeFrom.equals("RESOLVED") && hasPrivilege(projectId, Privilege.ISSUE_CLOSABLE);
+            case "REOPENED" -> changeFrom.equals("CLOSED") && hasPrivilege(projectId, Privilege.ISSUE_REOPENABLE) && isReporter(issueId);
             default -> throw new IllegalArgumentException("input state " + changeTo + " is not valid");
         };
     }
-    
 
-    /**유저와 이슈 작성자가 일치하는지 확인*/
-    public boolean isReporter(Long issueId){
+
+    /**
+     * 유저와 이슈 작성자가 일치하는지 확인
+     */
+    public boolean isReporter(Long issueId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         printPrivileges(authentication);
         // issueId의 reporter와 유저 비교
         User owner = issueRepository.findById(issueId)
-                .orElseThrow(()-> new NotFoundException("issue " + issueId + " not found"))
+                .orElseThrow(() -> new NotFoundException("issue " + issueId + " not found"))
                 .getReporter();
         Objects.requireNonNull(owner, "issue " + issueId + " does not have reporter");
         String ownerId = owner.getAccountId();
         return ownerId.equals(authentication.getName());
     }
 
-    /**유저와 이슈 assignee가 일치하는지 확인*/
-    public boolean isAssignee(Long issueId){
+    /**
+     * 유저와 이슈 assignee가 일치하는지 확인
+     */
+    public boolean isAssignee(Long issueId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         printPrivileges(authentication);
         // issueId의 reporter와 유저 비교
         User assignee = issueRepository.findById(issueId)
-                .orElseThrow(()-> new NotFoundException("issue " + issueId + " not found"))
+                .orElseThrow(() -> new NotFoundException("issue " + issueId + " not found"))
                 .getAssignee();
         Objects.requireNonNull(assignee, "issue " + issueId + " does not have assignee");
         String assigneeId = assignee.getAccountId();
