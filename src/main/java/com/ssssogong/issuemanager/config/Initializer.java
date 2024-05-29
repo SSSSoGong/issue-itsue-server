@@ -1,14 +1,20 @@
 package com.ssssogong.issuemanager.config;
 
+import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
 import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
+import com.ssssogong.issuemanager.domain.enumeration.Category;
+import com.ssssogong.issuemanager.domain.enumeration.Priority;
+import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.domain.role.Role;
 import com.ssssogong.issuemanager.exception.RoleSettingException;
+import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
 import com.ssssogong.issuemanager.repository.RoleRepository;
 import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
@@ -54,6 +60,7 @@ public class Initializer implements ApplicationRunner {
     private final ProjectRepository projectRepository;
     private final UserProjectRepository userProjectRepository;
     private final PasswordEncoder passwordEncoder;
+    private final IssueRepository issueRepository;
 
 
     private boolean roleDoesNotExist(final List<Role> roles, final String expectedRoleName) {
@@ -246,6 +253,22 @@ public class Initializer implements ApplicationRunner {
                     userProjectRepository.save(userProjects.get(idx++));
             }
             System.out.println("Initializer: saved userProjects");
+
+            //이슈 저장! 통계 내려면 이슈는 다다익선이니까~ 실행될때마다 tester, category, priority 랜덤 저장됨
+            Random random = new Random();
+            final Category[] categories = Category.values();
+            final Priority[] priorities = Priority.values();
+            issueRepository.save(Issue.builder()
+                    .project(project)
+                    .title("prepared issue")
+                    .description("this is description!")
+                    .category(categories[random.nextInt(categories.length)])
+                    .priority(priorities[random.nextInt(priorities.length)])
+                    .state(State.NEW)
+                    .reporter(tester.get(random.nextInt(tester.size())))
+                    .build()
+            );
+
         } catch (Exception e) {
 //            System.out.println("Initializer Exception: " + e.getMessage());
             log.error("Initializer Exception", e);
