@@ -17,6 +17,9 @@ public interface UserProjectRepository extends JpaRepository<UserProject, Long> 
 
     List<UserProject> findAllByUserId(Long id);
 
+    @Query("SELECT up FROM UserProject up LEFT JOIN FETCH up.user LEFT JOIN FETCH up.project LEFT JOIN FETCH up.role")
+    List<UserProject> findAllFetchJoinUserAndProjectAndRole();
+
     @Query("SELECT up FROM UserProject up JOIN FETCH up.project WHERE up.user.id = :userId")
     List<UserProject> findAllByUserIdFetchJoinProject(@Param("userId") Long userId);
 
