@@ -46,7 +46,7 @@ public class IssueImageService {
 
                     Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
                     IssueImage issueImage = IssueImage.builder()
-                            .imageUrl(filePath.toString())
+                            .imageUrl("/images/" + fileName) // 실제 저장 주소가 아닌 프론트에게 넘길 이미지 주소!
                             .build();
                     issueImage.setIssue(issue);
                     issueImageRepository.save(issueImage);
