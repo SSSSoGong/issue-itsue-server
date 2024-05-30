@@ -49,7 +49,7 @@ public class CommentImageService {
                 file.transferTo(filePath.toFile()); // 파일 경로 => 파일 변환 후 해당 경로에 파일 저장
 
                 CommentImage commentImage = CommentImage.builder()
-                        .imageUrl(filePath.toString())
+                        .imageUrl("/saveimages/" + fileName) // 실제 저장 주소가 아닌 프론트에게 넘길 이미지 주소!
                         .build();
 
                 commentImage.setComment(comment); // 연관관계 주입
