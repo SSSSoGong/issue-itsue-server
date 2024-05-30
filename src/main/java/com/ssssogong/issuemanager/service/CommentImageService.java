@@ -34,7 +34,7 @@ public class CommentImageService {
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
-        Path saveImagesPath = currentPath.resolve("save_images"); // 현재 경로에 save_images 경로 추가
+        Path saveImagesPath = currentPath.resolve("saveimages"); // 현재 경로에 save_images 경로 추가
 
         if (!Files.exists(saveImagesPath)) { // 해당 폴더 없으면
             Files.createDirectories(saveImagesPath); // 생성
