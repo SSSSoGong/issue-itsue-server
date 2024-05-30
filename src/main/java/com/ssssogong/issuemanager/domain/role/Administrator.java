@@ -8,7 +8,6 @@ import java.util.List;
 public class Administrator extends Role {
     {
         this.allowedPrivileges = List.of(
-                // TODO : Admin은 모든 권한을 줘도 괜찮지 않을까?
                 Privilege.PROJECT_CREATABLE,
                 Privilege.PROJECT_UPDATABLE,
                 Privilege.PROJECT_DELETABLE,
