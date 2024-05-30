@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ImageController {
 
-    @GetMapping("/images/{fileName}")
+    @GetMapping("/saveimages/{fileName}")
     public ResponseEntity<Resource> loadImage(@PathVariable(value = "fileName") String fileName) throws MalformedURLException {
         final URI image = Paths.get("").toAbsolutePath().resolve("saveimages").resolve(fileName).toUri();
         final UrlResource urlResource = new UrlResource(image);
