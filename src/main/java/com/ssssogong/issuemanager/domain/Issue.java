@@ -87,4 +87,8 @@ public class Issue extends BaseEntity {
             this.state = State.valueOf(state);
 
     }
+
+    public boolean hasResolvedHistory() {
+        return issueModifications.stream().anyMatch(each -> each.getTo() == State.RESOLVED);
+    }
 }

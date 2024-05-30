@@ -1,14 +1,18 @@
 package com.ssssogong.issuemanager.service;
 
+import com.ssssogong.issuemanager.domain.AssigneeSuggestionPolicy;
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.mapper.IssueMapper;
+import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +35,8 @@ public class IssueService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final IssueModificationService issueModificationService;
+    private final AssigneeSuggestionPolicy assigneeSuggestionPolicy;
+    private final UserProjectRepository userProjectRepository;
 
     // 이슈 생성
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE)")
@@ -118,5 +124,20 @@ public class IssueService {
         return filteredIssues.stream()
                 .map(IssueMapper::toIssueProjectResponseDto) // entity -> dto
                 .collect(Collectors.toList());
+    }
+
+    // assignee 추천
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> suggestAssignee(final Long projectId, final Long issueId) {
+        final Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NotFoundException("이슈를 찾을 수 없습니다."));
+
+        final List<User> developers = userProjectRepository.findAllByProjectId(projectId)
+                .stream()
+                .filter(each -> each.getRole().isRole("Developer"))
+                .map(UserProject::getUser).toList();
+
+        final List<User> suggestion = assigneeSuggestionPolicy.suggest(issue, developers);
+        return UserMapper.toUserResponseDTO(suggestion);
     }
 }
