@@ -59,6 +59,11 @@ public class IssueServiceTest {
                 .accountId("tester")
                 .username("Hyun")
                 .build();
+        final User dev = User.builder()
+                .id(2L)
+                .accountId("dev")
+                .username("Woo")
+                .build();
         final Project project = Project.builder()
                 .id(1L)
                 .name("야심찬 프로젝트")
@@ -72,9 +77,11 @@ public class IssueServiceTest {
                 .state(State.ASSIGNED)
                 .category(Category.REFACTORING)
                 .reporter(user)
+                .assignee(dev)
                 .project(project)
                 .build();
         userRepository.save(user);
+        userRepository.save(dev);
         projectRepository.save(project);
         issueRepository.save(issue);
     }
@@ -167,23 +174,15 @@ public class IssueServiceTest {
 
     @Transactional
     @Test
-    @WithMockUser(username = "tester", roles = {"ISSUE_ASSIGNABLE_1"})
+    @WithMockUser(username = "dev", roles = {"ISSUE_FIXABLE_1"})
     void 이슈_상태_변경() {
         // given
         final Long projectId = 1L;
         final Long issueId = 1L;
-        final String newState = "ASSIGNED";
-        final String accountId = "Dev";
-        final User user = User.builder()
-                .id(5L)
-                .accountId(accountId)
-                .username("Jin")
-                .build();
+        final String newState = "FIXED";
         final IssueStateUpdateRequestDto issueStateUpdateRequestDto = IssueStateUpdateRequestDto.builder()
                 .state(newState)
-                .assignee(accountId)
                 .build();
-        userRepository.save(user);
 
 
         // when
@@ -196,7 +195,6 @@ public class IssueServiceTest {
         assertThat(issueModifications).isNotEmpty();
         assertAll(
                 () -> assertThat(updatedIssue.getState()).isEqualTo(State.valueOf(newState)),
-                () -> assertThat(updatedIssue.getAssignee().getAccountId()).isEqualTo(accountId),
                 () -> assertThat(issueModifications).hasSize(1),
                 () -> assertThat(issueModifications.get(0).getIssue()).isEqualTo(updatedIssue)
         );
