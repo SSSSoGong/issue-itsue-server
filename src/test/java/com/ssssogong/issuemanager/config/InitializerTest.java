@@ -68,6 +68,7 @@ public class InitializerTest {
 
         // when
         List<User> usersBefore = userRepository.findAll();
+        initializer.saveInitialRoles();
         initializer.saveInitialAccounts();
         List<User> savedUsers = userRepository.findAll();
         int savedDevCount = (int) savedUsers.stream().filter(each -> {
@@ -104,6 +105,7 @@ public class InitializerTest {
 
         // when
         List<UserProject> userProjectsBefore = userProjectRepository.findAll();
+        initializer.saveInitialRoles();
         initializer.saveInitialAccounts();
         List<UserProject> savedUserProjects = userProjectRepository.findAll();
         int savedAdminCount = (int) savedUserProjects.stream().filter(each ->
