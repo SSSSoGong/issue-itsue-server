@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class UserTest {
-
     @Test
     void setter가_작동하는지_확인한다(){
         // given
