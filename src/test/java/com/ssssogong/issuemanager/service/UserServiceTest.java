@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Sql(value = "/truncate.sql")
+@Sql(value = "/truncate_role.sql")
 class UserServiceTest {
 
     @Autowired
