@@ -78,15 +78,11 @@ class CommentImageServiceTest {
                 new FileInputStream("bear.jpg")
         );
 
-        CommentImage commentImage = CommentImage.builder()
-                .imageUrl("bear.jpg")
-                .comment(getComment())
-                .build();
-
-        commentImageRepository.save(commentImage);
+        final Long commentId = getComment().getId();
+        commentImageService.saveImages(commentId, List.of(image));
 
         //then
-        assertThatCode(() -> commentImageService.deleteImages(getComment().getId()))
+        assertThatCode(() -> commentImageService.deleteImages(commentId))
                 .doesNotThrowAnyException();
 
         assertEquals(0, getComment().getCommentImages().size());
