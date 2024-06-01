@@ -59,7 +59,8 @@ public class IssueImageService {
     public void delete(Long issueId) {
         List<IssueImage> issueImages = issueImageRepository.findByIssueId(issueId);
         for (IssueImage issueImage : issueImages) {
-            String imageUrl = issueImage.getImageUrl();
+            Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
+            String imageUrl = currentPath + issueImage.getImageUrl(); //현재 작업 절대 경로에 db에 저장되있던 url 추가
             File deleteFile = new File(imageUrl);
             deleteFile.delete();
         }
