@@ -95,7 +95,7 @@ public class Initializer implements ApplicationRunner {
 
         for (Class<? extends Role> roleClass : roleClasses) {
             String roleName = roleClass.getSimpleName();
-            //DB에 없는 role은 반영한다
+            // DB에 없는 role은 반영한다
             if (roleDoesNotExist(roles, roleName)) {
                 try {
                     Role roleInstance = roleClass.getDeclaredConstructor().newInstance();
