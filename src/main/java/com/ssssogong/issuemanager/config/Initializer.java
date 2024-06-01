@@ -52,9 +52,12 @@ public class Initializer implements ApplicationRunner {
     private final String DUMMY_ACCOUNTS_PASSWORD = "1234";
     private final String DUMMY_PROJECT_NAME = "Initial Project";
 
-    private final int PL_COUNT = 2;
-    private final int DEV_COUNT = 10;
-    private final int TESTER_COUNT = 5;
+    public final int ADMIN_COUNT = 1;
+    public final int PL_COUNT = 2;
+    public final int DEV_COUNT = 10;
+    public final int TESTER_COUNT = 5;
+
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ProjectRepository projectRepository;
@@ -113,7 +116,7 @@ public class Initializer implements ApplicationRunner {
     public void saveInitialAccounts() {
         System.out.println("TestAccountInitializer: saving accounts");
 
-        User admin;
+        User admin = null;
         List<User> existingUsers = userRepository.findAll();
         List<User> pl = new ArrayList<>();
         List<User> dev = new ArrayList<>();
@@ -127,11 +130,14 @@ public class Initializer implements ApplicationRunner {
         try {
             // 계정 추가
             // admin 추가
-            admin = User.builder()
-                    .accountId("adminID")
-                    .username("Hong Gildong")
-                    .password(passwordEncoder.encode(DUMMY_ACCOUNTS_PASSWORD))
-                    .build();
+            for(int i = 0; i < ADMIN_COUNT; i++) {
+                String adminId = (i == 0)? "adminId" : "adminId" + i;
+                admin = User.builder()
+                        .accountId(adminId)
+                        .username("Hong Gildong")
+                        .password(passwordEncoder.encode(DUMMY_ACCOUNTS_PASSWORD))
+                        .build();
+            }
             // PL 추가
             for (int i = 1; i <= PL_COUNT; i++) {
                 pl.add(
