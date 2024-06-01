@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserProjectTest {
 
     @Test
-    void 유저가_프로젝트에_초대외었을때_접근시간은_비어있다() {
+    void 유저가_프로젝트에_초대되었을때_접근시간은_비어있다() {
         // given
         final UserProject userProject = UserProject.builder().build();
 
