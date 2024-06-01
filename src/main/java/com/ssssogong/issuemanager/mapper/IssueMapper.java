@@ -55,6 +55,7 @@ public class IssueMapper {
 
     public static IssueProjectResponseDto toIssueProjectResponseDto(Issue issue) {
         return IssueProjectResponseDto.builder()
+                .id(issue.getId())
                 .title(issue.getTitle())
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
