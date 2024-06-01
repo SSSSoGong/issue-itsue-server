@@ -29,7 +29,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
 
-    public UserDto save(RegisterRequestDto registerRequest) throws Exception {
+    public UserDto save(RegisterRequestDto registerRequest){
         // 예외 처리 : id가 존재하는 경우 기각
         if (userRepository.existsByAccountId(registerRequest.getAccountId())) {
             throw new ConflictException("user '" + registerRequest.getAccountId() + "' already exists.");
