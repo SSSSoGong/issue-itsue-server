@@ -52,7 +52,6 @@ public class CommentController {
 
         commentImageService.deleteImages(commentId);
         commentImageService.saveImages(commentId, commentImageRequestDto.getImageFiles());
-        System.out.println("controller : " + commentId);
 
         return new ResponseEntity<>(commentService.updateComment(commentId, commentRequestDto.getContent()), HttpStatus.OK);
     }

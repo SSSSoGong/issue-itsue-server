@@ -37,26 +37,6 @@ public class IssueImageRepositoryTest {
         assertThat(findIssueImage.getImageUrl()).isEqualTo(issueImage.getImageUrl());
     }
 
-//    @Test
-//    void 이슈이미지_수정() {
-//        // given
-//        final IssueImage issueImage = IssueImage.builder()
-//                .id(1L)
-//                .imageUrl("이미지 경로")
-//                .build();
-//        issueImageRepository.save(issueImage);
-//
-//        // when
-//        final String newImageUrl = "새로운 이미지 경로";
-//        issueImage.setImageUrl(newImageUrl);
-//        issueImageRepository.save(issueImage);
-//        IssueImage findIssueImage = issueImageRepository.findById(issueImage.getId()).orElse(null);
-//
-//        // then
-//        assertThat(findIssueImage).isNotNull();
-//        assertThat(findIssueImage.getImageUrl()).isEqualTo(newImageUrl);
-//    }
-
     @Test
     void 이슈이미지_삭제(){
         // given

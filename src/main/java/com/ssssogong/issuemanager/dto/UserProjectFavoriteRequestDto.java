@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserProjectFavoriteRequestDto {
 
-    private boolean isFavorite;
+    private Boolean isFavorite;
 }

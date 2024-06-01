@@ -66,7 +66,8 @@ public class CommentImageService {
 
         for (CommentImage commentImage : commentImages) {
 
-            String imageUrl = commentImage.getImageUrl();
+            Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
+            String imageUrl = currentPath + commentImage.getImageUrl(); //현재 작업 절대 경로에 db에 저장되있던 url 추가
             File deleteFile = new File(imageUrl); // 해당 코멘트에 달린 이미지들 경로 추출
             deleteFile.delete(); // 로컬 파일 삭제 => boolean 타입이 반환되는데, 에러 메세지 돌려줄지 말지 결정.
         }

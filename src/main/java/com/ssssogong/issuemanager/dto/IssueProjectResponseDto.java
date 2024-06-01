@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class IssueProjectResponseDto {
+    private Long id;
     private String title;
     private String priority;
     private String state;
@@ -20,7 +21,9 @@ public class IssueProjectResponseDto {
     private String updatedAt;
 
     @Builder
-    public IssueProjectResponseDto(String title, String priority, String state, String category, String reporter, String fixer, String assignee, String createdAt, String updatedAt) {
+
+    public IssueProjectResponseDto(Long id, String title, String priority, String state, String category, String reporter, String fixer, String assignee, String createdAt, String updatedAt) {
+        this.id = id;
         this.title = title;
         this.priority = priority;
         this.state = state;

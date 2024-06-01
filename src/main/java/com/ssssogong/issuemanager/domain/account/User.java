@@ -18,13 +18,10 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-
     @Column(name = "account_id", unique = true)
     private String accountId;
-
     @Setter
     private String password;
-
     @Setter
     private String username;
 }
