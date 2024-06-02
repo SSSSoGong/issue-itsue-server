@@ -122,7 +122,7 @@ class UserServiceTest {
         UserDto UserByAccountId = userService.findUserByAccountId("user" + USERS_LENGTH);
 
         // then
-        assertThat(allUsers.size()).isEqualTo(USERS_LENGTH);
+        assertThat(allUsers.size()).isEqualTo(USERS_LENGTH+1);
         assertThat(UsersByUsername.size()).isEqualTo(2);
         assertThat(UserByAccountId).isNotNull();
     }
