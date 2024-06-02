@@ -46,7 +46,7 @@ public class IssueImageService {
 
                     Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
                     IssueImage issueImage = IssueImage.builder()
-                            .imageUrl(filePath.toString())
+                            .imageUrl("/saveimages/" + fileName) // 실제 저장 주소가 아닌 프론트에게 넘길 이미지 주소!
                             .build();
                     issueImage.setIssue(issue);
                     issueImageRepository.save(issueImage);
@@ -59,7 +59,8 @@ public class IssueImageService {
     public void delete(Long issueId) {
         List<IssueImage> issueImages = issueImageRepository.findByIssueId(issueId);
         for (IssueImage issueImage : issueImages) {
-            String imageUrl = issueImage.getImageUrl();
+            Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
+            String imageUrl = currentPath + issueImage.getImageUrl(); //현재 작업 절대 경로에 db에 저장되있던 url 추가
             File deleteFile = new File(imageUrl);
             deleteFile.delete();
         }

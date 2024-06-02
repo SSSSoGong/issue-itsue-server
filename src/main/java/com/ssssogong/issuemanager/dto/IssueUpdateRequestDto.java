@@ -13,11 +13,13 @@ public class IssueUpdateRequestDto {
     private String title;
     private String description;
     private String priority;
+    private String category;
 
     @Builder
-    public IssueUpdateRequestDto(String title, String description, String priority) {
+    public IssueUpdateRequestDto(String title, String description, String priority, String category) {
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.category = category;
     }
 }

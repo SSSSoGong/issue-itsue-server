@@ -158,6 +158,6 @@ public class ProjectService {
             final Long projectId,
             final UserProjectFavoriteRequestDto userProjectFavoriteRequestDto) {
         final UserProject userProject = findUserProjectByAccountIdAndProjectId(accountId, projectId);
-        userProject.updateIsFavorite(userProjectFavoriteRequestDto.isFavorite());
+        userProject.updateIsFavorite(userProjectFavoriteRequestDto.getIsFavorite());
     }
 }

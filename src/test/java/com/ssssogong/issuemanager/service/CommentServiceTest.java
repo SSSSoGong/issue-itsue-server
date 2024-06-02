@@ -7,6 +7,8 @@ import com.ssssogong.issuemanager.dto.CommentRequestDto;
 import com.ssssogong.issuemanager.repository.CommentRepository;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +20,9 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-;
 
-
+@SuppressWarnings("NonAsciiCharacters")
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(value = "/truncate.sql")
 class CommentServiceTest {
@@ -41,7 +43,7 @@ class CommentServiceTest {
     @Test
     @WithMockUser(username = "dev1")
     @Transactional
-    void 코멘트_생성하기() throws IOException {
+    void 코멘트_생성하기() {
         //given
         Issue issue = Issue.builder()
                 .description("테스트 이슈")
@@ -135,7 +137,6 @@ class CommentServiceTest {
         assertThatCode(() -> commentService.getComment(comment.getId()))
                 .doesNotThrowAnyException();
 
-
     }
 
     @Test
@@ -166,10 +167,8 @@ class CommentServiceTest {
         String updateContent = "update content";
 
         //then
-        System.out.println(comment.getId());
         assertThatCode(() -> commentService.updateComment(comment.getId(), updateContent))
                 .doesNotThrowAnyException();
-
     }
 
     @Test

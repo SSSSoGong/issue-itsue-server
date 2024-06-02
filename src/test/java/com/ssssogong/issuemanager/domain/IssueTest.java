@@ -28,7 +28,7 @@ public class IssueTest {
         // when
         final String title = "대단한 이슈";
         final String description = "대단한 이슈입니다";
-        issue.update(title, description, null);
+        issue.update(title, description, null, null);
 
         // then
         assertThat(issue.getTitle()).isEqualTo(title);
@@ -50,7 +50,7 @@ public class IssueTest {
         // when
         final String title = "";
         final String description = "대단한 이슈입니다";
-        issue.update(title, description, null);
+        issue.update(title, description, null, null);
 
         // then
         assertThat(issue.getTitle()).isEqualTo(originalTitle);
@@ -72,7 +72,7 @@ public class IssueTest {
         // when
         final String title = "대단한 이슈";
         final String description = "";
-        issue.update(title, description, null);
+        issue.update(title, description, null, null);
 
         // then
         assertThat(issue.getTitle()).isEqualTo(title);
@@ -94,7 +94,7 @@ public class IssueTest {
         // when
         final String title = "대단한 이슈";
         final String description = "대단한 이슈입니다";
-        issue.update(title, description, null);
+        issue.update(title, description, null, null);
 
         // then
         assertThat(issue.getTitle()).isEqualTo(title);

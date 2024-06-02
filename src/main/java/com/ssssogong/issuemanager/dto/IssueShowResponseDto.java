@@ -20,9 +20,10 @@ public class IssueShowResponseDto {
     private String reporter;
     private String reportedDate;
     private List<String> imageUrls;
+    private String assignee;
 
     @Builder
-    public IssueShowResponseDto(String title, String description, String priority, String state, String category, String reporter, String reportedDate, List<String> imageUrls) {
+    public IssueShowResponseDto(String title, String description, String priority, String state, String category, String reporter, String reportedDate, List<String> imageUrls, String assignee) {
         this.title = title;
         this.description = description;
         this.priority = priority;
@@ -31,5 +32,6 @@ public class IssueShowResponseDto {
         this.reporter = reporter;
         this.reportedDate = reportedDate;
         this.imageUrls = imageUrls;
+        this.assignee = assignee;
     }
 }
