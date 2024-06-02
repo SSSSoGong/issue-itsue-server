@@ -32,12 +32,12 @@ public class IssueStatisticsService {
 
     private final IssueRepository issueRepository;
 
-    public List<DateStatisticsResponseDto> getDailyStatistics(Integer period) {
+    public List<DateStatisticsResponseDto> getDailyStatistics(Long projectId, Integer period) {
         if (Objects.isNull(period)) {
             period = DEFAULT_DAILY_PERIOD;
         }
         LocalDateTime nDaysAgo = LocalDateTime.now().minus(period - 1, ChronoUnit.DAYS);
-        final List<Issue> issues = issueRepository.findIssuesCreatedSince(nDaysAgo);
+        final List<Issue> issues = issueRepository.findIssuesCreatedSinceAndByProjectId(projectId, nDaysAgo);
 
         List<LocalDate> recentDays = nDaysAgo.toLocalDate().datesUntil(LocalDate.now().plusDays(1))
                 .toList();
@@ -52,12 +52,12 @@ public class IssueStatisticsService {
                 .toList();
     }
 
-    public List<DateStatisticsResponseDto> getMonthlyStatistics(Integer period) {
+    public List<DateStatisticsResponseDto> getMonthlyStatistics(Long projectId, Integer period) {
         if (Objects.isNull(period)) {
             period = DEFAULT_MONTHLY_PERIOD;
         }
         LocalDateTime nMonthsAgo = LocalDateTime.now().minusMonths(period - 1).withDayOfMonth(1);
-        final List<Issue> issues = issueRepository.findIssuesCreatedSince(nMonthsAgo);
+        final List<Issue> issues = issueRepository.findIssuesCreatedSinceAndByProjectId(projectId, nMonthsAgo);
         List<LocalDate> recentMonths = nMonthsAgo.toLocalDate().datesUntil(LocalDate.now().plusDays(1), Period.ofMonths(1))
                 .toList();
 
@@ -72,8 +72,8 @@ public class IssueStatisticsService {
                 .toList();
     }
 
-    public List<CategoryStatisticsResponseDto> getCategoryStatistics() {
-        final List<Issue> issues = issueRepository.findAll();
+    public List<CategoryStatisticsResponseDto> getCategoryStatistics(Long projectId) {
+        final List<Issue> issues = issueRepository.findByProjectId(projectId);
         Map<Category, Long> issuesByCategory = issues.stream()
                 .collect(Collectors.groupingBy(Issue::getCategory, Collectors.counting()));
 
@@ -87,8 +87,8 @@ public class IssueStatisticsService {
                 .toList();
     }
 
-    public List<PriorityStatisticsResponseDto> getPriorityStatistics() {
-        final List<Issue> issues = issueRepository.findAll();
+    public List<PriorityStatisticsResponseDto> getPriorityStatistics(Long projectId) {
+        final List<Issue> issues = issueRepository.findByProjectId(projectId);
         Map<Priority, Long> issuesByPriority = issues.stream()
                 .collect(Collectors.groupingBy(Issue::getPriority, Collectors.counting()));
 
