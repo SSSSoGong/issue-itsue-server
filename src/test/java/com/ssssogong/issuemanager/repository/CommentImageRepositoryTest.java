@@ -2,8 +2,11 @@ package com.ssssogong.issuemanager.repository;
 
 import com.ssssogong.issuemanager.domain.Comment;
 import com.ssssogong.issuemanager.domain.CommentImage;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SuppressWarnings("NonAsciiCharacters")
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@DataJpaTest
 @Sql(value = "/truncate.sql")
 class CommentImageRepositoryTest {
     @Autowired
@@ -25,7 +30,6 @@ class CommentImageRepositoryTest {
 
 
     @Test
-    @Transactional
     void 해당_코멘트에_달린_이미지_찾기() {
         //given
         Comment comment = Comment.builder()
@@ -48,17 +52,15 @@ class CommentImageRepositoryTest {
         commentImage1.setComment(comment);
         commentImage2.setComment(comment);
 
+        commentRepository.save(comment);
+
+
         //then
-        assertAll(
-                () -> assertThat(commentImage1.getComment().getId()).isEqualTo(comment.getId()),
-                () -> assertThat(commentImage1.getComment().getId()).isEqualTo(comment.getId())
-        );
-
-
+        List<CommentImage> commentImageList = commentImageRepository.findByCommentId(comment.getId());
+        assertThat(commentImageList.size()).isEqualTo(2);
     }
 
     @Test
-    @Transactional
     void 해당_코멘트에_달린_이미지_삭제() {
         //given
         Comment comment = Comment.builder()
@@ -84,8 +86,6 @@ class CommentImageRepositoryTest {
         commentImageRepository.deleteByCommentId(comment.getId());
 
         //then
-        List<CommentImage> remainingImages = commentImageRepository.findByCommentId(comment.getId());
-        assertEquals(0, remainingImages.size());
-
+        assertEquals(0, commentImageRepository.count());
     }
 }

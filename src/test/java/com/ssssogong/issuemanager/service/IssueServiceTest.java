@@ -131,6 +131,7 @@ public class IssueServiceTest {
                 () -> assertThat(issueShowResponseDto.getCategory()).isEqualTo("REFACTORING")
         );
     }
+
     @Transactional
     @Test
     @WithMockUser(username = "tester", roles = {"ISSUE_UPDATABLE_1"})
