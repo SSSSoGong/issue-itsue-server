@@ -104,7 +104,7 @@ class UserServiceTest {
         // given
         final int USERS_LENGTH = 10;
         List<User> users = new ArrayList<>();
-        for(int i = 0; i < USERS_LENGTH-1; i++) {
+        for(int i = 1; i < USERS_LENGTH; i++) {
             users.add(User.builder()
                     .accountId("user" + i)
                     .username("username" + i)
