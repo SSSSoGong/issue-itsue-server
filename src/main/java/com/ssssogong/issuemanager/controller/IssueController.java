@@ -76,4 +76,14 @@ public class IssueController {
         List<IssueProjectResponseDto> issues = issueService.findIssuesInProject(projectId, title, priority, state, category, reporter, fixer, assignee, issueCount);
         return ResponseEntity.ok(issues);
     }
+
+    // 이슈에 대한 assignee 추천
+    @GetMapping("/projects/{projectId}/issues/{issueId}/assignee-suggestion")
+    public ResponseEntity<List<UserResponseDto>> suggestAssignee(
+            @PathVariable("projectId") Long projectId,
+            @PathVariable("issueId") Long issueId
+    ) {
+        List<UserResponseDto> response = issueService.suggestAssignee(projectId, issueId);
+        return ResponseEntity.ok(response);
+    }
 }

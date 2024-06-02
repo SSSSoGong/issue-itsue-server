@@ -1,14 +1,18 @@
 package com.ssssogong.issuemanager.service;
 
+import com.ssssogong.issuemanager.domain.AssigneeSuggestionPolicy;
 import com.ssssogong.issuemanager.domain.Issue;
 import com.ssssogong.issuemanager.domain.Project;
+import com.ssssogong.issuemanager.domain.UserProject;
 import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.State;
 import com.ssssogong.issuemanager.dto.*;
 import com.ssssogong.issuemanager.exception.NotFoundException;
 import com.ssssogong.issuemanager.mapper.IssueMapper;
+import com.ssssogong.issuemanager.mapper.UserMapper;
 import com.ssssogong.issuemanager.repository.IssueRepository;
 import com.ssssogong.issuemanager.repository.ProjectRepository;
+import com.ssssogong.issuemanager.repository.UserProjectRepository;
 import com.ssssogong.issuemanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +35,8 @@ public class IssueService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final IssueModificationService issueModificationService;
+    private final AssigneeSuggestionPolicy assigneeSuggestionPolicy;
+    private final UserProjectRepository userProjectRepository;
 
     // 이슈 생성
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_REPORTABLE)")
@@ -57,16 +63,16 @@ public class IssueService {
     //  이슈 수정
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_UPDATABLE) and @ProjectPrivilegeEvaluator.isReporter(#issueId)")
     @Transactional
-    public IssueIdResponseDto update(@P("projectId") Long projectId, @P("issueId")Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
+    public IssueIdResponseDto update(@P("projectId") Long projectId, @P("issueId") Long issueId, IssueUpdateRequestDto issueUpdateRequestDto) throws IOException {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
-        issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority());
+        issue.update(issueUpdateRequestDto.getTitle(), issueUpdateRequestDto.getDescription(), issueUpdateRequestDto.getPriority(), issueUpdateRequestDto.getCategory());
         return IssueMapper.toIssueIdResponseDto(issue);  // entity -> dto
     }
 
     //  이슈 삭제
     @PreAuthorize("@ProjectPrivilegeEvaluator.hasPrivilege(#projectId, @Privilege.ISSUE_DELETABLE)")
     @Transactional
-    public void delete(@P("projectId")Long projectId, @P("issueId") Long issueId) {
+    public void delete(@P("projectId") Long projectId, @P("issueId") Long issueId) {
         if (!issueRepository.existsById(issueId))
             throw new NotFoundException("해당 issue가 없습니다.");
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
@@ -76,7 +82,7 @@ public class IssueService {
     //  이슈 상태 변경
     @PreAuthorize("@ProjectPrivilegeEvaluator.canChangeIssueState(#issueId, #issueStateUpdateRequestDto)")
     @Transactional
-    public IssueIdResponseDto stateUpdate(@P("projectId")Long projectId, @P("issueId")Long issueId, @P("issueStateUpdateRequestDto")IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
+    public IssueIdResponseDto stateUpdate(@P("projectId") Long projectId, @P("issueId") Long issueId, @P("issueStateUpdateRequestDto") IssueStateUpdateRequestDto issueStateUpdateRequestDto) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new NotFoundException("해당 issue가 없습니다"));
         State from = issue.getState();
         issue.update(issueStateUpdateRequestDto.getState());
@@ -95,6 +101,8 @@ public class IssueService {
         issueModificationService.save(issue, from, to, modifier); // issueModification 저장
         return IssueMapper.toIssueIdResponseDto(issue); // entity -> dto
     }
+
+
 
     // 프로젝트에 속한 이슈 검색
     @Transactional(readOnly = true)
@@ -116,5 +124,20 @@ public class IssueService {
         return filteredIssues.stream()
                 .map(IssueMapper::toIssueProjectResponseDto) // entity -> dto
                 .collect(Collectors.toList());
+    }
+
+    // assignee 추천
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> suggestAssignee(final Long projectId, final Long issueId) {
+        final Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new NotFoundException("이슈를 찾을 수 없습니다."));
+
+        final List<User> developers = userProjectRepository.findAllByProjectId(projectId)
+                .stream()
+                .filter(each -> each.getRole().isRole("Developer"))
+                .map(UserProject::getUser).toList();
+
+        final List<User> suggestion = assigneeSuggestionPolicy.suggest(issue, developers);
+        return UserMapper.toUserResponseDTO(suggestion);
     }
 }

@@ -58,7 +58,7 @@ public class IssueStatisticsService {
         }
         LocalDateTime nMonthsAgo = LocalDateTime.now().minusMonths(period - 1).withDayOfMonth(1);
         final List<Issue> issues = issueRepository.findIssuesCreatedSince(nMonthsAgo);
-        List<LocalDate> recentMonths = nMonthsAgo.toLocalDate().datesUntil(LocalDate.now(), Period.ofMonths(1))
+        List<LocalDate> recentMonths = nMonthsAgo.toLocalDate().datesUntil(LocalDate.now().plusDays(1), Period.ofMonths(1))
                 .toList();
 
         //월별로 분류해서 이슈 발생 횟수를 센다

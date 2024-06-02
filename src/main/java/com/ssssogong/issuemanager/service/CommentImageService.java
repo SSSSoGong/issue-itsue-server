@@ -34,7 +34,7 @@ public class CommentImageService {
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
-        Path saveImagesPath = currentPath.resolve("save_images"); // 현재 경로에 save_images 경로 추가
+        Path saveImagesPath = currentPath.resolve("saveimages"); // 현재 경로에 save_images 경로 추가
 
         if (!Files.exists(saveImagesPath)) { // 해당 폴더 없으면
             Files.createDirectories(saveImagesPath); // 생성
@@ -49,7 +49,7 @@ public class CommentImageService {
                 file.transferTo(filePath.toFile()); // 파일 경로 => 파일 변환 후 해당 경로에 파일 저장
 
                 CommentImage commentImage = CommentImage.builder()
-                        .imageUrl(filePath.toString())
+                        .imageUrl("/saveimages/" + fileName) // 실제 저장 주소가 아닌 프론트에게 넘길 이미지 주소!
                         .build();
 
                 commentImage.setComment(comment); // 연관관계 주입
@@ -66,7 +66,8 @@ public class CommentImageService {
 
         for (CommentImage commentImage : commentImages) {
 
-            String imageUrl = commentImage.getImageUrl();
+            Path currentPath = Paths.get("").toAbsolutePath();  // 현재 작업 절대경로
+            String imageUrl = currentPath + commentImage.getImageUrl(); //현재 작업 절대 경로에 db에 저장되있던 url 추가
             File deleteFile = new File(imageUrl); // 해당 코멘트에 달린 이미지들 경로 추출
             deleteFile.delete(); // 로컬 파일 삭제 => boolean 타입이 반환되는데, 에러 메세지 돌려줄지 말지 결정.
         }
