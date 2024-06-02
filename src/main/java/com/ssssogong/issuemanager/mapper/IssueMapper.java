@@ -7,7 +7,10 @@ import com.ssssogong.issuemanager.domain.account.User;
 import com.ssssogong.issuemanager.domain.enumeration.Category;
 import com.ssssogong.issuemanager.domain.enumeration.Priority;
 import com.ssssogong.issuemanager.domain.enumeration.State;
-import com.ssssogong.issuemanager.dto.*;
+import com.ssssogong.issuemanager.dto.IssueIdResponseDto;
+import com.ssssogong.issuemanager.dto.IssueProjectResponseDto;
+import com.ssssogong.issuemanager.dto.IssueSaveRequestDto;
+import com.ssssogong.issuemanager.dto.IssueShowResponseDto;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -50,7 +53,7 @@ public class IssueMapper {
                 .imageUrls(issue.getIssueImages() != null ? issue.getIssueImages().stream()
                         .map(IssueImage::getImageUrl)
                         .collect(Collectors.toList()) : null)
-                .assignee(issue.getAssignee().getAccountId())
+                .assignee(issue.getAssignee() != null ? issue.getAssignee().getAccountId() : null)
                 .build();
     }
 
