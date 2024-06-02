@@ -133,7 +133,7 @@ public class ProjectPrivilegeEvaluator {
     public boolean isAssignee(Long issueId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         printPrivileges(authentication);
-        // issueId의 reporter와 유저 비교
+        // issueId의 assignee와 유저 비교
         User assignee = issueRepository.findById(issueId)
                 .orElseThrow(() -> new NotFoundException("issue " + issueId + " not found"))
                 .getAssignee();

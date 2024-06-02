@@ -50,12 +50,13 @@ public class IssueMapper {
                 .imageUrls(issue.getIssueImages() != null ? issue.getIssueImages().stream()
                         .map(IssueImage::getImageUrl)
                         .collect(Collectors.toList()) : null)
+                .assignee(issue.getAssignee().getAccountId())
                 .build();
     }
 
     public static IssueProjectResponseDto toIssueProjectResponseDto(Issue issue) {
         return IssueProjectResponseDto.builder()
-                .id(issue.getId())
+                .issueId(issue.getId())
                 .title(issue.getTitle())
                 .priority(issue.getPriority() != null ? issue.getPriority().toString() : null)
                 .state(issue.getState() != null ? issue.getState().toString() : null)
